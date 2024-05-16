@@ -1,4 +1,4 @@
 # PolyLinked
-A simiulation of LinkedIn
-Authors: AliReza Atharifard, Mohammad Javad Akbari
-Version: 1.0
+A simiulation of LinkedIn 
+<br />Authors: AliReza Atharifard, Mohammad Javad Akbari
+<br />Version: 1.0
