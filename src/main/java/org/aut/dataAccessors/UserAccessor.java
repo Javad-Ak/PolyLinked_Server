@@ -1,6 +1,7 @@
 package org.aut.dataAccessors;
 
 import java.sql.*;
+
 import org.aut.models.User;
 
 public class UserAccessor {
@@ -24,9 +25,10 @@ public class UserAccessor {
         statement.setString(1, username);
         ResultSet resultSet = statement.executeQuery();
 
-        if (resultSet.next())
-            return new User(resultSet.getString(1), resultSet.getString(2));
+        User newUser = null;
+        if (resultSet.next()) newUser = new User(resultSet.getString(1), resultSet.getString(2));
 
-        return null; // not found
+        statement.close();
+        return newUser; // null -> not found
     }
 }

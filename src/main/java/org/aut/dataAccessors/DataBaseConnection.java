@@ -6,12 +6,18 @@ import java.util.ArrayList;
 import java.nio.file.*;
 import java.sql.*;
 
-public class DataBaseConnection {
+public class DataBaseConnection extends Thread {
     private static final String directory = "src/main/dataBase";
     private static final String url = "jdbc:sqlite:./src/main/dataBase/data.db";
     private static final ArrayList<Connection> connections = new ArrayList<>();
 
-    private DataBaseConnection() {
+    public DataBaseConnection(String name) {
+        super(name);
+    }
+
+    @Override
+    public void run() {
+        closeConnections();
     }
 
     public static void create() throws IOException {
@@ -41,7 +47,7 @@ public class DataBaseConnection {
         }
     }
 
-    public static void closeConnections() {
+    public void closeConnections() {
         for (Connection connection : connections) {
             try {
                 connection.close();
