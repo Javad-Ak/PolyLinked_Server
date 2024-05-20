@@ -3,6 +3,7 @@ package org.aut;
 import com.sun.net.httpserver.HttpServer;
 
 import java.net.InetSocketAddress;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import org.aut.dataAccessors.DataBaseConnection;

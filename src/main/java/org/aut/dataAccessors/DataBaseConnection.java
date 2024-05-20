@@ -30,8 +30,11 @@ public class DataBaseConnection extends Thread {
              Statement statement = connection.createStatement()) {
 //            TODO other tables
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (" +
-                    "username VARCHAR(32) PRIMARY KEY NOT NULL" +
-                    ", password VARCHAR(32) NOT NULL );");
+                    "id TEXT PRIMARY KEY NOT NULL" +
+                    ", email TEXT PRIMARY KEY NOT NULL" +
+                    ", firstName VARCHAR(20) NOT NULL" +
+                    ", lastName VARCHAR(40) NOT NULL " +
+                    "password VARCHAR(20) NOT NULL);");
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
         }
