@@ -11,11 +11,13 @@ public class UserAccessor {
     }
 
     public synchronized static void addUser(User user) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO users (username, password) " +
-                "VALUES (?, ?)");
-        statement.setString(1, user.getUsername());
-        statement.setString(2, user.getPassword());
-
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO users (id , first_name , last_name , email, password) " +
+                "VALUES (?,?,?,? ?)");
+        statement.setNString(1, user.getId());
+        statement.setString(2, user.getFirstName());
+        statement.setString(3, user.getLastName());
+        statement.setString(4, user.getEmail());
+        statement.setString(5, user.getPassword());
         statement.executeUpdate();
         statement.close();
     }

@@ -1,9 +1,11 @@
 package org.aut.models;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.math.RandomUtils;
+import java.util.Random;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.json.JSONObject;
+
+import java.util.Random;
+import java.util.UUID;
 
 public class User {
     private String id;
@@ -13,19 +15,27 @@ public class User {
     private String lastName;
 
     public User(String email, String password, String firstName, String lastName) {
-        this.id = "user" + RandomUtils.nextInt(99999) + RandomStringUtils.randomAlphanumeric(4);
-        this.email = email;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        if(validateFields(firstName , lastName , email , password)){
+            this.id = "user" + new Random().nextInt(99999)+ UUID.randomUUID().toString().substring(4 , 27);
+            this.email = email;
+            this.password = password;
+            this.firstName = firstName;
+            this.lastName = lastName;
+        } else {
+            throw new IllegalArgumentException("Invalid Fields");
+        }
     }
 
     public User(JSONObject json) {
-        this.id = json.getString("id");
-        this.email = json.getString("email");
-        this.password = json.getString("password");
-        this.firstName = json.getString("first_name");
-        this.lastName = json.getString("last_name");
+        if(validateFields(json.getString("first-name") ,json.getString("last-name") , json.getString("email") , json.getString("password"))){
+            this.id = json.getString("id");
+            this.email = json.getString("email");
+            this.password = json.getString("password");
+            this.firstName = json.getString("first_name");
+            this.lastName = json.getString("last_name");
+        } else {
+            throw new IllegalArgumentException("Invalid Fields");
+        }
     }
 
     @Override
@@ -63,10 +73,12 @@ public class User {
         return password;
     }
 
-    private boolean validateFields() {
+    private boolean validateFields( String firstName , String lastName , String email ,String password) {
+        if(firstName == null || lastName == null || email == null || password == null) return false;
         if (!EmailValidator.getInstance().isValid(email)) return false;
-
-//        TODO: others
+        if (!password.matches(".*[0-9].*") || !password.matches(".*[a-zA-Z].*")) return false;
+        if (password.length() < 8) return false;
+//        TODO: others(?)
         return true;
     }
 }

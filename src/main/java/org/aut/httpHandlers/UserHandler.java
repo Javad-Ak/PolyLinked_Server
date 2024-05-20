@@ -25,10 +25,10 @@ public class UserHandler implements HttpHandler {
                 try {
                     if (!jsonObject.toString().isEmpty() && !UserController.UserExists(newUser.getUsername())) {
                         UserController.addUser(newUser);
-                        response.put("message", "User " + newUser.getUsername() + " created");
+                        response.put("message", "User " + newUser.getFirstName() + " " + newUser.getLastName() + " created");
 //                    TODO : Files.createDirectories
                     } else {
-                        response.put("message", "User " + newUser.getUsername() + " already exists");
+                        response.put("message", "User " +  newUser.getFirstName() + " " + newUser.getLastName() + " already exists");
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
