@@ -34,7 +34,7 @@ public class DataBaseConnection extends Thread {
                     ", email TEXT PRIMARY KEY NOT NULL" +
                     ", firstName VARCHAR(20) NOT NULL" +
                     ", lastName VARCHAR(40) NOT NULL " +
-                    "password VARCHAR(20) NOT NULL);");
+                    ", password VARCHAR(20) NOT NULL);");
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
         }

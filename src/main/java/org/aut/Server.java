@@ -32,7 +32,7 @@ public class Server {
 
             System.out.println("Server is running on localhost:8080.");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

@@ -19,7 +19,7 @@ public class UserTest {
 
             con.setDoInput(true); // enables input stream, no need
             con.setDoOutput(true); // enables output stream
-            JsonHandler.sendJsonObject(con.getOutputStream(), new User("Ali", "a1234").toJSON());
+            JsonHandler.sendJsonObject(con.getOutputStream(), new User("ali@gmail.com" , "ali12345" , "Ali", "akbari").toJSON());
 
             if (con.getResponseCode() / 100 == 2) {
                 System.out.println("test1 result: " + JsonHandler.getJsonObject(con.getInputStream()));

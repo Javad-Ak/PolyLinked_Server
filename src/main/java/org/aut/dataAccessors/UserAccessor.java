@@ -3,6 +3,8 @@ package org.aut.dataAccessors;
 import java.sql.*;
 
 import org.aut.models.User;
+import org.aut.utils.JsonHandler;
+import org.json.JSONObject;
 
 public class UserAccessor {
     private static final Connection connection = DataBaseConnection.getConnection();
@@ -22,15 +24,13 @@ public class UserAccessor {
         statement.close();
     }
 
-    public synchronized static User getUser(String username) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE username = ?");
-        statement.setString(1, username);
+    public synchronized static User getUser(String email) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE email = ?");
+        statement.setString(1, email);
         ResultSet resultSet = statement.executeQuery();
-
-        User newUser = null;
-        if (resultSet.next()) newUser = new User(resultSet.getString(1), resultSet.getString(2));
-
+        JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
         statement.close();
-        return newUser; // null -> not found
+
+        return jsonObject ==  null ? null : new User(jsonObject); // null -> not found
     }
 }
