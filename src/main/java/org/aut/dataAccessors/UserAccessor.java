@@ -14,8 +14,8 @@ public class UserAccessor {
 
     public synchronized static void addUser(User user) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("INSERT INTO users (id, email, password, firstName, LastName) " +
-                "VALUES (?,?,?,? ?)");
-        statement.setNString(1, user.getId());
+                "VALUES (?,?,?,?,?);");
+        statement.setString(1, user.getId());
         statement.setString(2, user.getEmail());
         statement.setString(3, user.getPassword());
         statement.setString(4, user.getFirstName());
@@ -25,7 +25,7 @@ public class UserAccessor {
     }
 
     public synchronized static User getUser(String email) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE email = ?");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE email = ?;");
         statement.setString(1, email);
         ResultSet resultSet = statement.executeQuery();
         JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);

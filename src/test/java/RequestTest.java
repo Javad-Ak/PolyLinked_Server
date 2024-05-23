@@ -1,13 +1,15 @@
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.*;
 
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 
-@DisplayName("------ testing users...")
-public class UserTest {
+@DisplayName("------ testing requests...")
+public class RequestTest {
     @Test
     @DisplayName("---- adding a user")
     public void addUser() {
@@ -19,10 +21,15 @@ public class UserTest {
 
             con.setDoInput(true); // enables input stream, no need
             con.setDoOutput(true); // enables output stream
-            JsonHandler.sendJsonObject(con.getOutputStream(), new User("ali@gmail.com" , "ali1222345" , "Ali", "akbari").toJSON());
+            OutputStream out = con.getOutputStream();
+
+            JsonHandler.sendObject(con.getOutputStream(), new User("ali@gmail.com" , "ali1222345" , "Ali", "akbari").toJSON());
+            out.close();
 
             if (con.getResponseCode() / 100 == 2) {
-                System.out.println("test1 result: " + JsonHandler.getJsonObject(con.getInputStream()));
+                InputStream inp = con.getInputStream();
+                System.out.println("test result: " + JsonHandler.getObject(inp));
+                inp.close();
             } else {
                 System.out.println("Server returned HTTP code " + con.getResponseCode());
             }
