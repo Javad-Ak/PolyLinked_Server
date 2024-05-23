@@ -23,15 +23,13 @@ public class RequestTest {
             con.setDoOutput(true); // enables output stream
             OutputStream out = con.getOutputStream();
 
-            JsonHandler.sendObject(con.getOutputStream(), new User("ali@gmail.com" , "ali1222345" , "Ali", "akbari").toJSON());
+            JsonHandler.sendObject(con.getOutputStream(), new User("ali@gmail.com", "ali1222345", "Ali", "akbari").toJSON());
             out.close();
 
             if (con.getResponseCode() / 100 == 2) {
-                InputStream inp = con.getInputStream();
-                System.out.println("test result: " + JsonHandler.getObject(inp));
-                inp.close();
+                System.out.println("test result: " + JsonHandler.getObject(con.getInputStream()));
             } else {
-                System.out.println("Server returned HTTP code " + con.getResponseCode());
+                System.out.println("Server returned HTTP code " + con.getResponseCode() + JsonHandler.getObject(con.getInputStream()));
             }
             con.disconnect();
         } catch (Exception e) {
