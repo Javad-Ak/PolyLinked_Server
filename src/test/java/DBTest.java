@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-@DisplayName("------ testing requests...")
+@DisplayName("------ testing DataBase...")
 public class DBTest {
     @Test
     @DisplayName("---- adding a user")

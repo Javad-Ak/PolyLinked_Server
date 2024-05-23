@@ -24,7 +24,7 @@ public class UserAccessor {
         statement.close();
     }
 
-    public synchronized static User getUser(String email) throws SQLException {
+    public synchronized static User getUserByEmail(String email) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE email = ?;");
         statement.setString(1, email);
         ResultSet resultSet = statement.executeQuery();
