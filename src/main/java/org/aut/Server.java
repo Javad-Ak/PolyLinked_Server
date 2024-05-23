@@ -3,6 +3,7 @@ package org.aut;
 import com.sun.net.httpserver.HttpServer;
 
 import java.net.InetSocketAddress;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import org.aut.dataAccessors.DataBaseConnection;
@@ -29,9 +30,9 @@ public class Server {
             server.start();
             Runtime.getRuntime().addShutdownHook(new DataBaseConnection("atExit"));
 
-            System.out.println("Server is running on localhost:8080.");
+            System.out.println("Server is running (localhost:8080).");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

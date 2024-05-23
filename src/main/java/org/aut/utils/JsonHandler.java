@@ -1,27 +1,43 @@
 package org.aut.utils;
 
 import org.json.JSONObject;
+
 import java.io.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class JsonHandler {
     private JsonHandler() {
     }
 
-    public static JSONObject getJsonObject(InputStream body) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(body));
+    public static JSONObject getObject(InputStream inp) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inp));
         StringBuilder res = new StringBuilder();
 
         String line;
-        while ((line = reader.readLine()) != null) {
+        while ((line = reader.readLine()) != null)
             res.append(line);
-        }
-        body.close();
+
+        reader.close();
+        inp.close();
         return new JSONObject(res.toString());
     }
 
-    public static void sendJsonObject(OutputStream body, JSONObject obj) throws IOException {
-        body.write(obj.toString().getBytes());
-        body.flush();
-        body.close();
+    public static void sendObject(OutputStream out, JSONObject obj) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+        writer.write(obj.toString());
+        writer.flush();
+        writer.close();
+        out.close();
+    }
+
+    public static JSONObject getFromResultSet(ResultSet set) throws SQLException {
+        JSONObject jsonObject = new JSONObject();
+        if (set.next()) {
+            for (int i = 1; i <= set.getMetaData().getColumnCount(); i++)
+                jsonObject.put(set.getMetaData().getColumnName(i), set.getObject(i));//expected bug
+        }
+        set.close();
+        return jsonObject.isEmpty() ? null : jsonObject;
     }
 }

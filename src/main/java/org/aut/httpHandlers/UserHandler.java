@@ -8,37 +8,41 @@ import org.aut.utils.JsonHandler;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.util.Arrays;
 
 
 public class UserHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
-        String[] splittedPath = exchange.getRequestURI().getPath().split("/"); // later usage
+        String[] splitPath = exchange.getRequestURI().getPath().split("/"); // later usage
 
         JSONObject response = new JSONObject();
         switch (method) {
             case "POST":
-                JSONObject jsonObject = JsonHandler.getJsonObject(exchange.getRequestBody());
+                JSONObject jsonObject = JsonHandler.getObject(exchange.getRequestBody());
                 User newUser = new User(jsonObject);
 
                 try {
-                    if (!jsonObject.toString().isEmpty() && !UserController.UserExists(newUser.getUsername())) {
+                    if (!jsonObject.toString().isEmpty() && !UserController.UserExists(newUser.getEmail())) {
                         UserController.addUser(newUser);
-                        response.put("message", "User " + newUser.getUsername() + " created");
+                        response.put("message", "User with email " + newUser.getEmail() + " created.");
+
 //                    TODO : Files.createDirectories
-                    } else {
-                        response.put("message", "User " + newUser.getUsername() + " already exists");
+                    } else if (!jsonObject.isEmpty()) {
+                        response.put("error", "User with email " + newUser.getEmail() + " already exists.");
                     }
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    response.put("error", "Something went wrong. Try again later.");
+                    System.out.println(e.getMessage());
                 }
                 break;
 
 //                TODO other cases
         }
+
         exchange.sendResponseHeaders(200, response.toString().getBytes().length); // 200 -> successful connection
-        JsonHandler.sendJsonObject(exchange.getResponseBody(), response);
+        JsonHandler.sendObject(exchange.getResponseBody(), response);
         exchange.close();
     }
 }
