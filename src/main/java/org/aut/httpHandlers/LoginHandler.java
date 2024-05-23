@@ -9,8 +9,8 @@ import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.JwtHandler;
 import org.json.JSONObject;
-import java.io.IOException;
 
+import java.io.IOException;
 
 public class LoginHandler implements HttpHandler {
     @Override

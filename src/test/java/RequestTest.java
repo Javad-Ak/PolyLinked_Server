@@ -1,3 +1,4 @@
+import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -60,5 +61,31 @@ public class RequestTest {
             System.out.println("Server returned HTTP code " + con.getResponseCode() + JsonHandler.getObject(con.getInputStream()));
         }
         con.disconnect();
+    }
+
+    @Test
+    @DisplayName("---- adding a user with httpClient")
+    public void login() throws Exception { // Using Httpclient is encouraged.
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            // Create a new HttpRequest
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("http://localhost:8080/users/login"))
+                    .timeout(Duration.ofSeconds(10))
+                    .header("Content-Type", "json")
+                    .POST(HttpRequest.BodyPublishers.ofString(new JSONObject("{email: ali@gmail.com, password:ali1222345}").toString()))
+                    .build();
+
+            // Send the request and get the response
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            // Print the response status code
+            System.out.println("Response Code: " + response.statusCode());
+            // Print the response status code
+            System.out.println("Response headers: " + response.headers().toString());
+            // Print the response body
+            System.out.println("Response Body: " + response.body());
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
     }
 }
