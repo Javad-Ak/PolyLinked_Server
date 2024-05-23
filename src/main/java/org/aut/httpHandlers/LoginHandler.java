@@ -9,9 +9,8 @@ import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.JwtHandler;
 import org.json.JSONObject;
-
 import java.io.IOException;
-import java.sql.SQLException;
+
 
 public class LoginHandler implements HttpHandler {
     @Override
@@ -25,7 +24,7 @@ public class LoginHandler implements HttpHandler {
             if (UserController.authenticate(received.getString("email"), received.getString("password"))) {
                 code = 200; // success
                 User user = UserAccessor.getUserByEmail(received.getString("email"));
-                assert user != null;
+                assert user != null; // Already checked in authentication.
                 response.put("JWT", JwtHandler.generateToken(user.getId()));
             } else {
                 code = 403; // permission denied
