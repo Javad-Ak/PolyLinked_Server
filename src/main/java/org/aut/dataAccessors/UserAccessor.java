@@ -13,13 +13,13 @@ public class UserAccessor {
     }
 
     public synchronized static void addUser(User user) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO users (id , first_name , last_name , email, password) " +
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO users (id, email, password, firstName, LastName) " +
                 "VALUES (?,?,?,? ?)");
         statement.setNString(1, user.getId());
-        statement.setString(2, user.getFirstName());
-        statement.setString(3, user.getLastName());
-        statement.setString(4, user.getEmail());
-        statement.setString(5, user.getPassword());
+        statement.setString(2, user.getEmail());
+        statement.setString(3, user.getPassword());
+        statement.setString(4, user.getFirstName());
+        statement.setString(5, user.getLastName());
         statement.executeUpdate();
         statement.close();
     }
@@ -31,6 +31,6 @@ public class UserAccessor {
         JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
         statement.close();
 
-        return jsonObject ==  null ? null : new User(jsonObject); // null -> not found
+        return jsonObject == null ? null : new User(jsonObject); // null -> not found
     }
 }

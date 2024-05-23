@@ -14,7 +14,7 @@ public class UserHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
-//        String[] splittedPath = exchange.getRequestURI().getPath().split("/"); // later usage
+        String[] splitPath = exchange.getRequestURI().getPath().split("/"); // later usage
 
         JSONObject response = new JSONObject();
         switch (method) {
@@ -25,10 +25,10 @@ public class UserHandler implements HttpHandler {
                 try {
                     if (!jsonObject.toString().isEmpty() && !UserController.UserExists(newUser.getEmail())) {
                         UserController.addUser(newUser);
-                        response.put("message", "User " + newUser.getFirstName() + " " + newUser.getLastName() + " created");
+                        response.put("message", "User with email " + newUser.getEmail() + " created.");
 //                    TODO : Files.createDirectories
                     } else {
-                        response.put("message", "User " +  newUser.getFirstName() + " " + newUser.getLastName() + " already exists");
+                        response.put("message", "User with email " + newUser.getEmail() + " already exists.");
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);

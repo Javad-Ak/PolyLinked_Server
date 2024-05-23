@@ -30,7 +30,7 @@ public class Server {
             server.start();
             Runtime.getRuntime().addShutdownHook(new DataBaseConnection("atExit"));
 
-            System.out.println("Server is running on localhost:8080.");
+            System.out.println("Server is running (localhost:8080).");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }

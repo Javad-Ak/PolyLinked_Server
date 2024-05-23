@@ -10,7 +10,7 @@ import org.aut.utils.JsonHandler;
 public class UserTest {
     @Test
     @DisplayName("---- adding a user")
-    public void testcase1() {
+    public void addUser() {
         try {
             URL url = new URL("http://localhost:8080/users");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -19,7 +19,7 @@ public class UserTest {
 
             con.setDoInput(true); // enables input stream, no need
             con.setDoOutput(true); // enables output stream
-            JsonHandler.sendJsonObject(con.getOutputStream(), new User("ali@gmail.com" , "ali12345" , "Ali", "akbari").toJSON());
+            JsonHandler.sendJsonObject(con.getOutputStream(), new User("ali@gmail.com" , "ali1222345" , "Ali", "akbari").toJSON());
 
             if (con.getResponseCode() / 100 == 2) {
                 System.out.println("test1 result: " + JsonHandler.getJsonObject(con.getInputStream()));

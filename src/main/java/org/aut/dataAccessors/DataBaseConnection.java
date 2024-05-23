@@ -32,9 +32,9 @@ public class DataBaseConnection extends Thread {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (" +
                     "id TEXT PRIMARY KEY NOT NULL" +
                     ", email TEXT PRIMARY KEY NOT NULL" +
-                    ", firstName VARCHAR(20) NOT NULL" +
-                    ", lastName VARCHAR(40) NOT NULL " +
-                    ", password VARCHAR(20) NOT NULL);");
+                    ", password VARCHAR(20) NOT NULL" +
+                    ", firstName VARCHAR(20) NOT NULL " +
+                    ", lastName VARCHAR(40) NOT NULL);");
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
         }
