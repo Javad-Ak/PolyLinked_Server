@@ -1,5 +1,7 @@
 package org.aut.dataAccessors;
 
+import java.io.IOException;
+import java.rmi.RemoteException;
 import java.sql.*;
 
 import org.aut.models.User;
@@ -12,6 +14,20 @@ public class UserAccessor {
     private UserAccessor() {
     }
 
+    public static void createUserTable() throws IOException {
+        try(Statement statement = connection.createStatement()) {
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (" +
+                    "id TEXT NOT NULL" +
+                    ", email TEXT NOT NULL" +
+                    ", password VARCHAR(20) NOT NULL" +
+                    ", firstName VARCHAR(20) NOT NULL " +
+                    ", lastName VARCHAR(40) NOT NULL" +
+                    ", PRIMARY KEY (id, email));");
+
+        } catch (Exception e) {
+            throw new RemoteException(e.getMessage());
+        }
+    }
     public synchronized static void addUser(User user) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("INSERT INTO users (id, email, password, firstName, LastName) " +
                 "VALUES (?,?,?,?,?);");
@@ -29,6 +45,17 @@ public class UserAccessor {
         statement.setString(1, email);
         ResultSet resultSet = statement.executeQuery();
         JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
+        resultSet.close();
+        statement.close();
+
+        return jsonObject == null ? null : new User(jsonObject); // null -> not found
+    }
+    public synchronized static User getUserById(String id) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE id = ?;");
+        statement.setString(1, id);
+        ResultSet resultSet = statement.executeQuery();
+        JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
+        resultSet.close();
         statement.close();
 
         return jsonObject == null ? null : new User(jsonObject); // null -> not found

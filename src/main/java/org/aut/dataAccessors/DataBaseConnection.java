@@ -25,21 +25,12 @@ public class DataBaseConnection extends Thread {
         Path file = Paths.get(directory + "/data.db");
         if (!Files.isDirectory(path)) Files.createDirectories(path);
         if (!Files.isRegularFile(file)) Files.createFile(file);
-
-        try (Connection connection = DriverManager.getConnection(url);
-             Statement statement = connection.createStatement()) {
+        UserAccessor.createUserTable();
+        FollowAccessor.createFollowsTable();
 //            TODO other tables
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (" +
-                    "id TEXT NOT NULL" +
-                    ", email TEXT NOT NULL" +
-                    ", password VARCHAR(20) NOT NULL" +
-                    ", firstName VARCHAR(20) NOT NULL " +
-                    ", lastName VARCHAR(40) NOT NULL" +
-                    ", PRIMARY KEY (id, email));");
-        } catch (Exception e) {
-            throw new RemoteException(e.getMessage());
-        }
     }
+
+
 
     public static Connection getConnection() {
         try {

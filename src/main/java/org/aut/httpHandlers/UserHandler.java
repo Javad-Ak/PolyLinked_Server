@@ -22,7 +22,7 @@ public class UserHandler implements HttpHandler {
                 JSONObject jsonObject = JsonHandler.getObject(exchange.getRequestBody());
                 User newUser = new User(jsonObject);
                 try {
-                    if (!jsonObject.isEmpty() && !UserController.userExists(newUser.getEmail())) {
+                    if (!jsonObject.isEmpty() && !UserController.userExistsByEmail(newUser.getEmail())) {
                         UserController.addUser(newUser);
                         code = 200; // success
                         response.put("success", "User with email " + newUser.getEmail() + " created.");
