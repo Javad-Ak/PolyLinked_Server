@@ -50,4 +50,14 @@ public class UserAccessor {
 
         return jsonObject == null ? null : new User(jsonObject); // null -> not found
     }
+    public synchronized static User getUserById(String id) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE id = ?;");
+        statement.setString(1, id);
+        ResultSet resultSet = statement.executeQuery();
+        JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
+        resultSet.close();
+        statement.close();
+
+        return jsonObject == null ? null : new User(jsonObject); // null -> not found
+    }
 }
