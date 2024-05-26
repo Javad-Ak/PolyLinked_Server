@@ -24,8 +24,8 @@ public class DBTest {
     public void addFollow() throws Exception {
         DataBaseConnection.create();
         User user1 , user2;
-        UserAccessor.addUser(user1 = new User("ali1@gmail.com" , "ali1222345" , "Ali", "akbari"));
-        UserAccessor.addUser(user2 = new User("ali2@gmail.com" , "ali1222345" , "Alireza", "athari"));
+        UserAccessor.addUser(user1 = new User("ali1@gmail.com" , "ali1222345" , "Ali", "akbari", ""));
+        UserAccessor.addUser(user2 = new User("ali2@gmail.com" , "ali1222345" , "Alireza", "athari", ""));
         FollowController.addFollow(new Follow (user1.getId() , user2.getId()));
         try{
             FollowController.addFollow(new Follow (user1.getId() , user2.getId()));

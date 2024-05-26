@@ -36,7 +36,7 @@ public class User {
         firstName = json.getString("firstName");
         lastName = json.getString("lastName");
         additionalName = json.getString("additionalName");
-        createDate = new Date(Long.parseLong(json.getString("createDate")));
+        createDate = new Date(json.getLong("createDate"));
     }
 
     @Override
@@ -74,6 +74,14 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getAdditionalName() {
+        return additionalName;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
     }
 
     private void validateFields(String email, String password, String firstName, String lastName, String additionalName) {
