@@ -10,11 +10,14 @@ public class UserController {
     }
 
     public static void addUser(User user) throws SQLException {
-        if (!userExists(user.getEmail())) UserAccessor.addUser(user);
+        if (!userExistsByEmail(user.getEmail())) UserAccessor.addUser(user);
     }
 
-    public static boolean userExists(String email) throws SQLException {
+    public static boolean userExistsByEmail(String email) throws SQLException {
         return UserAccessor.getUserByEmail(email) != null;
+    }
+    public static boolean userExistsById(String id) throws SQLException {
+        return UserAccessor.getUserById(id) != null;
     }
 
     public static boolean authenticate(String email, String password) throws SQLException {
