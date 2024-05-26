@@ -23,7 +23,7 @@ public class RequestTest {
                     .uri(URI.create("http://localhost:8080/users"))
                     .timeout(Duration.ofSeconds(10))
                     .header("Content-Type", "json")
-                    .POST(HttpRequest.BodyPublishers.ofString(new User("ali@gmail.com", "ali1222345", "Ali", "akbari").toString()))
+                    .POST(HttpRequest.BodyPublishers.ofString(new User("ali@gmail.com", "ali7771222345", "Ali", "akbari", "ll").toString()))
                     .build();
 
             // Send the request and get the response
@@ -52,13 +52,13 @@ public class RequestTest {
         con.setDoOutput(true); // enables output stream
         OutputStream out = con.getOutputStream();
 
-        JsonHandler.sendObject(con.getOutputStream(), new User("ali@gmail.com", "ali1222345", "Ali", "akbari").toJSON());
+        JsonHandler.sendObject(con.getOutputStream(), new User("ali@gmail.com", "ali1222345", "Ali", "akbari", "k").toJSON());
         out.close();
 
         if (con.getResponseCode() / 100 == 2) {
             System.out.println("test result: " + JsonHandler.getObject(con.getInputStream()));
         } else {
-            System.out.println("Server returned HTTP code " + con.getResponseCode() + JsonHandler.getObject(con.getInputStream()));
+            System.out.println("Server returned HTTP code " + con.getResponseCode());
         }
         con.disconnect();
     }
