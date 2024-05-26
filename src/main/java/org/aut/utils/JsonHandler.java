@@ -37,7 +37,6 @@ public class JsonHandler {
             for (int i = 1; i <= set.getMetaData().getColumnCount(); i++)
                 jsonObject.put(set.getMetaData().getColumnName(i), set.getObject(i));//expected bug
         }
-        set.close();
         return jsonObject.isEmpty() ? null : jsonObject;
     }
 }

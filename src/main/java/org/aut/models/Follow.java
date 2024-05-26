@@ -19,6 +19,14 @@ public class Follow {
                 + "}";
     }
     public JSONObject toJSON (){return new JSONObject(toString());}
+
+    public String getFollowed() {
+        return followed;
+    }
+
+    public String getFollower() {
+        return follower;
+    }
 }
 
 
