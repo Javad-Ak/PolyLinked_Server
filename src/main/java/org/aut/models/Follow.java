@@ -3,14 +3,8 @@ package org.aut.models;
 
 import org.json.JSONObject;
 
-public class Follow {
+public record Follow(String follower, String followed) {
 
-    String follower;
-    String followed;
-    public Follow(String follower, String followed) {
-        this.follower = follower;
-        this.followed = followed;
-    }
     @Override
     public String toString() {
         return "{" +
@@ -18,14 +12,9 @@ public class Follow {
                 + ", followed:" + followed
                 + "}";
     }
-    public JSONObject toJSON (){return new JSONObject(toString());}
 
-    public String getFollowed() {
-        return followed;
-    }
-
-    public String getFollower() {
-        return follower;
+    public JSONObject toJSON() {
+        return new JSONObject(toString());
     }
 }
 
