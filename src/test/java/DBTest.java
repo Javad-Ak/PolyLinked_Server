@@ -12,7 +12,7 @@ public class DBTest {
     @DisplayName("---- adding a user")
     public void addUser() throws Exception {
         DataBaseConnection.create();
-        UserAccessor.addUser(new User("ali@gmail.com" , "ali1222345" , "Ali", "akbari"));
+        UserAccessor.addUser(new User("ali@gmail.com" , "ali1222345" , "Ali", "akbari", "ll"));
         System.out.println("User added successfully");
     }
 }
