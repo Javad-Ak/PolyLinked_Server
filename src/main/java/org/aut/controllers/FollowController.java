@@ -15,6 +15,8 @@ public class FollowController {
             throw new NotFoundException("User not found");
         } else if (FollowAccessor.followExists(follow)) {
             throw new PermissionDeniedException("Follow already exists");
+        } else if( follow.followed().equals(follow.follower())) {
+            throw new PermissionDeniedException("User Can't follow himself");
         }
         FollowAccessor.addFollow(follow);
     }

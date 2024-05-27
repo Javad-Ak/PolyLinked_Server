@@ -3,6 +3,7 @@ package org.aut.dataAccessors;
 import org.aut.models.Follow;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
+import org.aut.utils.exceptions.PermissionDeniedException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ public class FollowAccessor {
     private FollowAccessor() {
     }
 
-    public static void createFollowsTable() throws IOException {
+    public synchronized static void createFollowsTable() throws IOException {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS follows (" +
                     "follower_id TEXT NOT NULL" +
@@ -27,6 +28,7 @@ public class FollowAccessor {
         }
     }
 
+
     public synchronized static void addFollow(Follow follow) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("INSERT INTO follows (follower_id , followed_id) " +
                 "VALUES (?, ?);");
@@ -36,7 +38,14 @@ public class FollowAccessor {
         statement.close();
     }
 
-    public synchronized static ArrayList<User> getFollowers(String id) throws SQLException {
+    public synchronized static void deleteFollow (Follow follow) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("DELETE FROM follows WHERE follower_id = ? AND followed_id = ?");
+        statement.setString(1, follow.follower());
+        statement.setString(2, follow.followed());
+        statement.executeUpdate();
+        statement.close();
+    }
+    public synchronized static ArrayList<User> getFollowers(String id) throws SQLException , PermissionDeniedException {
         ArrayList<User> followers;
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM follows WHERE followed_id = ? ORDER BY follower_id DESC;");
         statement.setString(1, id);
@@ -45,7 +54,7 @@ public class FollowAccessor {
         return followers;
     }
 
-    public synchronized static ArrayList<User> getFollowings(String id) throws SQLException {
+    public synchronized static ArrayList<User> getFollowings(String id) throws SQLException , PermissionDeniedException {
         ArrayList<User> followings;
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM follows WHERE follower_id = ? ORDER BY followed_id DESC;");
         statement.setString(1, id);
@@ -54,7 +63,7 @@ public class FollowAccessor {
         return followings;
     }
 
-    public static boolean followExists(Follow follow) throws SQLException {
+    public synchronized static boolean followExists(Follow follow) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM follows WHERE follower_id = ? AND followed_id = ?");
         statement.setString(1, follow.follower());
         statement.setString(2, follow.followed());
@@ -64,7 +73,7 @@ public class FollowAccessor {
         return res;
     }
 
-    public static ArrayList<User> getUserListFromStatement(PreparedStatement statement) throws SQLException {
+    public synchronized static ArrayList<User> getUserListFromStatement(PreparedStatement statement) throws SQLException  , PermissionDeniedException {
         ArrayList<User> users = new ArrayList<>();
         ResultSet resultSet = statement.executeQuery();
         JSONObject jsonObject;

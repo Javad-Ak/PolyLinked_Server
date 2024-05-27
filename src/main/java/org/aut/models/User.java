@@ -3,6 +3,7 @@ package org.aut.models;
 import java.util.Date;
 import java.util.Random;
 
+import org.aut.utils.exceptions.PermissionDeniedException;
 import org.json.JSONObject;
 
 import java.util.UUID;
@@ -16,7 +17,7 @@ public class User {
     private final String additionalName; // 20 ch
     private final Date createDate;
 
-    public User(String email, String password, String firstName, String lastName, String additionalName) {
+    public User(String email, String password, String firstName, String lastName, String additionalName) throws PermissionDeniedException {
         validateFields(email, password, firstName, lastName, additionalName);
 
         this.id = "user" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
@@ -28,7 +29,7 @@ public class User {
         createDate = new Date(System.currentTimeMillis());
     }
 
-    public User(JSONObject json) {
+    public User(JSONObject json) throws PermissionDeniedException {
         validateFields(json.getString("email"), json.getString("password"), json.getString("firstName"), json.getString("lastName"), json.getString("additionalName"));
         id = json.getString("id");
         email = json.getString("email");
@@ -84,13 +85,13 @@ public class User {
         return createDate;
     }
 
-    private void validateFields(String email, String password, String firstName, String lastName, String additionalName) {
+    private static void validateFields(String email, String password, String firstName, String lastName, String additionalName) throws PermissionDeniedException {
         if ((firstName == null || lastName == null || email == null || password == null) ||
                 (!email.matches("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")) ||
                 (!password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,20}$")) ||
                 (!firstName.matches("(?i)^[a-z]{1,20}$")) ||
                 (!lastName.matches("(?i)^[a-z]{1,40}$")) ||
                 (!additionalName.matches("(?i)^[a-z]{0,20}$")))
-            throw new RuntimeException("invalid argument");
+            throw new PermissionDeniedException("invalid argument");//wrong
     }
 }
