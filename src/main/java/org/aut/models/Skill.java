@@ -1,6 +1,6 @@
 package org.aut.models;
 
-import org.aut.utils.exceptions.PermissionDeniedException;
+import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONObject;
 
 import java.util.Random;
@@ -12,8 +12,8 @@ public class Skill {
     private final String educationId;
     private final String name; // 60 chars
 
-    public Skill(String profileId, String educationId, String name) throws PermissionDeniedException {
-        if (name == null || name.isEmpty()) throw new PermissionDeniedException("Invalid Arguments");
+    public Skill(String profileId, String educationId, String name) throws NotAcceptableException {
+        if (name == null || name.isEmpty()) throw new NotAcceptableException("Invalid Arguments");
 
         this.id = "skill" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
         this.profileId = profileId;

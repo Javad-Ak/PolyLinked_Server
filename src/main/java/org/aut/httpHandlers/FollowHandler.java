@@ -20,8 +20,8 @@ public class FollowHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
+        int code = 405;
 
-        int code = 400;
         JSONObject jsonObject = JsonHandler.getObject(exchange.getRequestBody());
         System.out.println(jsonObject);
         String jwt = exchange.getRequestHeaders().getFirst("Authorization");

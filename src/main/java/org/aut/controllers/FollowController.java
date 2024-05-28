@@ -4,7 +4,6 @@ import org.aut.dataAccessors.FollowAccessor;
 import org.aut.models.Follow;
 import org.aut.utils.exceptions.NotFoundException;
 import org.aut.utils.exceptions.NotAcceptableException;
-
 import java.sql.SQLException;
 
 public class FollowController {

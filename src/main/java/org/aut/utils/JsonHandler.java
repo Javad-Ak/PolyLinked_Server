@@ -19,7 +19,6 @@ public class JsonHandler {
             res.append(line);
 
         reader.close();
-        inp.close();
         return new JSONObject(res.toString());
     }
 
@@ -28,7 +27,6 @@ public class JsonHandler {
         writer.write(obj.toString());
         writer.flush();
         writer.close();
-        out.close();
     }
 
     public static JSONObject getFromResultSet(ResultSet set) throws SQLException {

@@ -1,6 +1,6 @@
 package org.aut.models;
 
-import org.aut.utils.exceptions.PermissionDeniedException;
+import org.aut.utils.exceptions.NotFoundException;
 import org.json.JSONObject;
 import java.util.Date;
 
@@ -16,7 +16,7 @@ public class CallInfo {
     private final String socialMedia;
 
 
-    public CallInfo(String userId, String emailAddress, String mobileNumber, String homeNumber, String workNumber, String address, Date birthDay, PrivacyPolitics privacyPolitics, String socialMedia) throws PermissionDeniedException {
+    public CallInfo(String userId, String emailAddress, String mobileNumber, String homeNumber, String workNumber, String address, Date birthDay, PrivacyPolitics privacyPolitics, String socialMedia) throws NotFoundException {
         validateFields(userId, emailAddress, mobileNumber, homeNumber, workNumber, address, socialMedia);
         this.userId = userId;
         this.emailAddress = emailAddress;
@@ -56,14 +56,14 @@ public class CallInfo {
                 '}';
     }
 
-    private void validateFields(String userId, String emailAddress, String mobileNumber, String homeNumber, String workNumber, String address, String socialMedia) throws PermissionDeniedException {
+    private void validateFields(String userId, String emailAddress, String mobileNumber, String homeNumber, String workNumber, String address, String socialMedia) throws NotFoundException {
         if (userId == null || emailAddress == null ||
                 (mobileNumber != null && !mobileNumber.matches("^[0-9]{1,40}$")) ||
                 (workNumber != null && !workNumber.matches("^[0-9]{1,40}$")) ||
                 (homeNumber != null && !homeNumber.matches("^[0-9]{1,40}$")) ||
                 (address != null && address.length() > 40) ||
                 (socialMedia != null && socialMedia.length() > 40)
-        ) throw new PermissionDeniedException("Illegal args");
+        ) throw new NotFoundException("Illegal args");
     }
 
     public enum PrivacyPolitics {

@@ -1,7 +1,11 @@
 # @name followTest
-POST http://localhost:8080/follow HTTP/1.1
+POST http://localhost:8080/follows HTTP/1.1
 Content-Type:application/json
 Authorization:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyOTI0NzdhNjQtNDU0OS1iNmE5IiwiaWF0IjoxNzE2OTEwNTY5LCJleHAiOjE3MTc1MTA1Njl9.3EpViQoMvHGHDv3XPEYGIZuEII3Y-yHDstd0qoQRYJ0
 eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyOTI0NzdhNjQtNDU0OS1iNmE5IiwiaWF0IjoxNzE2OTEwNTY5LCJleHAiOjE3MTc1MTA1Njl9.3EpViQoMvHGHDv3XPEYGIZuEII3Y-yHDstd0qoQRYJ0
 
-{"follower": "user92477a64-4549-b6a9"  ,"followed": "user6393301c-42bb-8c19"}
+# body
+{
+  "follower": "user92477a64-4549-b6a9",
+  "followed": "user6393301c-42bb-8c19"
+}

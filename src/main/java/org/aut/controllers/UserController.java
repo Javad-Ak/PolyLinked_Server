@@ -2,6 +2,7 @@ package org.aut.controllers;
 
 import org.aut.dataAccessors.UserAccessor;
 import org.aut.models.User;
+import org.aut.utils.exceptions.NotFoundException;
 
 import java.sql.SQLException;
 
@@ -14,14 +15,25 @@ public class UserController {
     }
 
     public static boolean userExistsByEmail(String email) throws SQLException {
-        return UserAccessor.getUserByEmail(email) != null;
-    }
-    public static boolean userExistsById(String id) throws SQLException {
-        return UserAccessor.getUserById(id) != null;
+        try {
+            UserAccessor.getUserByEmail(email);
+            return true;
+        } catch (NotFoundException e) {
+            return false;
+        }
     }
 
-    public static boolean authenticate(String email, String password) throws SQLException {
+    public static boolean userExistsById(String id) throws SQLException {
+        try {
+            UserAccessor.getUserById(id);
+            return true;
+        } catch (NotFoundException e) {
+            return false;
+        }
+    }
+
+    public static boolean authenticate(String email, String password) throws SQLException, NotFoundException {
         User user = UserAccessor.getUserByEmail(email);
-        return user != null && user.getPassword().equals(password);
+        return user.getPassword().equals(password);
     }
 }

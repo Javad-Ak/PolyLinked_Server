@@ -4,12 +4,12 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import org.aut.controllers.UserController;
 import org.aut.dataAccessors.UserAccessor;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.JwtHandler;
+import org.aut.utils.exceptions.NotFoundException;
 import org.aut.utils.exceptions.UnauthorizedException;
 import org.json.JSONObject;
 
@@ -19,32 +19,42 @@ import java.sql.SQLException;
 public class LoginHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        if (!exchange.getRequestMethod().equals("POST")) return;
-        JSONObject received = JsonHandler.getObject(exchange.getRequestBody()); // A json with email and password
-
         JSONObject response = new JSONObject();
         int code;
+
         try {
-            if (UserController.authenticate(received.getString("email"), received.getString("password"))) {
-                code = 200; // success
-                User user = UserAccessor.getUserByEmail(received.getString("email"));
-                assert user != null; // Already checked in authentication.
-                response.put("JWT", JwtHandler.generateToken(user.getId()));
+            if (!exchange.getRequestMethod().equals("POST")) {
+                code = 405; // method not found
             } else {
-                code = 403; // permission denied
-                response.put("failure", "User unauthorized.");
+                JSONObject received = JsonHandler.getObject(exchange.getRequestBody()); // A json with email and password
+                if (UserController.authenticate(received.getString("email"), received.getString("password"))) {
+                    code = 200;
+                    User user = UserAccessor.getUserByEmail(received.getString("email"));
+                    response.put("Authorization", JwtHandler.generateToken(user.getId()));
+                } else {
+                    throw new UnauthorizedException("Invalid credentials");
+                }
             }
-        } catch (Exception e) {
-            code = 500; // server conflict
-            response.put("failure", "Something went wrong. Try again later.");
+        } catch (UnauthorizedException e) {
+            code = 401;
+        } catch (NotFoundException e) {
+            code = 404;
+        } catch (SQLException e) {
+            code = 500;
             System.out.println(e.getMessage());
         }
-        exchange.sendResponseHeaders(code, response.toString().getBytes().length);
-        JsonHandler.sendObject(exchange.getResponseBody(), response);
+
+
+        if (response.isEmpty()) {
+            exchange.sendResponseHeaders(code, 0);
+        } else {
+            exchange.sendResponseHeaders(code, response.toString().getBytes().length);
+            JsonHandler.sendObject(exchange.getResponseBody(), response);
+        }
         exchange.close();
     }
 
-    public static User getUserByToken(String token) throws SQLException , UnauthorizedException {
+    public static User getUserByToken(String token) throws SQLException, UnauthorizedException {
         try {
             Claims claims = JwtHandler.verifyToken(token);
             User user;
@@ -53,7 +63,7 @@ public class LoginHandler implements HttpHandler {
                 throw new UnauthorizedException("Authentication failed.");
             }
             return user;
-        } catch (JwtException e){
+        } catch (Exception e) {
             throw new UnauthorizedException("Authentication failed.");
         }
     }

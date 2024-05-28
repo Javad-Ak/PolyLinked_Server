@@ -27,10 +27,7 @@ public class DataBaseConnection extends Thread {
         if (!Files.isRegularFile(file)) Files.createFile(file);
         UserAccessor.createUserTable();
         FollowAccessor.createFollowsTable();
-//            TODO other tables
     }
-
-
 
     public static Connection getConnection() {
         try {

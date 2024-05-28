@@ -1,6 +1,6 @@
 package org.aut.models;
 
-import org.aut.utils.exceptions.PermissionDeniedException;
+import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONObject;
 
 import java.util.Date;
@@ -19,7 +19,9 @@ public class Education {
     private final String about; // 1000 chars
     // + skills(5)
 
-    public Education(String userId, String institute, String field, Date start, Date end, int grade, String activities, String about) {
+    public Education(String userId, String institute, String field, Date start, Date end, int grade, String activities, String about) throws NotAcceptableException {
+        validateFields(institute, field, start, end, grade, activities, about);
+
         this.id = "edu" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
         this.userId = userId;
         this.institute = institute;
@@ -58,12 +60,12 @@ public class Education {
                 '}';
     }
 
-    private void validateFields(String institute, String field, Date start, Date end, int grade, String activities, String about) throws PermissionDeniedException {
+    private void validateFields(String institute, String field, Date start, Date end, int grade, String activities, String about) throws NotAcceptableException {
         if (institute == null || institute.isEmpty() || field == null || field.isEmpty() ||
                 start == null || end == null || start.after(end) ||
                 activities == null || activities.isEmpty() || about == null || about.isEmpty() ||
                 grade < 0 || grade > 100 ||
                 institute.length() > 40 || field.length() > 40 || activities.length() > 500 || about.length() > 1000
-        ) throw new PermissionDeniedException("Illegal args");
+        ) throw new NotAcceptableException("Illegal args");
     }
 }

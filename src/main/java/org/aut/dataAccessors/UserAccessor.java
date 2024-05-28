@@ -7,6 +7,8 @@ import java.sql.*;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
+import org.aut.utils.exceptions.NotFoundException;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 public class UserAccessor {
@@ -47,36 +49,24 @@ public class UserAccessor {
     }
 
 
-    public synchronized static User getUserByEmail(String email) throws SQLException {
+    public synchronized static User getUserByEmail(String email) throws SQLException, NotFoundException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE email = ?;");
-        statement.setString(1, email);
-        ResultSet resultSet = statement.executeQuery();
-        JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
-        resultSet.close();
-        statement.close();
-        if (jsonObject == null) {
-            return null;
-        } else {
-            User user;
-            try {
-                user = new User(jsonObject);
-            } catch (NotAcceptableException e) {
-                user = null;
-            }
-            return user;
-        }
-        // null -> not found
+        return getUserFromResultSet(email, statement);
     }
 
-    public synchronized static User getUserById(String id) throws SQLException {
+    public synchronized static User getUserById(String id) throws SQLException, NotFoundException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE id = ?;");
-        statement.setString(1, id);
+        return getUserFromResultSet(id, statement);
+    }
+
+    private static User getUserFromResultSet(String input, PreparedStatement statement) throws SQLException, NotFoundException {
+        statement.setString(1, input);
         ResultSet resultSet = statement.executeQuery();
         JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
         resultSet.close();
         statement.close();
         if (jsonObject == null) {
-            return null;
+            throw new NotFoundException("User not Found");
         } else {
             User user;
             try {
@@ -86,6 +76,5 @@ public class UserAccessor {
             }
             return user;
         }
-        //null -> not found
     }
 }
