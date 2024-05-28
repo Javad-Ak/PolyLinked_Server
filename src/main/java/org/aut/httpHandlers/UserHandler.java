@@ -14,6 +14,7 @@ public class UserHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
+        String[] splitPath = exchange.getRequestURI().getPath().split("/");
 
         JSONObject response = new JSONObject();
         int code = 400;

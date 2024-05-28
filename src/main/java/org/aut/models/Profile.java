@@ -2,8 +2,10 @@ package org.aut.models;
 
 import org.json.JSONObject;
 
+import java.util.Date;
+
 public class Profile {
-    private final String id; // same as user id
+    private final String userId; // same as user id -> foreign key
     private final String bio; // 220 ch
     private final String pathToPic; // 400*400, 1 mb
     private final String pathToBG; // 1584*396
@@ -11,24 +13,36 @@ public class Profile {
     private final String city;  // 60 ch
     private final Status status;
     private final Profession profession;
+    // + Skills(relatively), Educations, CallInfo
 
     public Profile(String id, String bio, String pathToPic, String pathToBG, String country, String city, Status status, Profession profession) {
         validateFields(bio, country, city);
 
-        this.id = id;
+        this.userId = id;
         this.bio = bio;
         this.pathToPic = pathToPic;
         this.pathToBG = pathToBG;
-        this.country = country;
-        this.city = city;
+        this.country = country.toUpperCase();
+        this.city = city.toUpperCase();
         this.status = status;
         this.profession = profession;
+    }
+
+    public Profile(JSONObject profile) {
+        this.userId = profile.getString("id");
+        this.bio = profile.getString("bio");
+        this.pathToPic = profile.getString("pathToPic");
+        this.pathToBG = profile.getString("pathToBG");
+        this.country = profile.getString("country");
+        this.city = profile.getString("city");
+        this.status = Status.valueOf(profile.getString("status"));
+        this.profession = Profession.valueOf(profile.getString("profession"));
     }
 
     @Override
     public String toString() {
         return '{' +
-                "id: " + id +
+                "id: " + userId +
                 ", bio: " + bio +
                 ", pathToPic: " + pathToPic +
                 ", pathToBG: " + pathToBG +
@@ -51,7 +65,7 @@ public class Profile {
             throw new RuntimeException("invalid arguments");
     }
 
-    public static enum Status {
+    public enum Status {
         RECRUITER("RECRUITER"), SERVICE_PROVIDER("SERVICE_PROVIDER"), JOB_SEARCHER("JOB_SEARCHER");
 
         private final String value;
@@ -60,12 +74,13 @@ public class Profile {
             this.value = value;
         }
 
-        public String getValue() {
+        @Override
+        public String toString() {
             return value;
         }
     }
 
-    public static enum Profession {
+    public enum Profession {
         DOCTOR("DOCTOR"),
         NURSE("NURSE"),
         TEACHER("TEACHER"),
@@ -133,7 +148,8 @@ public class Profile {
             this.value = value;
         }
 
-        public String getValue() {
+        @Override
+        public String toString() {
             return value;
         }
     }
