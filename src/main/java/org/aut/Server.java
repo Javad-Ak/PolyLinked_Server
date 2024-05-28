@@ -1,13 +1,11 @@
 package org.aut;
 
 import com.sun.net.httpserver.HttpServer;
-
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
 import org.aut.dataAccessors.DataBaseConnection;
 import org.aut.httpHandlers.FollowHandler;
-import org.aut.httpHandlers.FollowerHandler;
 import org.aut.httpHandlers.LoginHandler;
 import org.aut.httpHandlers.UserHandler;
 
