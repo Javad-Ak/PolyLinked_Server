@@ -1,10 +1,12 @@
 package org.aut.models;
 
+import org.aut.utils.exceptions.PermissionDeniedException;
+import org.json.JSONObject;
 import java.util.Date;
 
 public class CallInfo {
     private final String userId; // foreign key
-    private final String emailAddress; // valid
+    private final String emailAddress; // foreign key
     private final String mobileNumber; // valid 40 chars
     private final String homeNumber;
     private final String workNumber;
@@ -14,7 +16,8 @@ public class CallInfo {
     private final String socialMedia;
 
 
-    public CallInfo(String userId, String emailAddress, String mobileNumber, String homeNumber, String workNumber, String address, Date birthDay, PrivacyPolitics privacyPolitics, String socialMedia) {
+    public CallInfo(String userId, String emailAddress, String mobileNumber, String homeNumber, String workNumber, String address, Date birthDay, PrivacyPolitics privacyPolitics, String socialMedia) throws PermissionDeniedException {
+        validateFields(userId, emailAddress, mobileNumber, homeNumber, workNumber, address, socialMedia);
         this.userId = userId;
         this.emailAddress = emailAddress;
         this.mobileNumber = mobileNumber;
@@ -24,6 +27,43 @@ public class CallInfo {
         this.birthDay = birthDay;
         this.privacyPolitics = privacyPolitics;
         this.socialMedia = socialMedia;
+    }
+
+    public CallInfo(JSONObject jsonObject) {
+        userId = jsonObject.getString("userId");
+        emailAddress = jsonObject.getString("emailAddress");
+        mobileNumber = jsonObject.getString("mobileNumber");
+        homeNumber = jsonObject.getString("homeNumber");
+        workNumber = jsonObject.getString("workNumber");
+        Address = jsonObject.getString("Address");
+        birthDay = new Date(jsonObject.getLong("birthDay"));
+        privacyPolitics = PrivacyPolitics.valueOf(jsonObject.getString("privacyPolitics"));
+        socialMedia = jsonObject.getString("socialMedia");
+    }
+
+    @Override
+    public String toString() {
+        return '{' +
+                "userId: " + userId +
+                ", emailAddress: " + emailAddress +
+                ", mobileNumber: " + mobileNumber +
+                ", homeNumber: " + homeNumber +
+                ", workNumber: " + workNumber +
+                ", Address: " + Address +
+                ", birthDay: " + birthDay.getTime() +
+                ", privacyPolitics: " + privacyPolitics +
+                ", socialMedia: " + socialMedia +
+                '}';
+    }
+
+    private void validateFields(String userId, String emailAddress, String mobileNumber, String homeNumber, String workNumber, String address, String socialMedia) throws PermissionDeniedException {
+        if (userId == null || emailAddress == null ||
+                (mobileNumber != null && !mobileNumber.matches("^[0-9]{1,40}$")) ||
+                (workNumber != null && !workNumber.matches("^[0-9]{1,40}$")) ||
+                (homeNumber != null && !homeNumber.matches("^[0-9]{1,40}$")) ||
+                (address != null && address.length() > 40) ||
+                (socialMedia != null && socialMedia.length() > 40)
+        ) throw new PermissionDeniedException("Illegal args");
     }
 
     public enum PrivacyPolitics {

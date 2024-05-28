@@ -2,8 +2,6 @@ package org.aut.models;
 
 import org.json.JSONObject;
 
-import java.util.Date;
-
 public class Profile {
     private final String userId; // same as user id -> foreign key
     private final String bio; // 220 ch
@@ -29,14 +27,14 @@ public class Profile {
     }
 
     public Profile(JSONObject profile) {
-        this.userId = profile.getString("id");
-        this.bio = profile.getString("bio");
-        this.pathToPic = profile.getString("pathToPic");
-        this.pathToBG = profile.getString("pathToBG");
-        this.country = profile.getString("country");
-        this.city = profile.getString("city");
-        this.status = Status.valueOf(profile.getString("status"));
-        this.profession = Profession.valueOf(profile.getString("profession"));
+        userId = profile.getString("id");
+        bio = profile.getString("bio");
+        pathToPic = profile.getString("pathToPic");
+        pathToBG = profile.getString("pathToBG");
+        country = profile.getString("country");
+        city = profile.getString("city");
+        status = Status.valueOf(profile.getString("status"));
+        profession = Profession.valueOf(profile.getString("profession"));
     }
 
     @Override
@@ -60,7 +58,7 @@ public class Profile {
     private void validateFields(String bio, String country, String city) {
         if ((bio != null && bio.length() > 220) ||
                 (country != null && !country.matches("(?i)^[a-z]{0,60}$")) ||
-                (city != null && city.matches("(?i)^[a-z]{0,60}$")))
+                (city != null && !city.matches("(?i)^[a-z]{0,60}$")))
 
             throw new RuntimeException("invalid arguments");
     }
