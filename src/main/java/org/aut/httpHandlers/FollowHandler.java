@@ -5,85 +5,63 @@ import com.sun.net.httpserver.HttpHandler;
 import org.aut.controllers.FollowController;
 import org.aut.dataAccessors.FollowAccessor;
 import org.aut.models.Follow;
+import org.aut.models.User;
+
 import org.aut.utils.JsonHandler;
 import org.aut.utils.exceptions.NotFoundException;
-import org.aut.utils.exceptions.PermissionDeniedException;
+import org.aut.utils.exceptions.NotAcceptableException;
+import org.aut.utils.exceptions.UnauthorizedException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class FollowHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
 
-        JSONObject response = new JSONObject();
         int code = 400;
-        switch (method) {
-            case "POST":
-                JSONObject jsonObjectP = new JSONObject(exchange.getRequestBody());
-                String jwtP = exchange.getRequestHeaders().getFirst("JWT");
-                try {
-                    Follow newFollow = new Follow(jsonObjectP);
-                    if (!jsonObjectP.isEmpty() && jwtP != null && LoginHandler.getUserByToken(jwtP) != null && LoginHandler.getUserByToken(jwtP).getId().equals(newFollow.follower())) {
+        JSONObject jsonObject = JsonHandler.getObject(exchange.getRequestBody());
+        System.out.println(jsonObject);
+        String jwt = exchange.getRequestHeaders().getFirst("Authorization");
+        try {
+            User user = LoginHandler.getUserByToken(jwt);
+            Follow newFollow = new Follow(jsonObject);
+            System.out.println(newFollow);
+            if (!user.getId().equals(newFollow.getFollower()))
+                throw new UnauthorizedException("User unauthorized");
+
+            switch (method) {
+                case "POST":
+                    if (!jsonObject.isEmpty()) {
                         FollowController.addFollow(newFollow);
-                        code = 200; //success
-                        response.put("success", "The user has been followed successfully");
-                    } else if (jwtP == null) {
-                        throw new PermissionDeniedException("JWT is missing");
-                    } else if (jsonObjectP.isEmpty()) {
-                        throw new PermissionDeniedException("Request body is missing");
-                    } else if (LoginHandler.getUserByToken(jwtP) == null || !LoginHandler.getUserByToken(jwtP).getId().equals(newFollow.follower())) {
-                        throw new PermissionDeniedException("User unauthorized");
+                        code = 200;
                     }
-                } catch (PermissionDeniedException e) {
-                    code = 409;
-                    response.put("failure", "Permission denied");
-                } catch (NotFoundException e) {
-                    code = 404;
-                    response.put("failure", "User not found");
-                } catch (Exception e) {
-                    code = 500;
-                    response.put("failure", "Something went wrong. Try again later");
-                    System.out.println(e.getMessage());
-                }
-                break;
-            case "DELETE":
-                JSONObject jsonD = new JSONObject(exchange.getRequestBody());
-                String jwtD = exchange.getRequestHeaders().getFirst("JWT");
-                try {
-                    Follow follow = new Follow(jsonD);
-                    if (!jsonD.isEmpty() && FollowAccessor.followExists(follow) && jwtD != null && LoginHandler.getUserByToken(jwtD) != null && LoginHandler.getUserByToken(jwtD).getId().equals(follow.follower())) {
+                    break;
+
+                case "DELETE":
+                    Follow follow = new Follow(jsonObject);
+                    if (!jsonObject.isEmpty()) {
                         FollowAccessor.deleteFollow(follow);
                         code = 200;
-                        response.put("success", "The user has been unfollowed successfully");
-                    } else if (jsonD.isEmpty()) {
-                        throw new PermissionDeniedException("Request body is missing");
+
                     } else if (!FollowAccessor.followExists(follow)) {
                         throw new NotFoundException("User not found");
-                    } else if (jwtD == null) {
-                        throw new PermissionDeniedException("JWT is missing");
-                    } else if (LoginHandler.getUserByToken(jwtD) == null || !LoginHandler.getUserByToken(jwtD).getId().equals(follow.follower())) {
-                        throw new PermissionDeniedException("User unauthorized");
                     }
-                } catch (PermissionDeniedException e) {
-                    code = 409;
-                    response.put("failure", "Permission denied");
-                } catch (NotFoundException e) {
-                code = 404;
-                response.put("failure", "Follower or Followed not found");
-                }
-                catch (Exception e) {
-                    code = 500;
-                    response.put("failure", "Something went wrong. Try again later");
-                    System.out.println(e.getMessage());
-                }
-                break;
-
-
+                    break;
+            }
+        } catch (UnauthorizedException e) {
+            code = 401;
+        } catch (SQLException e) {
+            code = 500;
+        } catch (NotAcceptableException e) {
+            code = 406;
+        } catch (NotFoundException e) {
+            code = 404;
         }
-        exchange.sendResponseHeaders(code, response.toString().getBytes().length);
-        JsonHandler.sendObject(exchange.getResponseBody(), response);
+
+        exchange.sendResponseHeaders(code, 0);
         exchange.close();
     }
 }

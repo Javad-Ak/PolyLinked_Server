@@ -27,9 +27,6 @@ public class Server {
             server.createContext("/user/signup", new UserHandler());
             server.createContext("/user/login", new LoginHandler());
             server.createContext("/follow" , new FollowHandler());
-//            server.createContext("/user/followers", new FollowerHandler());
-//            server.createContext("/user/followings", new FollowingHandler());
-
             server.setExecutor(Executors.newFixedThreadPool(8));
             server.start();
             Runtime.getRuntime().addShutdownHook(new DataBaseConnection("atExit"));

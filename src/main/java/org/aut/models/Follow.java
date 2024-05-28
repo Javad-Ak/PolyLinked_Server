@@ -1,24 +1,31 @@
 
 package org.aut.models;
 
-import org.aut.utils.exceptions.PermissionDeniedException;
+import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONObject;
-
-import java.util.Objects;
 
 public final class Follow {
     private final String follower;
     private final String followed;
 
-    public Follow(String follower, String followed) {
+    public Follow(String follower, String followed) throws NotAcceptableException {
+        validateFields(follower, followed);
         this.follower = follower;
         this.followed = followed;
     }
 
-    public Follow(JSONObject json) throws PermissionDeniedException {
-        validateFields(json.getString(follower()) , json.optString(followed()));
-        followed = json.getString(follower());
-        follower = json.getString(follower());
+    public Follow(JSONObject json) throws NotAcceptableException {
+        validateFields(json.getString("follower"), json.getString("followed"));
+        follower = json.getString("follower");
+        followed = json.getString("followed");
+    }
+
+    public String getFollowed() {
+        return followed;
+    }
+
+    public String getFollower() {
+        return follower;
     }
 
     @Override
@@ -33,9 +40,9 @@ public final class Follow {
         return new JSONObject(toString());
     }
 
-    private static void validateFields(String follower, String followed) throws PermissionDeniedException {
-        if (follower == null || followed == null)
-            throw new PermissionDeniedException("Follower or Followed fields cannot be null");
+    private static void validateFields(String follower, String followed) throws NotAcceptableException {
+        if (follower == null || followed == null || followed.equals(follower))
+            throw new NotAcceptableException("Follower or Followed fields cannot be null");
     }
 
     public String follower() {
@@ -44,20 +51,6 @@ public final class Follow {
 
     public String followed() {
         return followed;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (Follow) obj;
-        return Objects.equals(this.follower, that.follower) &&
-                Objects.equals(this.followed, that.followed);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(follower, followed);
     }
 
 }

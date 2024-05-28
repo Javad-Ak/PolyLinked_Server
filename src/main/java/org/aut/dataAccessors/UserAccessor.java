@@ -6,7 +6,7 @@ import java.sql.*;
 
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
-import org.aut.utils.exceptions.PermissionDeniedException;
+import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONObject;
 
 public class UserAccessor {
@@ -60,7 +60,7 @@ public class UserAccessor {
             User user;
             try {
                 user = new User(jsonObject);
-            } catch (PermissionDeniedException e) {
+            } catch (NotAcceptableException e) {
                 user = null;
             }
             return user;
@@ -81,7 +81,7 @@ public class UserAccessor {
             User user;
             try {
                 user = new User(jsonObject);
-            } catch (PermissionDeniedException e) {
+            } catch (NotAcceptableException e) {
                 user = null;
             }
             return user;

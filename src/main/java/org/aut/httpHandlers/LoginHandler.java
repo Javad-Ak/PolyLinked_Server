@@ -10,6 +10,7 @@ import org.aut.dataAccessors.UserAccessor;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.JwtHandler;
+import org.aut.utils.exceptions.UnauthorizedException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -43,14 +44,17 @@ public class LoginHandler implements HttpHandler {
         exchange.close();
     }
 
-    public static User getUserByToken(String token) throws SQLException {
-        Claims claims = JwtHandler.verifyToken(token);
-        User user;
+    public static User getUserByToken(String token) throws SQLException , UnauthorizedException {
         try {
+            Claims claims = JwtHandler.verifyToken(token);
+            User user;
             user = UserAccessor.getUserById(claims.getSubject());
-        } catch (JwtException e) {
-            return null;
+            if (user == null) {
+                throw new UnauthorizedException("Authentication failed.");
+            }
+            return user;
+        } catch (JwtException e){
+            throw new UnauthorizedException("Authentication failed.");
         }
-        return user;
     }
 }

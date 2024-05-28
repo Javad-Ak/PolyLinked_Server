@@ -3,7 +3,7 @@ package org.aut.dataAccessors;
 import org.aut.models.Follow;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
-import org.aut.utils.exceptions.PermissionDeniedException;
+import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class FollowAccessor {
         statement.executeUpdate();
         statement.close();
     }
-    public synchronized static ArrayList<User> getFollowers(String id) throws SQLException , PermissionDeniedException {
+    public synchronized static ArrayList<User> getFollowers(String id) throws SQLException , NotAcceptableException {
         ArrayList<User> followers;
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM follows WHERE followed_id = ? ORDER BY follower_id DESC;");
         statement.setString(1, id);
@@ -54,7 +54,7 @@ public class FollowAccessor {
         return followers;
     }
 
-    public synchronized static ArrayList<User> getFollowings(String id) throws SQLException , PermissionDeniedException {
+    public synchronized static ArrayList<User> getFollowings(String id) throws SQLException , NotAcceptableException {
         ArrayList<User> followings;
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM follows WHERE follower_id = ? ORDER BY followed_id DESC;");
         statement.setString(1, id);
@@ -73,7 +73,7 @@ public class FollowAccessor {
         return res;
     }
 
-    public synchronized static ArrayList<User> getUserListFromStatement(PreparedStatement statement) throws SQLException  , PermissionDeniedException {
+    public synchronized static ArrayList<User> getUserListFromStatement(PreparedStatement statement) throws SQLException  , NotAcceptableException {
         ArrayList<User> users = new ArrayList<>();
         ResultSet resultSet = statement.executeQuery();
         JSONObject jsonObject;
