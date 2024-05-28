@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import org.aut.dataAccessors.DataBaseConnection;
 import org.aut.httpHandlers.FollowHandler;
 import org.aut.httpHandlers.LoginHandler;
+import org.aut.httpHandlers.ProfileHandler;
 import org.aut.httpHandlers.UserHandler;
 
 /**
@@ -25,6 +26,7 @@ public class Server {
             server.createContext("/users", new UserHandler());
             server.createContext("/users/login", new LoginHandler());
             server.createContext("/follows", new FollowHandler());
+            server.createContext("/profiles", new ProfileHandler());
 
             server.setExecutor(Executors.newFixedThreadPool(8));
             server.start();
@@ -32,7 +34,7 @@ public class Server {
 
             System.out.println("Server is running (localhost:8080).");
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }

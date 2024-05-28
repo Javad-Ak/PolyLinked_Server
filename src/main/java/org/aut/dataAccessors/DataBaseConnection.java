@@ -7,8 +7,9 @@ import java.nio.file.*;
 import java.sql.*;
 
 public class DataBaseConnection extends Thread {
-    private static final String directory = "src/main/dataBase";
-    private static final String url = "jdbc:sqlite:./src/main/dataBase/data.db";
+    private static final Path RESOURCES = Path.of("./src/main/resources");
+    private static final Path DATABASE = Path.of("./src/main/resources/dataBase.db");
+    private static final Path URL = Path.of("jdbc:sqlite:./src/main/resources/dataBase.db");
     private static final ArrayList<Connection> connections = new ArrayList<>();
 
     public DataBaseConnection(String name) {
@@ -21,17 +22,18 @@ public class DataBaseConnection extends Thread {
     }
 
     public static void create() throws IOException {
-        Path path = Paths.get(directory);
-        Path file = Paths.get(directory + "/data.db");
-        if (!Files.isDirectory(path)) Files.createDirectories(path);
-        if (!Files.isRegularFile(file)) Files.createFile(file);
+        if (!Files.isDirectory(RESOURCES)) Files.createDirectories(RESOURCES);
+        if (!Files.isRegularFile(DATABASE)) Files.createFile(DATABASE);
+
+        MediaAccessor.createDirectories();
         UserAccessor.createUserTable();
         FollowAccessor.createFollowsTable();
+        ProfileAccessor.createUserTables();
     }
 
     public static Connection getConnection() {
         try {
-            Connection connection = DriverManager.getConnection(url);
+            Connection connection = DriverManager.getConnection(URL.toString());
             connections.add(connection);
             return connection;
         } catch (SQLException e) {

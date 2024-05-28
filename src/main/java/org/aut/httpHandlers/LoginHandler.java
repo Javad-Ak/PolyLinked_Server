@@ -30,7 +30,7 @@ public class LoginHandler implements HttpHandler {
                 if (UserController.authenticate(received.getString("email"), received.getString("password"))) {
                     code = 200;
                     User user = UserAccessor.getUserByEmail(received.getString("email"));
-                    response.put("Authorization", JwtHandler.generateToken(user.getId()));
+                    response.put("Authorization", JwtHandler.generateToken(user.getUserId()));
                 } else {
                     throw new UnauthorizedException("Invalid credentials");
                 }

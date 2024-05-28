@@ -63,6 +63,38 @@ public class Profile {
             throw new RuntimeException("invalid arguments");
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public String getPathToPic() {
+        return pathToPic;
+    }
+
+    public String getPathToBG() {
+        return pathToBG;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getStatus() {
+        return status.toString();
+    }
+
+    public String getProfession() {
+        return profession.toString();
+    }
+
     public enum Status {
         RECRUITER("RECRUITER"), SERVICE_PROVIDER("SERVICE_PROVIDER"), JOB_SEARCHER("JOB_SEARCHER");
 

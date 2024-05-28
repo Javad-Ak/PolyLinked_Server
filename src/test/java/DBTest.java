@@ -23,9 +23,9 @@ public class DBTest {
         User user1 , user2;
         UserAccessor.addUser(user1 = new User("ali1@gmail.com" , "ali1222345" , "Ali", "akbari", ""));
         UserAccessor.addUser(user2 = new User("ali2@gmail.com" , "ali1222345" , "Alireza", "athari", ""));
-        FollowController.addFollow(new Follow (user1.getId() , user2.getId()));
+        FollowController.addFollow(new Follow (user1.getUserId() , user2.getUserId()));
         try{
-            FollowController.addFollow(new Follow (user1.getId() , user2.getId()));
+            FollowController.addFollow(new Follow (user1.getUserId() , user2.getUserId()));
         } catch (NotAcceptableException e){
             System.out.println(e.getMessage());
         }

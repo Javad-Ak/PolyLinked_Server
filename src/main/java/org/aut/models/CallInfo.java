@@ -2,11 +2,12 @@ package org.aut.models;
 
 import org.aut.utils.exceptions.NotFoundException;
 import org.json.JSONObject;
+
 import java.util.Date;
 
 public class CallInfo {
     private final String userId; // foreign key
-    private final String emailAddress; // foreign key
+    private final String email; // foreign key
     private final String mobileNumber; // valid 40 chars
     private final String homeNumber;
     private final String workNumber;
@@ -16,10 +17,10 @@ public class CallInfo {
     private final String socialMedia;
 
 
-    public CallInfo(String userId, String emailAddress, String mobileNumber, String homeNumber, String workNumber, String address, Date birthDay, PrivacyPolitics privacyPolitics, String socialMedia) throws NotFoundException {
-        validateFields(userId, emailAddress, mobileNumber, homeNumber, workNumber, address, socialMedia);
+    public CallInfo(String userId, String email, String mobileNumber, String homeNumber, String workNumber, String address, Date birthDay, PrivacyPolitics privacyPolitics, String socialMedia) throws NotFoundException {
+        validateFields(userId, email, mobileNumber, homeNumber, workNumber, address, socialMedia);
         this.userId = userId;
-        this.emailAddress = emailAddress;
+        this.email = email;
         this.mobileNumber = mobileNumber;
         this.homeNumber = homeNumber;
         this.workNumber = workNumber;
@@ -31,7 +32,7 @@ public class CallInfo {
 
     public CallInfo(JSONObject jsonObject) {
         userId = jsonObject.getString("userId");
-        emailAddress = jsonObject.getString("emailAddress");
+        email = jsonObject.getString("emailAddress");
         mobileNumber = jsonObject.getString("mobileNumber");
         homeNumber = jsonObject.getString("homeNumber");
         workNumber = jsonObject.getString("workNumber");
@@ -41,11 +42,47 @@ public class CallInfo {
         socialMedia = jsonObject.getString("socialMedia");
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getMobileNumber() {
+        return mobileNumber;
+    }
+
+    public String getHomeNumber() {
+        return homeNumber;
+    }
+
+    public String getWorkNumber() {
+        return workNumber;
+    }
+
+    public String getAddress() {
+        return Address;
+    }
+
+    public long getBirthDay() {
+        return birthDay.getTime();
+    }
+
+    public String getPrivacyPolitics() {
+        return privacyPolitics.toString();
+    }
+
+    public String getSocialMedia() {
+        return socialMedia;
+    }
+
     @Override
     public String toString() {
         return '{' +
                 "userId: " + userId +
-                ", emailAddress: " + emailAddress +
+                ", emailAddress: " + email +
                 ", mobileNumber: " + mobileNumber +
                 ", homeNumber: " + homeNumber +
                 ", workNumber: " + workNumber +
@@ -56,12 +93,13 @@ public class CallInfo {
                 '}';
     }
 
-    private void validateFields(String userId, String emailAddress, String mobileNumber, String homeNumber, String workNumber, String address, String socialMedia) throws NotFoundException {
-        if (userId == null || emailAddress == null ||
+    private void validateFields(String userId, String email, String mobileNumber, String homeNumber, String workNumber, String address, String socialMedia) throws NotFoundException {
+        if (userId == null || email == null ||
                 (mobileNumber != null && !mobileNumber.matches("^[0-9]{1,40}$")) ||
                 (workNumber != null && !workNumber.matches("^[0-9]{1,40}$")) ||
                 (homeNumber != null && !homeNumber.matches("^[0-9]{1,40}$")) ||
                 (address != null && address.length() > 40) ||
+                (!email.matches("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")) ||
                 (socialMedia != null && socialMedia.length() > 40)
         ) throw new NotFoundException("Illegal args");
     }
