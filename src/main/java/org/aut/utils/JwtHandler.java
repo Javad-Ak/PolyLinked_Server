@@ -31,7 +31,7 @@ public class JwtHandler {
 
         try {
             return Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
-        } catch (JwtException e) {
+        } catch (JwtException e ) {
             return null;
         }
     }

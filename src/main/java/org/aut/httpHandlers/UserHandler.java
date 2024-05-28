@@ -21,11 +21,11 @@ public class UserHandler implements HttpHandler {
         switch (method) {
             case "POST":
                 JSONObject jsonObject = JsonHandler.getObject(exchange.getRequestBody());
-                User newUser = new User(jsonObject);
                 try {
+                    User newUser = new User(jsonObject);
                     if (!jsonObject.isEmpty() && !UserController.userExistsByEmail(newUser.getEmail())) {
                         UserController.addUser(newUser);
-                        code = 200; // success
+                        code = 200 ; // success
                         response.put("success", "User with email " + newUser.getEmail() + " created.");
 
 //                    TODO : Files.createDirectories

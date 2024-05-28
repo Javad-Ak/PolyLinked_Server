@@ -1,14 +1,11 @@
 import org.aut.controllers.FollowController;
 import org.aut.dataAccessors.DataBaseConnection;
-import org.aut.dataAccessors.FollowAccessor;
 import org.aut.dataAccessors.UserAccessor;
 import org.aut.models.Follow;
 import org.aut.models.User;
-import org.aut.utils.exceptions.PermissionDeniedException;
+import org.aut.utils.exceptions.NotAcceptableException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
 
 @DisplayName("------ testing DataBase...")
 public class DBTest {
@@ -29,7 +26,7 @@ public class DBTest {
         FollowController.addFollow(new Follow (user1.getId() , user2.getId()));
         try{
             FollowController.addFollow(new Follow (user1.getId() , user2.getId()));
-        } catch (PermissionDeniedException e){
+        } catch (NotAcceptableException e){
             System.out.println(e.getMessage());
         }
         System.out.println("Follow added successfully");

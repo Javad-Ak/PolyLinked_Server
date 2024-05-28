@@ -6,6 +6,7 @@ import java.sql.*;
 
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
+import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONObject;
 
 public class UserAccessor {
@@ -45,6 +46,7 @@ public class UserAccessor {
         statement.close();
     }
 
+
     public synchronized static User getUserByEmail(String email) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE email = ?;");
         statement.setString(1, email);
@@ -52,8 +54,18 @@ public class UserAccessor {
         JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
         resultSet.close();
         statement.close();
-
-        return jsonObject == null ? null : new User(jsonObject); // null -> not found
+        if (jsonObject == null) {
+            return null;
+        } else {
+            User user;
+            try {
+                user = new User(jsonObject);
+            } catch (NotAcceptableException e) {
+                user = null;
+            }
+            return user;
+        }
+        // null -> not found
     }
 
     public synchronized static User getUserById(String id) throws SQLException {
@@ -63,7 +75,17 @@ public class UserAccessor {
         JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
         resultSet.close();
         statement.close();
-
-        return jsonObject == null ? null : new User(jsonObject); // null -> not found
+        if (jsonObject == null) {
+            return null;
+        } else {
+            User user;
+            try {
+                user = new User(jsonObject);
+            } catch (NotAcceptableException e) {
+                user = null;
+            }
+            return user;
+        }
+        //null -> not found
     }
 }
