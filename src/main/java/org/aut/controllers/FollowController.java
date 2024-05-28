@@ -1,9 +1,7 @@
 package org.aut.controllers;
 
 import org.aut.dataAccessors.FollowAccessor;
-import org.aut.dataAccessors.UserAccessor;
 import org.aut.models.Follow;
-import org.aut.models.User;
 import org.aut.utils.exceptions.NotFoundException;
 import org.aut.utils.exceptions.PermissionDeniedException;
 

@@ -10,7 +10,6 @@ import org.aut.dataAccessors.UserAccessor;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.JwtHandler;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;

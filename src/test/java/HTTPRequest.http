@@ -1,7 +1,7 @@
 # @name followTest
-POST https://localhost:8080/follow
+POST https://localhost:8080/follow HTTP/1.1
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyOTI0NzdhNjQtNDU0OS1iNmE5IiwiaWF0IjoxNzE2ODM1Mjg0LCJleHAiOjE3MTc0MzUyODR9.13j41_PxhKR-GuFyzNqCzwSZh-dLy2yPocn68hxoKro
-eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyOTI0NzdhNjQtNDU0OS1iNmE5IiwiaWF0IjoxNzE2ODM1Mjg0LCJleHAiOjE3MTc0MzUyODR9.13j41_PxhKR-GuFyzNqCzwSZh-dLy2yPocn68hxoKro
+JWT: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyOTI0NzdhNjQtNDU0OS1iNmE5IiwiaWF0IjoxNzE2ODgxMzc1LCJleHAiOjE3MTc0ODEzNzV9.C9quOoJcAVxJ-rAqS0D9US8k87N8JNHMz280sZxSQ0c
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyOTI0NzdhNjQtNDU0OS1iNmE5IiwiaWF0IjoxNzE2ODgxMzc1LCJleHAiOjE3MTc0ODEzNzV9.C9quOoJcAVxJ-rAqS0D9US8k87N8JNHMz280sZxSQ0c
 
 {"follower": "user92477a64-4549-b6a9"  ,"followed": "user6393301c-42bb-8c19"}

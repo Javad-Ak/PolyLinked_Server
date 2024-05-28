@@ -18,9 +18,9 @@ public class User {
     private final Date createDate;
 
     public User(String email, String password, String firstName, String lastName, String additionalName) throws PermissionDeniedException {
-        validateFields(email, password, firstName, lastName, additionalName);
-
-        this.id = "user" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
+        String id = "user" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
+        validateFields(id , email, password, firstName, lastName, additionalName);
+        this.id = id;
         this.email = email;
         this.password = password;
         this.firstName = firstName;
@@ -30,7 +30,7 @@ public class User {
     }
 
     public User(JSONObject json) throws PermissionDeniedException {
-        validateFields(json.getString("email"), json.getString("password"), json.getString("firstName"), json.getString("lastName"), json.getString("additionalName"));
+        validateFields( json.getString("id") , json.getString("email"), json.getString("password"), json.getString("firstName"), json.getString("lastName"), json.getString("additionalName"));
         id = json.getString("id");
         email = json.getString("email");
         password = json.getString("password");
@@ -62,7 +62,7 @@ public class User {
     }
 
     public String getId() {
-        return id;
+        return  id;
     }
 
     public String getLastName() {
@@ -85,13 +85,13 @@ public class User {
         return createDate;
     }
 
-    private static void validateFields(String email, String password, String firstName, String lastName, String additionalName) throws PermissionDeniedException {
-        if ((firstName == null || lastName == null || email == null || password == null) ||
+    private static void validateFields(String id ,String email, String password, String firstName, String lastName, String additionalName) throws PermissionDeniedException {
+        if ((firstName == null || lastName == null || email == null || password == null || id == null) ||
                 (!email.matches("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")) ||
                 (!password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,20}$")) ||
                 (!firstName.matches("(?i)^[a-z]{1,20}$")) ||
                 (!lastName.matches("(?i)^[a-z]{1,40}$")) ||
                 (!additionalName.matches("(?i)^[a-z]{0,20}$")))
-            throw new PermissionDeniedException("invalid argument");//wrong
+            throw new PermissionDeniedException("invalid argument");
     }
 }

@@ -21,13 +21,20 @@ public class FollowHandler implements HttpHandler {
         int code = 400;
         switch (method) {
             case "POST":
-                JSONObject jsonObject = new JSONObject(exchange.getRequestBody());
+                JSONObject jsonObjectP = new JSONObject(exchange.getRequestBody());
+                String jwtP = exchange.getRequestHeaders().getFirst("JWT");
                 try {
-                    Follow newFollow = new Follow(jsonObject);
-                    if (!jsonObject.isEmpty()) {
+                    Follow newFollow = new Follow(jsonObjectP);
+                    if (!jsonObjectP.isEmpty() && jwtP != null && LoginHandler.getUserByToken(jwtP) != null && LoginHandler.getUserByToken(jwtP).getId().equals(newFollow.follower())) {
                         FollowController.addFollow(newFollow);
                         code = 200; //success
                         response.put("success", "The user has been followed successfully");
+                    } else if (jwtP == null) {
+                        throw new PermissionDeniedException("JWT is missing");
+                    } else if (jsonObjectP.isEmpty()) {
+                        throw new PermissionDeniedException("Request body is missing");
+                    } else if (LoginHandler.getUserByToken(jwtP) == null || !LoginHandler.getUserByToken(jwtP).getId().equals(newFollow.follower())) {
+                        throw new PermissionDeniedException("User unauthorized");
                     }
                 } catch (PermissionDeniedException e) {
                     code = 409;
@@ -42,18 +49,31 @@ public class FollowHandler implements HttpHandler {
                 }
                 break;
             case "DELETE":
-                JSONObject json = new JSONObject(exchange.getRequestBody());
+                JSONObject jsonD = new JSONObject(exchange.getRequestBody());
+                String jwtD = exchange.getRequestHeaders().getFirst("JWT");
                 try {
-                    Follow newFollow = new Follow(json);
-                    if (!json.isEmpty() && FollowAccessor.followExists(newFollow)) {
-                        FollowAccessor.deleteFollow(newFollow);
+                    Follow follow = new Follow(jsonD);
+                    if (!jsonD.isEmpty() && FollowAccessor.followExists(follow) && jwtD != null && LoginHandler.getUserByToken(jwtD) != null && LoginHandler.getUserByToken(jwtD).getId().equals(follow.follower())) {
+                        FollowAccessor.deleteFollow(follow);
                         code = 200;
                         response.put("success", "The user has been unfollowed successfully");
-                    } else if (!json.isEmpty()) {
-                        code = 409;
-                        response.put("failure", "Follow not exists");
+                    } else if (jsonD.isEmpty()) {
+                        throw new PermissionDeniedException("Request body is missing");
+                    } else if (!FollowAccessor.followExists(follow)) {
+                        throw new NotFoundException("User not found");
+                    } else if (jwtD == null) {
+                        throw new PermissionDeniedException("JWT is missing");
+                    } else if (LoginHandler.getUserByToken(jwtD) == null || !LoginHandler.getUserByToken(jwtD).getId().equals(follow.follower())) {
+                        throw new PermissionDeniedException("User unauthorized");
                     }
-                } catch (Exception e) {
+                } catch (PermissionDeniedException e) {
+                    code = 409;
+                    response.put("failure", "Permission denied");
+                } catch (NotFoundException e) {
+                code = 404;
+                response.put("failure", "Follower or Followed not found");
+                }
+                catch (Exception e) {
                     code = 500;
                     response.put("failure", "Something went wrong. Try again later");
                     System.out.println(e.getMessage());
