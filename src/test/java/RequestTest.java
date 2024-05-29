@@ -1,3 +1,4 @@
+import org.aut.dataAccessors.UserAccessor;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,27 @@ import org.aut.utils.JsonHandler;
 public class RequestTest {
     @Test
     @DisplayName("---- adding a user with httpClient")
-    public void addUser_Java11() throws Exception {
+    public void postProfile() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/users"))
+                .timeout(Duration.ofSeconds(10))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(new User("kasra@gmail.com", "ali7771222345", "Ali", "akbari", "ll").toString()))
+                .build();
+
+        // Send the request and get the response
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Response Code: " + response.statusCode());
+        System.out.println("Response headers: " + response.headers().toString());
+
+        client.close();
+    }
+
+    @Test
+    @DisplayName("---- adding a user with httpClient")
+    public void postUser_Java11() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/users"))
@@ -36,7 +57,7 @@ public class RequestTest {
 
     @Test
     @DisplayName("---- adding a user with URL")
-    public void addUser_Java8() throws Exception {
+    public void postUser_Java8() throws Exception {
         URL url = new URL("http://localhost:8080/users");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
@@ -77,6 +98,25 @@ public class RequestTest {
         } else {
             System.out.println("Server returned HTTP code " + response.statusCode());
         }
+        client.close();
+    }
+
+    @Test
+    @DisplayName("---- update a user with httpClient")
+    public void updateUser() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        User user = UserAccessor.getUserById("user769286ee-4627-ad72");
+        user.setLastName("UpdatedAkbari");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/users"))
+                .timeout(Duration.ofSeconds(10))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzY5Mjg2ZWUtNDYyNy1hZDcyIiwiaWF0IjoxNzE" +
+                        "3MDExMTQyLCJleHAiOjE3MTc2MTExNDJ9.TaYK4qpCR6AKPDjma1IdOXVBVdV-MhfHbL10GkKubVg")
+                .PUT(HttpRequest.BodyPublishers.ofString(user.toString()))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("Response Code: " + response.statusCode());
         client.close();
     }
 }

@@ -22,7 +22,7 @@ public class Skill {
     }
 
     public Skill(JSONObject jsonObject) {
-        this.skillId = jsonObject.getString("id");
+        this.skillId = jsonObject.getString("skillId");
         this.userId = jsonObject.getString("profile_id");
         this.educationId = jsonObject.getString("education_id");
         this.text = jsonObject.getString("name");
@@ -47,7 +47,7 @@ public class Skill {
     @Override
     public String toString() {
         return '{' +
-                "id:" + skillId +
+                "skillId:" + skillId +
                 ", profileId:" + userId +
                 ", educationId:" + educationId +
                 ", name:" + text +

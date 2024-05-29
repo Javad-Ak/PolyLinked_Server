@@ -10,12 +10,12 @@ import java.util.UUID;
 
 public class User {
     private final String userId; // UUID
-    private final String email; // valid
-    private final String password; // > 7 ch, int
-    private final String firstName; // 20 ch
-    private final String lastName; // 40 ch
-    private final String additionalName; // 20 ch
-    private final Date createDate;
+    private String email; // valid
+    private String password; // > 7 ch, int
+    private String firstName; // 20 ch
+    private String lastName; // 40 ch
+    private String additionalName; // 20 ch
+    private Date createDate;
 
     public User(String email, String password, String firstName, String lastName, String additionalName) throws NotAcceptableException {
         String id = "user" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
@@ -93,5 +93,29 @@ public class User {
                 (!lastName.matches("(?i)^[a-z]{1,40}$")) ||
                 (!additionalName.matches("(?i)^[a-z]{0,20}$")))
             throw new NotAcceptableException("invalid argument");
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setAdditionalName(String additionalName) {
+        this.additionalName = additionalName;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 }

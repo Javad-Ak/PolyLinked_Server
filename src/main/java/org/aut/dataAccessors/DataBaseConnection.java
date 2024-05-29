@@ -28,7 +28,10 @@ public class DataBaseConnection extends Thread {
         MediaAccessor.createDirectories();
         UserAccessor.createUserTable();
         FollowAccessor.createFollowsTable();
-        ProfileAccessor.createUserTables();
+        ProfileAccessor.createTable();
+        EducationAccessor.createTable();
+        SkillsAccessor.createTable();
+        CallInfoAccessor.createUserTable();
     }
 
     public static Connection getConnection() {

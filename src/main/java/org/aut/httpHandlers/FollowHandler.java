@@ -23,7 +23,6 @@ public class FollowHandler implements HttpHandler {
         int code = 405;
 
         JSONObject jsonObject = JsonHandler.getObject(exchange.getRequestBody());
-        System.out.println(jsonObject);
         String jwt = exchange.getRequestHeaders().getFirst("Authorization");
         try {
             User user = LoginHandler.getUserByToken(jwt);
