@@ -20,7 +20,7 @@ public class CallInfoAccessor {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS callInfo (" +
                     "userId TEXT NOT NULL" +
-                    ", email TEXT PRIMARY KEY" +
+                    ", email TEXT PRIMARY KEY NOT NULL" +
                     ", mobileNumber TEXT" +
                     ", homeNumber TEXT" +
                     ", workNumber TEXT" +
