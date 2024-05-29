@@ -30,8 +30,8 @@ public class User {
     }
 
     public User(JSONObject json) throws NotAcceptableException {
-        validateFields( json.getString("id") , json.getString("email"), json.getString("password"), json.getString("firstName"), json.getString("lastName"), json.getString("additionalName"));
-        userId = json.getString("id");
+        validateFields( json.getString("userId") , json.getString("email"), json.getString("password"), json.getString("firstName"), json.getString("lastName"), json.getString("additionalName"));
+        userId = json.getString("userId");
         email = json.getString("email");
         password = json.getString("password");
         firstName = json.getString("firstName");
@@ -43,7 +43,7 @@ public class User {
     @Override
     public String toString() {
         return "{" +
-                "id:" + userId +
+                "userId:" + userId +
                 ", email:" + email +
                 ", password:" + password +
                 ", firstName:" + firstName +

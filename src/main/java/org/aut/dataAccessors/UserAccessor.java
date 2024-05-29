@@ -20,13 +20,13 @@ public class UserAccessor {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (" +
                     "userId TEXT NOT NULL" +
-                    ", email TEXT NOT NULL" +
+                    ", email TEXT PRIMARY KEY NOT NULL" +
                     ", password VARCHAR(20) NOT NULL" +
                     ", firstName VARCHAR(20) NOT NULL " +
                     ", lastName VARCHAR(40) NOT NULL" +
                     ", additionalName VARCHAR(20)" +
                     ", createDate BIGINT(20)" +
-                    ", PRIMARY KEY (userId, email));");
+                    ");");
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
         }

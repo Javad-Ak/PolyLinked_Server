@@ -64,7 +64,7 @@ public class ProfileAccessor {
                     ");");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS callInfo (" +
                     "userId TEXT NOT NULL" +
-                    ", email TEXT" +
+                    ", email TEXT PRIMARY KEY" +
                     ", mobileNumber TEXT" +
                     ", homeNumber TEXT" +
                     ", workNumber TEXT" +
@@ -72,7 +72,6 @@ public class ProfileAccessor {
                     ", birthDay BIGINT" +
                     ", privacyPolitics TEXT" +
                     ", socialMedia TEXT" +
-                    ", PRIMARY KEY (userId, email)" +
                     ", FOREIGN KEY (userId, email)" +
                     " REFERENCES users (userId, email)" +
                     " ON UPDATE CASCADE" +

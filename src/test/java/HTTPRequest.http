@@ -1,11 +1,11 @@
 # @name followTest
 POST http://localhost:8080/follows HTTP/1.1
-Content-Type:application/json
-Authorization:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyOTI0NzdhNjQtNDU0OS1iNmE5IiwiaWF0IjoxNzE2OTEwNTY5LCJleHAiOjE3MTc1MTA1Njl9.3EpViQoMvHGHDv3XPEYGIZuEII3Y-yHDstd0qoQRYJ0
-eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyOTI0NzdhNjQtNDU0OS1iNmE5IiwiaWF0IjoxNzE2OTEwNTY5LCJleHAiOjE3MTc1MTA1Njl9.3EpViQoMvHGHDv3XPEYGIZuEII3Y-yHDstd0qoQRYJ0
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMjM3NTBkMTQtNDdjMC1iMjIwIiwiaWF0IjoxNzE2OTg1NjA2LCJleHAiOjE3MTc1ODU2MDZ9.ej7LwjDK9sO_9XXPJk5HxH6tSrw_2enANFDosy6yOr8
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMjM3NTBkMTQtNDdjMC1iMjIwIiwiaWF0IjoxNzE2OTg1NjA2LCJleHAiOjE3MTc1ODU2MDZ9.ej7LwjDK9sO_9XXPJk5HxH6tSrw_2enANFDosy6yOr8
 
 # body
 {
-  "follower": "user92477a64-4549-b6a9",
-  "followed": "user6393301c-42bb-8c19"
+  "follower": "user23750d14-47c0-b220",
+  "followed": "user31766fbd-430a-baf1"
 }

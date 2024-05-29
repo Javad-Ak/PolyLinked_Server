@@ -37,16 +37,16 @@ public class FollowAccessor {
     public synchronized static void addFollow(Follow follow) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("INSERT INTO follows (follower_id , followed_id) " +
                 "VALUES (?, ?);");
-        statement.setString(1, follow.follower());
-        statement.setString(2, follow.followed());
+        statement.setString(1, follow.getFollower());
+        statement.setString(2, follow.getFollowed());
         statement.executeUpdate();
         statement.close();
     }
 
     public synchronized static void deleteFollow(Follow follow) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("DELETE FROM follows WHERE follower_id = ? AND followed_id = ?");
-        statement.setString(1, follow.follower());
-        statement.setString(2, follow.followed());
+        statement.setString(1, follow.getFollowed());
+        statement.setString(2, follow.getFollowed());
         statement.executeUpdate();
         statement.close();
     }
@@ -71,8 +71,8 @@ public class FollowAccessor {
 
     public synchronized static boolean followExists(Follow follow) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM follows WHERE follower_id = ? AND followed_id = ?");
-        statement.setString(1, follow.follower());
-        statement.setString(2, follow.followed());
+        statement.setString(1, follow.getFollower());
+        statement.setString(2, follow.getFollowed());
         ResultSet resultSet = statement.executeQuery();
         boolean res = resultSet.next();
         statement.close();
