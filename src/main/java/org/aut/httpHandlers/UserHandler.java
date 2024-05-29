@@ -43,6 +43,7 @@ public class UserHandler implements HttpHandler {
                     JSONObject jsonObject = JsonHandler.getObject(exchange.getRequestBody());
                     User newUser = new User(jsonObject);
                     if(!user.getUserId().equals(newUser.getUserId())){
+
                         throw new UnauthorizedException("Unauthorized");
                     }
                     if (!jsonObject.isEmpty()) {

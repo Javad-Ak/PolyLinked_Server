@@ -110,7 +110,9 @@ public class RequestTest {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/users"))
                 .timeout(Duration.ofSeconds(10))
-                .header("Content-Type", "json")
+                .header("Content-Type", "application/json")
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzY5Mjg2ZWUtNDYyNy1hZDcyIiwiaWF0IjoxNzE" +
+                        "3MDExMTQyLCJleHAiOjE3MTc2MTExNDJ9.TaYK4qpCR6AKPDjma1IdOXVBVdV-MhfHbL10GkKubVg")
                 .PUT(HttpRequest.BodyPublishers.ofString(user.toString()))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());

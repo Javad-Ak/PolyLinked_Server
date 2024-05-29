@@ -46,7 +46,7 @@ public class UserController {
     }
 
     public static void updateUser(User user) throws SQLException, NotFoundException {
-        if (!userExistsById(user.getUserId())) {
+        if (userExistsById(user.getUserId())) {
             UserAccessor.updateUser(user);
         } else {
             throw new NotFoundException("User not found");
