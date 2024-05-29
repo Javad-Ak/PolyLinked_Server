@@ -11,12 +11,13 @@ public class Profile {
     private final String city;  // 60 ch
     private final Status status;
     private final Profession profession;
+    private final boolean notify;
     // + Skills(relatively), Educations, CallInfo
 
-    public Profile(String id, String bio, String pathToPic, String pathToBG, String country, String city, Status status, Profession profession) {
+    public Profile(String userID, String bio, String pathToPic, String pathToBG, String country, String city, Status status, Profession profession, boolean notify) {
         validateFields(bio, country, city);
 
-        this.userId = id;
+        this.userId = userID;
         this.bio = bio;
         this.pathToPic = pathToPic;
         this.pathToBG = pathToBG;
@@ -24,10 +25,11 @@ public class Profile {
         this.city = city.toUpperCase();
         this.status = status;
         this.profession = profession;
+        this.notify = notify;
     }
 
     public Profile(JSONObject profile) {
-        userId = profile.getString("id");
+        userId = profile.getString("userID");
         bio = profile.getString("bio");
         pathToPic = profile.getString("pathToPic");
         pathToBG = profile.getString("pathToBG");
@@ -35,12 +37,13 @@ public class Profile {
         city = profile.getString("city");
         status = Status.valueOf(profile.getString("status"));
         profession = Profession.valueOf(profile.getString("profession"));
+        notify = profile.getBoolean("notify");
     }
 
     @Override
     public String toString() {
         return '{' +
-                "id: " + userId +
+                "userID: " + userId +
                 ", bio: " + bio +
                 ", pathToPic: " + pathToPic +
                 ", pathToBG: " + pathToBG +
@@ -48,6 +51,7 @@ public class Profile {
                 ", city: " + city.toUpperCase() +
                 ", status: " + status +
                 ", profession: " + profession +
+                ", notify: " + notify +
                 '}';
     }
 
@@ -93,6 +97,10 @@ public class Profile {
 
     public String getProfession() {
         return profession.toString();
+    }
+
+    public boolean getNotify() {
+        return notify;
     }
 
     public enum Status {

@@ -34,7 +34,7 @@ public class Education {
     }
 
     public Education(JSONObject jsonObject) {
-        educationId = jsonObject.getString("id");
+        educationId = jsonObject.getString("educationId");
         userId = jsonObject.getString("user_id");
         institute = jsonObject.getString("institute");
         field = jsonObject.getString("field");
@@ -48,7 +48,7 @@ public class Education {
     @Override
     public String toString() {
         return "{" +
-                ", id:" + educationId +
+                ", educationId:" + educationId +
                 ", userId:" + userId +
                 ", institute:" + institute +
                 ", field:" + field +
