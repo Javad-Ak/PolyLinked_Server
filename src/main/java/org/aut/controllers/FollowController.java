@@ -8,11 +8,11 @@ import java.sql.SQLException;
 
 public class FollowController {
     public static void addFollow(Follow follow) throws SQLException, NotFoundException , NotAcceptableException {
-        if (!UserController.userExistsById(follow.follower()) || !UserController.userExistsById(follow.followed())) {
+        if (!UserController.userExistsById(follow.getFollower()) || !UserController.userExistsById(follow.getFollowed())) {
             throw new NotFoundException("User not found");
         } else if (FollowAccessor.followExists(follow)) {
             throw new NotAcceptableException("Follow already exists");
-        } else if( follow.followed().equals(follow.follower())) {
+        } else if( follow.getFollowed().equals(follow.getFollower())) {
             throw new NotAcceptableException("User Can't follow himself");
         }
         FollowAccessor.addFollow(follow);

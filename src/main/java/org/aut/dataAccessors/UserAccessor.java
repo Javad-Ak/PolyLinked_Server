@@ -8,7 +8,6 @@ import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
-import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 public class UserAccessor {
@@ -17,27 +16,26 @@ public class UserAccessor {
     private UserAccessor() {
     }
 
-    public static void createUserTable() throws IOException {
+    static void createUserTable() throws IOException {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (" +
-                    "id TEXT NOT NULL" +
-                    ", email TEXT NOT NULL" +
+                    "userId TEXT NOT NULL" +
+                    ", email TEXT PRIMARY KEY NOT NULL" +
                     ", password VARCHAR(20) NOT NULL" +
                     ", firstName VARCHAR(20) NOT NULL " +
                     ", lastName VARCHAR(40) NOT NULL" +
                     ", additionalName VARCHAR(20)" +
                     ", createDate BIGINT(20)" +
-                    ", PRIMARY KEY (id, email));");
-
+                    ");");
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
         }
     }
 
     public synchronized static void addUser(User user) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO users (id, email, password, firstName, LastName, additionalName, createDate) " +
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO users (userId, email, password, firstName, LastName, additionalName, createDate) " +
                 "VALUES (?,?,?,?,?,?,?);");
-        statement.setString(1, user.getId());
+        statement.setString(1, user.getUserId());
         statement.setString(2, user.getEmail());
         statement.setString(3, user.getPassword());
         statement.setString(4, user.getFirstName());
@@ -55,7 +53,7 @@ public class UserAccessor {
     }
 
     public synchronized static User getUserById(String id) throws SQLException, NotFoundException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE id = ?;");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE userId = ?;");
         return getUserFromResultSet(id, statement);
     }
 

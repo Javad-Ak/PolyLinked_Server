@@ -8,7 +8,7 @@ import java.util.Random;
 import java.util.UUID;
 
 public class Education {
-    private final String id;
+    private final String educationId;
     private final String userId;
     private final String institute; // 40 chars
     private final String field; // 40 chars
@@ -22,7 +22,7 @@ public class Education {
     public Education(String userId, String institute, String field, Date start, Date end, int grade, String activities, String about) throws NotAcceptableException {
         validateFields(institute, field, start, end, grade, activities, about);
 
-        this.id = "edu" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
+        this.educationId = "edu" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
         this.userId = userId;
         this.institute = institute;
         this.field = field;
@@ -34,7 +34,7 @@ public class Education {
     }
 
     public Education(JSONObject jsonObject) {
-        id = jsonObject.getString("id");
+        educationId = jsonObject.getString("id");
         userId = jsonObject.getString("user_id");
         institute = jsonObject.getString("institute");
         field = jsonObject.getString("field");
@@ -48,7 +48,7 @@ public class Education {
     @Override
     public String toString() {
         return "{" +
-                ", id:" + id +
+                ", id:" + educationId +
                 ", userId:" + userId +
                 ", institute:" + institute +
                 ", field:" + field +
@@ -67,5 +67,41 @@ public class Education {
                 grade < 0 || grade > 100 ||
                 institute.length() > 40 || field.length() > 40 || activities.length() > 500 || about.length() > 1000
         ) throw new NotAcceptableException("Illegal args");
+    }
+
+    public String getEducationId() {
+        return educationId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getInstitute() {
+        return institute;
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public long getStart() {
+        return start.getTime();
+    }
+
+    public long getEnd() {
+        return end.getTime();
+    }
+
+    public int getGrade() {
+        return grade;
+    }
+
+    public String getActivities() {
+        return activities;
+    }
+
+    public String getAbout() {
+        return about;
     }
 }

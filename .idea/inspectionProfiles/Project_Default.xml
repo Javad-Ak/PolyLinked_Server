@@ -4,7 +4,7 @@
     <inspection_tool class="IncorrectHttpHeaderInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="customHeaders">
         <set>
-          <option value="eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyOTI0NzdhNjQtNDU0OS1iNmE5IiwiaWF0IjoxNzE2OTEwNTY5LCJleHAiOjE3MTc1MTA1Njl9.3EpViQoMvHGHDv3XPEYGIZuEII3Y-yHDstd0qoQRYJ0" />
+          <option value="eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMjM3NTBkMTQtNDdjMC1iMjIwIiwiaWF0IjoxNzE2OTg1NjA2LCJleHAiOjE3MTc1ODU2MDZ9.ej7LwjDK9sO_9XXPJk5HxH6tSrw_2enANFDosy6yOr8" />
         </set>
       </option>
     </inspection_tool>

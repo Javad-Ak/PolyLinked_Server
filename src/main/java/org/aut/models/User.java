@@ -9,7 +9,7 @@ import org.json.JSONObject;
 import java.util.UUID;
 
 public class User {
-    private final String id; // UUID
+    private final String userId; // UUID
     private final String email; // valid
     private final String password; // > 7 ch, int
     private final String firstName; // 20 ch
@@ -20,7 +20,7 @@ public class User {
     public User(String email, String password, String firstName, String lastName, String additionalName) throws NotAcceptableException {
         String id = "user" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
         validateFields(id , email, password, firstName, lastName, additionalName);
-        this.id = id;
+        this.userId = id;
         this.email = email;
         this.password = password;
         this.firstName = firstName;
@@ -30,8 +30,8 @@ public class User {
     }
 
     public User(JSONObject json) throws NotAcceptableException {
-        validateFields( json.getString("id") , json.getString("email"), json.getString("password"), json.getString("firstName"), json.getString("lastName"), json.getString("additionalName"));
-        id = json.getString("id");
+        validateFields( json.getString("userId") , json.getString("email"), json.getString("password"), json.getString("firstName"), json.getString("lastName"), json.getString("additionalName"));
+        userId = json.getString("userId");
         email = json.getString("email");
         password = json.getString("password");
         firstName = json.getString("firstName");
@@ -43,7 +43,7 @@ public class User {
     @Override
     public String toString() {
         return "{" +
-                "id:" + id +
+                "userId:" + userId +
                 ", email:" + email +
                 ", password:" + password +
                 ", firstName:" + firstName +
@@ -61,8 +61,8 @@ public class User {
         return firstName;
     }
 
-    public String getId() {
-        return  id;
+    public String getUserId() {
+        return userId;
     }
 
     public String getLastName() {

@@ -7,34 +7,50 @@ import java.util.Random;
 import java.util.UUID;
 
 public class Skill {
-    private final String id;
-    private final String profileId;
+    private final String skillId;
+    private final String userId;
     private final String educationId;
-    private final String name; // 60 chars
+    private final String text; // 60 chars
 
-    public Skill(String profileId, String educationId, String name) throws NotAcceptableException {
-        if (name == null || name.isEmpty()) throw new NotAcceptableException("Invalid Arguments");
+    public Skill(String profileId, String educationId, String text) throws NotAcceptableException {
+        if (text == null || text.length() > 40) throw new NotAcceptableException("Invalid Arguments");
 
-        this.id = "skill" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
-        this.profileId = profileId;
+        this.skillId = "skill" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
+        this.userId = profileId;
         this.educationId = educationId;
-        this.name = name;
+        this.text = text;
     }
 
     public Skill(JSONObject jsonObject) {
-        this.id = jsonObject.getString("id");
-        this.profileId = jsonObject.getString("profile_id");
+        this.skillId = jsonObject.getString("id");
+        this.userId = jsonObject.getString("profile_id");
         this.educationId = jsonObject.getString("education_id");
-        this.name = jsonObject.getString("name");
+        this.text = jsonObject.getString("name");
+    }
+
+    public String getSkillId() {
+        return skillId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getEducationId() {
+        return educationId;
+    }
+
+    public String getText() {
+        return text;
     }
 
     @Override
     public String toString() {
         return '{' +
-                "id:" + id +
-                ", profileId:" + profileId +
+                "id:" + skillId +
+                ", profileId:" + userId +
                 ", educationId:" + educationId +
-                ", name:" + name +
+                ", name:" + text +
                 '}';
     }
 }
