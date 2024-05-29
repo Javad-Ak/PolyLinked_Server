@@ -1,3 +1,4 @@
+import org.aut.dataAccessors.UserAccessor;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -97,6 +98,23 @@ public class RequestTest {
         } else {
             System.out.println("Server returned HTTP code " + response.statusCode());
         }
+        client.close();
+    }
+
+    @Test
+    @DisplayName("---- update a user with httpClient")
+    public void updateUser() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        User user = UserAccessor.getUserById("user769286ee-4627-ad72");
+        user.setLastName("UpdatedAkbari");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/users"))
+                .timeout(Duration.ofSeconds(10))
+                .header("Content-Type", "json")
+                .PUT(HttpRequest.BodyPublishers.ofString(user.toString()))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("Response Code: " + response.statusCode());
         client.close();
     }
 }
