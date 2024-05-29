@@ -1,8 +1,6 @@
 package org.aut.dataAccessors;
 
 import org.aut.models.Education;
-import org.aut.models.Skill;
-
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.Connection;
