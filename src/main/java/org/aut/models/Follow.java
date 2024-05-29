@@ -4,7 +4,7 @@ package org.aut.models;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONObject;
 
-public final class Follow {
+public final class Follow implements JsonSerializable {
     private final String follower;
     private final String followed;
 
@@ -36,7 +36,8 @@ public final class Follow {
                 + "}";
     }
 
-    public JSONObject toJSON() {
+    @Override
+    public JSONObject toJson() {
         return new JSONObject(toString());
     }
 
@@ -52,7 +53,6 @@ public final class Follow {
     public String followed() {
         return followed;
     }
-
 }
 
 

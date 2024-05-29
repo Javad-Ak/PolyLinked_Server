@@ -1,8 +1,9 @@
 package org.aut.models;
 
+import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONObject;
 
-public class Profile {
+public class Profile implements JsonSerializable {
     private final String userId; // same as user id -> foreign key
     private final String bio; // 220 ch
     private final String pathToPic; // 400*400, 1 mb
@@ -38,6 +39,7 @@ public class Profile {
         status = Status.valueOf(profile.getString("status"));
         profession = Profession.valueOf(profile.getString("profession"));
         notify = profile.getBoolean("notify");
+        validateFields(bio, country, city);
     }
 
     @Override
@@ -55,6 +57,7 @@ public class Profile {
                 '}';
     }
 
+    @Override
     public JSONObject toJson() {
         return new JSONObject(toString());
     }

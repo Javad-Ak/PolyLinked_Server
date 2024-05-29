@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import java.util.Random;
 import java.util.UUID;
 
-public class Skill {
+public class Skill implements JsonSerializable {
     private final String skillId;
     private final String userId;
     private final String educationId;
@@ -52,5 +52,10 @@ public class Skill {
                 ", educationId:" + educationId +
                 ", name:" + text +
                 '}';
+    }
+
+    @Override
+    public JSONObject toJson() {
+        return new JSONObject(toString());
     }
 }

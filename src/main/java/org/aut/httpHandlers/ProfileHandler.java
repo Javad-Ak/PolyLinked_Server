@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class ProfileHandler implements HttpHandler {
     @Override
-    public void handle(HttpExchange httpExchange) throws IOException {
+    public void handle(HttpExchange exchange) throws IOException {
 
     }
 }
