@@ -2,6 +2,7 @@
 package org.aut.models;
 
 import org.aut.utils.exceptions.NotAcceptableException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class Follow {
@@ -15,9 +16,13 @@ public final class Follow {
     }
 
     public Follow(JSONObject json) throws NotAcceptableException {
-        validateFields(json.getString("follower"), json.getString("followed"));
-        follower = json.getString("follower");
-        followed = json.getString("followed");
+        try {
+            validateFields(json.getString("follower"), json.getString("followed"));
+            follower = json.getString("follower");
+            followed = json.getString("followed");
+        } catch (JSONException e) {
+            throw new NotAcceptableException("Wrong jsonObject");
+        }
     }
 
     public String getFollowed() {
