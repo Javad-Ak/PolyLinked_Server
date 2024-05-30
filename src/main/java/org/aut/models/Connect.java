@@ -8,9 +8,9 @@ public class Connect {
     private final String applicantId;
     private final String acceptorId;
     private final String note;
-    private final State acceptState;
+    private final AcceptState acceptState;
 
-    Connect(String applicantId, String acceptorId, String note , State acceptState) throws NotAcceptableException {
+    public Connect(String applicantId, String acceptorId, String note, AcceptState acceptState) throws NotAcceptableException {
         validateFields(applicantId, acceptorId, note);
         this.applicantId = applicantId;
         this.acceptorId = acceptorId;
@@ -19,11 +19,12 @@ public class Connect {
     }
 
     public Connect(JSONObject json) throws NotAcceptableException {
-        validateFields(json.getString("applicantId"), json.getString("acceptorId"), json.getString("note"));
-        applicantId = json.getString("applicantId");
-        acceptorId = json.getString("acceptorId");
-        acceptState = State.valueOf(json.getString("acceptState"));
-        note = json.getString("note");
+        this.applicantId = json.getString("applicantId");
+        this.acceptorId = json.getString("acceptorId");
+        this.acceptState = AcceptState.valueOf(json.getString("acceptState"));
+        this.note = json.getString("note");
+        validateFields(applicantId, acceptorId, note);
+        System.out.println("hey 1.76");
     }
 
     public String getAcceptorId() {
@@ -47,7 +48,7 @@ public class Connect {
         return "{" +
                 "applicantId:" + applicantId +
                 ", acceptorId:" + acceptorId +
-                ", acceptState:" + acceptState.value +
+                ", acceptState:" + acceptState.toString() +
                 ", note:" + note +
                 "}";
     }
@@ -62,7 +63,7 @@ public class Connect {
         }
     }
 
-    public enum State {
+    public enum AcceptState {
         ACCEPTED("ACCEPTED"),
         REJECTED("REJECTED"),
         WAITING("WAITING");
@@ -70,7 +71,7 @@ public class Connect {
 
         private final String value;
 
-        State(String value) {
+        AcceptState(String value) {
             this.value = value;
         }
 

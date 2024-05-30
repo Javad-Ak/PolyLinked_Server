@@ -1,8 +1,10 @@
+import org.aut.controllers.ConnectController;
 import org.aut.controllers.FollowController;
 import org.aut.controllers.UserController;
 import org.aut.dataAccessors.DataBaseConnection;
 import org.aut.dataAccessors.ProfileAccessor;
 import org.aut.dataAccessors.UserAccessor;
+import org.aut.models.Connect;
 import org.aut.models.Follow;
 import org.aut.models.Profile;
 import org.aut.models.User;
@@ -99,5 +101,21 @@ public class DBTest {
 
         ProfileAccessor.updateProfile(new Profile(user1.getUserId(), "updated", "bbb", "ccc", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, true));
         System.out.println("profile updated successfully");
+    }
+
+    @Test
+    @DisplayName("---- testing connect table")
+    public void ConnectTest() throws Exception {
+        DataBaseConnection.create();
+
+        User user1, user2;
+        UserAccessor.addUser(user1 = new User("ali5@gmail.com", "ali1222345", "Ali", "akbari", ""));
+        UserAccessor.addUser(user2 = new User("ali6@gmail.com", "ali1222345", "Alireza", "athari", ""));
+        try {
+            ConnectController.addConnect(new Connect(user1.getUserId(), user2.getUserId() , "this is connect note" , Connect.AcceptState.WAITING));
+        } catch (NotAcceptableException | NotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        System.out.println("Connect added successfully");
     }
 }
