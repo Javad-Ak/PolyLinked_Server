@@ -35,10 +35,10 @@ public class ConnectAccessor {
     public synchronized static void addConnect(Connect connect) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("INSERT INTO connects (applicant_id , acceptor_id , note , accept_state) " +
                 "VALUES (?, ?, ? , ?)");
-        statement.setString( 1, connect.getApplicantId());
-        statement.setString( 2, connect.getAcceptorId());
+        statement.setString( 1, connect.getApplicant_id());
+        statement.setString( 2, connect.getAcceptor_id());
         statement.setString(3 , connect.getNote());
-        statement.setString(4 , connect.getAcceptState());
+        statement.setString(4 , connect.getAccept_state());
         statement.executeUpdate();
         statement.close();
     }
@@ -46,8 +46,8 @@ public class ConnectAccessor {
 
     public synchronized static void deleteConnect(Connect connect) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("DELETE FROM connects WHERE applicant_id = ? AND acceptor_id = ? AND  accept_state = ?");
-        statement.setString(1, connect.getApplicantId());
-        statement.setString(2, connect.getAcceptorId());
+        statement.setString(1, connect.getApplicant_id());
+        statement.setString(2, connect.getAcceptor_id());
         statement.setString(3 , Connect.AcceptState.ACCEPTED.toString());
         statement.executeUpdate();
         statement.close();
@@ -55,9 +55,9 @@ public class ConnectAccessor {
 
     public synchronized static void updateConnect(Connect connect) throws SQLException {
        PreparedStatement statement = connection.prepareStatement("UPDATE connects SET accept_state = ? WHERE applicant_id = ? AND acceptor_id = ?");
-       statement.setString(1, connect.getAcceptState()); //may need change to ACCEPTED if there is only one case for updating
-       statement.setString(2, connect.getApplicantId());
-       statement.setString(3, connect.getAcceptorId());
+       statement.setString(1, connect.getAccept_state()); //may need change to ACCEPTED if there is only one case for updating
+       statement.setString(2, connect.getApplicant_id());
+       statement.setString(3, connect.getAcceptor_id());
        statement.executeUpdate();
        statement.close();
     }

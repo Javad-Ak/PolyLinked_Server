@@ -107,12 +107,8 @@ public class DBTest {
     @DisplayName("---- testing connect table")
     public void ConnectTest() throws Exception {
         DataBaseConnection.create();
-
-        User user1, user2;
-        UserAccessor.addUser(user1 = new User("ali5@gmail.com", "ali1222345", "Ali", "akbari", ""));
-        UserAccessor.addUser(user2 = new User("ali6@gmail.com", "ali1222345", "Alireza", "athari", ""));
         try {
-            ConnectController.addConnect(new Connect(user1.getUserId(), user2.getUserId() , "this is connect note" , Connect.AcceptState.WAITING));
+            ConnectController.addConnect(new Connect("user90059c8e-4be7-8764", "user241374d1-464e-863e" , "this is connect note" , Connect.AcceptState.WAITING));
         } catch (NotAcceptableException | NotFoundException e) {
             System.out.println(e.getMessage());
         }

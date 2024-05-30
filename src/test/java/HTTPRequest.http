@@ -32,10 +32,10 @@ Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzA2ODczNTgtNGYxNi04Nzg1Iiwi
 
 # body
 {
-  "applicantId": "user70687358-4f16-8785",
-  "acceptorId": "user37675cbe-4121-a9f6",
+  "applicant_id": "user70687358-4f16-8785",
+  "acceptor_id": "user37675cbe-4121-a9f6",
   "note": "salam bar note",
-  "acceptState": "WAITING"
+  "accept_state": "WAITING"
 }
 
 
@@ -53,10 +53,10 @@ Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzc2NzVjYmUtNDEyMS1hOWY2Iiwi
 # body
 
 {
-  "applicantId": "user70687358-4f16-8785",
-  "acceptorId": "user37675cbe-4121-a9f6",
+  "applicant_id": "user70687358-4f16-8785",
+  "acceptor_id": "user37675cbe-4121-a9f6",
   "note": "salam bar note",
-  "acceptState": "ACCEPTED"
+  "accept_state": "ACCEPTED"
 }
 
 
@@ -72,10 +72,10 @@ Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzA2ODczNTgtNGYxNi04Nzg1Iiwi
 
 # body
 {
-  "applicantId": "user70687358-4f16-8785",
-  "acceptorId": "user37675cbe-4121-a9f6",
+  "applicant_id": "user70687358-4f16-8785",
+  "acceptor_id": "user37675cbe-4121-a9f6",
   "note": "salam bar note",
-  "acceptState": "ACCEPTED"
+  "accept_state": "ACCEPTED"
 }
 
 ###

@@ -23,11 +23,12 @@ public class ConnectHandler implements HttpHandler {
         JSONObject jsonObject = JsonHandler.getObject(exchange.getRequestBody());
         String jwt = exchange.getRequestHeaders().getFirst("Authorization");
         try {
+            System.out.println("hey 0");
             Connect connect = new Connect(jsonObject);
             User user = LoginHandler.getUserByToken(jwt);
             switch (method) {
                 case "POST":
-                    if (!jsonObject.isEmpty() && user.getUserId().equals(connect.getApplicantId())) {
+                    if (!jsonObject.isEmpty() && user.getUserId().equals(connect.getApplicant_id())) {
                         ConnectController.addConnect(connect);
                         code = 200;
                     } else if (!jsonObject.isEmpty()) {
@@ -36,7 +37,7 @@ public class ConnectHandler implements HttpHandler {
                     break;
 
                 case "PUT":
-                    if (!jsonObject.isEmpty() && user.getUserId().equals(connect.getAcceptorId())) {
+                    if (!jsonObject.isEmpty() && user.getUserId().equals(connect.getAcceptor_id())) {
                         System.out.println(connect);
                         ConnectController.updateConnect(connect);
                         System.out.println("hey3");
@@ -47,7 +48,7 @@ public class ConnectHandler implements HttpHandler {
                     break;
 
                 case "DELETE":
-                    if (!jsonObject.isEmpty() && (user.getUserId().equals(connect.getApplicantId()) || user.getUserId().equals(connect.getAcceptorId()))) {
+                    if (!jsonObject.isEmpty() && (user.getUserId().equals(connect.getApplicant_id()) || user.getUserId().equals(connect.getAcceptor_id()))) {
                         ConnectController.deleteConnect(connect);
                         code = 200;
                     } else if (!jsonObject.isEmpty()) {

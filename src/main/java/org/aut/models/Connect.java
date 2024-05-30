@@ -1,54 +1,53 @@
 package org.aut.models;
 
 import org.aut.utils.exceptions.NotAcceptableException;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Connect {
-    private final String applicantId;
-    private final String acceptorId;
+    private final String applicant_id;
+    private final String acceptor_id;
     private final String note;
-    private final AcceptState acceptState;
+    private final AcceptState accept_state;
 
-    public Connect(String applicantId, String acceptorId, String note, AcceptState acceptState) throws NotAcceptableException {
-        validateFields(applicantId, acceptorId, note);
-        this.applicantId = applicantId;
-        this.acceptorId = acceptorId;
+    public Connect(String applicant_id, String acceptor_id, String note, AcceptState accept_state) throws NotAcceptableException {
+        validateFields(applicant_id, acceptor_id, note);
+        this.applicant_id = applicant_id;
+        this.acceptor_id = acceptor_id;
         this.note = note;
-        this.acceptState = acceptState;
+        this.accept_state = accept_state;
     }
 
     public Connect(JSONObject json) throws NotAcceptableException {
-        this.applicantId = json.getString("applicantId");
-        this.acceptorId = json.getString("acceptorId");
-        this.acceptState = AcceptState.valueOf(json.getString("acceptState"));
+        this.applicant_id = json.getString("applicant_id");
+        this.acceptor_id = json.getString("acceptor_id");
+        this.accept_state = AcceptState.valueOf(json.getString("accept_state"));
         this.note = json.getString("note");
-        validateFields(applicantId, acceptorId, note);
+        validateFields(applicant_id, acceptor_id, note);
         System.out.println("hey 1.76");
     }
 
-    public String getAcceptorId() {
-        return acceptorId;
+    public String getAcceptor_id() {
+        return acceptor_id;
     }
 
-    public String getApplicantId() {
-        return applicantId;
+    public String getApplicant_id() {
+        return applicant_id;
     }
 
     public String getNote() {
         return note;
     }
 
-    public String getAcceptState() {
-        return acceptState.value;
+    public String getAccept_state() {
+        return accept_state.value;
     }
 
     @Override
     public String toString() {
         return "{" +
-                "applicantId:" + applicantId +
-                ", acceptorId:" + acceptorId +
-                ", acceptState:" + acceptState.toString() +
+                "applicant_id:" + applicant_id +
+                ", acceptor_id:" + acceptor_id +
+                ", accept_state:" + accept_state.toString() +
                 ", note:" + note +
                 "}";
     }
