@@ -48,13 +48,13 @@ public class ProfileHandler implements HttpHandler {
                 }
                 break;
                 case "GET": {
+                    exchange.sendResponseHeaders(200, 0);
                     String path = exchange.getRequestURI().getPath().split("/")[2];
                     Profile profile = ProfileAccessor.getProfile(path);
                     if (profile == null) throw new NotFoundException("Profile not found");
 
                     File profilePicture = MediaAccessor.getProfile(profile.getUserId());
                     File background = MediaAccessor.getBackGround(profile.getUserId());
-                    exchange.sendResponseHeaders(200, -1);
 
                     OutputStream outputStream = exchange.getResponseBody();
                     MultipartHandler.writeJson(outputStream, profile);
