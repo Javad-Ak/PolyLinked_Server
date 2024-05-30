@@ -56,10 +56,14 @@ public class DBTest {
             System.out.println("User exists" + e.getMessage());
         }
 
-        ProfileAccessor.addProfile(new Profile(user1.getUserId(), "aaa", "bbb", "ccc", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, true));
+        Profile prof = new Profile(user1.getUserId(), "aaa", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, true);
+        ProfileAccessor.addProfile(prof);
         System.out.println("profile added successfully");
 
-        ProfileAccessor.updateProfile(new Profile(user1.getUserId(), "updated", "bbb", "ccc", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, true));
+        ProfileAccessor.updateProfile(new Profile(user1.getUserId(), "updated", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, true));
         System.out.println("profile updated successfully");
+
+        Profile p2 = ProfileAccessor.getProfile("user9227641a-49d4-ac0c");
+        System.out.println("profile fetched success fully: " + p2);
     }
 }

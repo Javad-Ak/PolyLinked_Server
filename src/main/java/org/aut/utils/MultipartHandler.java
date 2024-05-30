@@ -20,7 +20,6 @@ public class MultipartHandler {
     public static void writeFromFile(OutputStream outputStream, File file) throws IOException {
         int length = (int) file.length();
         writeHeaders(outputStream, file.getName() + "/file", length);
-        if (length == 0) return;
 
         FileInputStream inputStream = new FileInputStream(file);
         int totalWrite = 0;
@@ -40,7 +39,6 @@ public class MultipartHandler {
         JSONObject headers = new JSONObject();
         headers.put("Content-Type", type);
         headers.put("Content-Length", length);
-
         outputStream.write(headers.toString().getBytes());
         outputStream.flush();
     }
@@ -54,8 +52,6 @@ public class MultipartHandler {
 
         File file = new File(path + type[0].substring(type[0].lastIndexOf('.')));
         FileOutputStream outputStream = new FileOutputStream(file);
-
-        System.out.println(headers);
 
         int remained = length;
         byte[] buffer = new byte[100000];
@@ -83,7 +79,7 @@ public class MultipartHandler {
         JSONObject headers = readHeaders(inputStream);
         String[] type = headers.getString("Content-Type").split("/");
         int length = headers.getInt("Content-Length");
-        if (!type[1].equals("json") || !cls.getSimpleName().equals(type[0]))
+        if (type.length < 1 || (!type[1].equals("json") || !cls.getSimpleName().equals(type[0])))
             throw new NotAcceptableException("Invalid Content-Type");
 
         byte[] bytes = new byte[length];
@@ -99,8 +95,9 @@ public class MultipartHandler {
             res.append((char) ch);
             if ((char) ch == '}') break;
         }
-        if (res.charAt(0) != '{' || res.charAt(res.length() - 1) != '}')
+        if (res.isEmpty() || res.charAt(0) != '{' || res.charAt(res.length() - 1) != '}') {
             throw new NotAcceptableException("Invalid headers");
+        }
 
         return new JSONObject(res.toString());
     }

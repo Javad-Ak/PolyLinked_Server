@@ -21,13 +21,11 @@ public class ProfileAccessor {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS profiles (" +
                     "userId TEXT NOT NULL" +
                     ", bio TEXT" +
-                    ", pathToPic TEXT" +
-                    ", pathToBG TEXT" +
                     ", country TEXT" +
                     ", city TEXT" +
                     ", status TEXT" +
                     ", profession TEXT" +
-                    ", notify BOOLEAN" +
+                    ", notify TEXT" +
                     ", FOREIGN KEY (userId)" +
                     " REFERENCES users (userId)" +
                     " ON UPDATE CASCADE" +
@@ -39,18 +37,16 @@ public class ProfileAccessor {
     }
 
     public synchronized static void addProfile(Profile profile) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO profiles (userId, bio, pathToPic, pathToBG, country, city, status, profession, notify) " +
-                "VALUES (?,?,?,?,?,?,?,?,?);");
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO profiles (userId, bio, country, city, status, profession, notify) " +
+                "VALUES (?,?,?,?,?,?,?);");
 
         statement.setString(1, profile.getUserId());
         statement.setString(2, profile.getBio());
-        statement.setString(3, profile.getPathToPic());
-        statement.setString(4, profile.getPathToBG());
-        statement.setString(5, profile.getCountry());
-        statement.setString(6, profile.getCity());
-        statement.setString(7, profile.getStatus());
-        statement.setString(8, profile.getProfession());
-        statement.setBoolean(9, profile.getNotify());
+        statement.setString(3, profile.getCountry());
+        statement.setString(4, profile.getCity());
+        statement.setString(5, profile.getStatus());
+        statement.setString(6, profile.getProfession());
+        statement.setBoolean(7, profile.getNotify());
 
         statement.executeUpdate();
         statement.close();
@@ -62,18 +58,16 @@ public class ProfileAccessor {
     }
 
     public synchronized static void updateProfile(Profile profile) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("UPDATE profiles SET bio = ?, pathToPic = ?, pathToBG = ?, " +
+        PreparedStatement statement = connection.prepareStatement("UPDATE profiles SET bio = ?, " +
                 "country = ?, city = ?, status = ?, profession = ?, notify = ? WHERE userId = ?;");
 
         statement.setString(1, profile.getBio());
-        statement.setString(2, profile.getPathToPic());
-        statement.setString(3, profile.getPathToBG());
-        statement.setString(4, profile.getCountry());
-        statement.setString(5, profile.getCity());
-        statement.setString(6, profile.getStatus());
-        statement.setString(7, profile.getProfession());
-        statement.setBoolean(8, profile.getNotify());
-        statement.setString(9, profile.getUserId());
+        statement.setString(2, profile.getCountry());
+        statement.setString(3, profile.getCity());
+        statement.setString(4, profile.getStatus());
+        statement.setString(5, profile.getProfession());
+        statement.setBoolean(6, profile.getNotify());
+        statement.setString(7, profile.getUserId());
 
         statement.executeUpdate();
         statement.close();

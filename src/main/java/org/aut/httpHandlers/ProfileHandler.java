@@ -44,15 +44,19 @@ public class ProfileHandler implements HttpHandler {
 
                     inputStream.close();
                     code = 200;
-                    break;
+                    exchange.sendResponseHeaders(code, 0);
                 }
+                break;
                 case "GET": {
-                    String path = exchange.getRequestURI().getPath();
+                    String path = exchange.getRequestURI().getPath().split("/")[2];
                     Profile profile = ProfileAccessor.getProfile(path);
                     if (profile == null) throw new NotFoundException("Profile not found");
 
                     File profilePicture = MediaAccessor.getProfile(profile.getUserId());
                     File background = MediaAccessor.getBackGround(profile.getUserId());
+
+                    code = 200;
+                    exchange.sendResponseHeaders(code, 0);
 
                     OutputStream outputStream = exchange.getResponseBody();
                     MultipartHandler.writeJson(outputStream, profile);
@@ -60,20 +64,24 @@ public class ProfileHandler implements HttpHandler {
                     MultipartHandler.writeFromFile(outputStream, background);
 
                     outputStream.close();
-                    code = 200;
                 }
+                break;
+                default:
+                    exchange.sendResponseHeaders(code, 0);
             }
         } catch (UnauthorizedException e) {
             code = 401;
+            exchange.sendResponseHeaders(code, 0);
         } catch (SQLException e) {
             code = 500;
+            exchange.sendResponseHeaders(code, 0);
         } catch (NotAcceptableException e) {
             code = 406;
+            exchange.sendResponseHeaders(code, 0);
         } catch (NotFoundException e) {
             code = 404;
+            exchange.sendResponseHeaders(code, 0);
         }
-
-        exchange.sendResponseHeaders(code, 0);
         exchange.close();
     }
 }
