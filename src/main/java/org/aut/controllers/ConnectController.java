@@ -26,7 +26,7 @@ public class ConnectController {
     }
 
     public static void updateConnect(Connect connect) throws SQLException, NotFoundException , NotAcceptableException {
-        if (ConnectAccessor.getWaitingConnectOfAcceptor(connect.getApplicant_id() , connect.getAcceptor_id()) != null) {
+        if ((ConnectAccessor.getWaitingConnectOfAcceptor(connect.getApplicant_id() , connect.getAcceptor_id()) != null && (connect.getAccept_state().equals("ACCEPTED") || connect.getAccept_state().equals("REJECTED")))) {
             ConnectAccessor.updateConnect(connect);
         } else {
             throw new NotFoundException("Connect not found");

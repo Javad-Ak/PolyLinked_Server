@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Random;
 
 import org.aut.utils.exceptions.NotAcceptableException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.UUID;
@@ -19,25 +20,34 @@ public class User {
 
     public User(String email, String password, String firstName, String lastName, String additionalName) throws NotAcceptableException {
         String id = "user" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
-        validateFields(id , email, password, firstName, lastName, additionalName);
-        this.userId = id;
-        this.email = email;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.additionalName = additionalName;
-        createDate = new Date(System.currentTimeMillis());
+        try {
+            validateFields(id, email, password, firstName, lastName, additionalName);
+            this.userId = id;
+            this.email = email;
+            this.password = password;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.additionalName = additionalName;
+            createDate = new Date(System.currentTimeMillis());
+        } catch (JSONException e) {
+            throw new NotAcceptableException("Wrong jsonObject");
+        }
     }
 
     public User(JSONObject json) throws NotAcceptableException {
-        validateFields( json.getString("userId") , json.getString("email"), json.getString("password"), json.getString("firstName"), json.getString("lastName"), json.getString("additionalName"));
-        userId = json.getString("userId");
-        email = json.getString("email");
-        password = json.getString("password");
-        firstName = json.getString("firstName");
-        lastName = json.getString("lastName");
-        additionalName = json.getString("additionalName");
-        createDate = new Date(json.getLong("createDate"));
+        try {
+            validateFields(json.getString("userId"), json.getString("email"), json.getString("password"), json.getString("firstName"), json.getString("lastName"), json.getString("additionalName"));
+            userId = json.getString("userId");
+            email = json.getString("email");
+            password = json.getString("password");
+            firstName = json.getString("firstName");
+            lastName = json.getString("lastName");
+            additionalName = json.getString("additionalName");
+            createDate = new Date(json.getLong("createDate"));
+        } catch (JSONException e) {
+            throw new NotAcceptableException("Wrong jsonObject");
+
+        }
     }
 
     @Override
@@ -85,7 +95,7 @@ public class User {
         return createDate;
     }
 
-    private static void validateFields(String id ,String email, String password, String firstName, String lastName, String additionalName) throws NotAcceptableException {
+    private static void validateFields(String id, String email, String password, String firstName, String lastName, String additionalName) throws NotAcceptableException {
         if ((firstName == null || lastName == null || email == null || password == null || id == null) ||
                 (!email.matches("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")) ||
                 (!password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,20}$")) ||

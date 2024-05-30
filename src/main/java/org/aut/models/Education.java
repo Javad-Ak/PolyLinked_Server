@@ -1,6 +1,7 @@
 package org.aut.models;
 
 import org.aut.utils.exceptions.NotAcceptableException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
@@ -33,16 +34,20 @@ public class Education {
         this.about = about;
     }
 
-    public Education(JSONObject jsonObject) {
-        educationId = jsonObject.getString("educationId");
-        userId = jsonObject.getString("user_id");
-        institute = jsonObject.getString("institute");
-        field = jsonObject.getString("field");
-        start = new Date(jsonObject.getLong("start"));
-        end = new Date(jsonObject.getLong("end"));
-        grade = jsonObject.getInt("grade");
-        activities = jsonObject.getString("activities");
-        about = jsonObject.getString("about");
+    public Education(JSONObject jsonObject) throws NotAcceptableException {
+        try {
+            educationId = jsonObject.getString("educationId");
+            userId = jsonObject.getString("user_id");
+            institute = jsonObject.getString("institute");
+            field = jsonObject.getString("field");
+            start = new Date(jsonObject.getLong("start"));
+            end = new Date(jsonObject.getLong("end"));
+            grade = jsonObject.getInt("grade");
+            activities = jsonObject.getString("activities");
+            about = jsonObject.getString("about");
+        } catch (JSONException e) {
+            throw new NotAcceptableException("Wrong jsonObject");
+        }
     }
 
     @Override

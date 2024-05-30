@@ -1,6 +1,8 @@
 package org.aut.models;
 
+import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
@@ -30,8 +32,8 @@ public class CallInfo {
         this.socialMedia = socialMedia;
     }
 
-    public CallInfo(JSONObject jsonObject) {
-        userId = jsonObject.getString("userId");
+    public CallInfo(JSONObject jsonObject) throws NotAcceptableException {
+       try { userId = jsonObject.getString("userId");
         email = jsonObject.getString("emailAddress");
         mobileNumber = jsonObject.getString("mobileNumber");
         homeNumber = jsonObject.getString("homeNumber");
@@ -40,6 +42,10 @@ public class CallInfo {
         birthDay = new Date(jsonObject.getLong("birthDay"));
         privacyPolitics = PrivacyPolitics.valueOf(jsonObject.getString("privacyPolitics"));
         socialMedia = jsonObject.getString("socialMedia");
+       } catch (JSONException e) {
+           throw new NotAcceptableException("Wrong jsonObject");
+       }
+
     }
 
     public String getUserId() {

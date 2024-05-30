@@ -1,6 +1,7 @@
 package org.aut.models;
 
 import org.aut.utils.exceptions.NotAcceptableException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Connect {
@@ -10,11 +11,15 @@ public class Connect {
     private final AcceptState accept_state;
 
     public Connect(String applicant_id, String acceptor_id, String note, AcceptState accept_state) throws NotAcceptableException {
-        validateFields(applicant_id, acceptor_id, note);
-        this.applicant_id = applicant_id;
-        this.acceptor_id = acceptor_id;
-        this.note = note;
-        this.accept_state = accept_state;
+      try {
+          validateFields(applicant_id, acceptor_id, note);
+          this.applicant_id = applicant_id;
+          this.acceptor_id = acceptor_id;
+          this.note = note;
+          this.accept_state = accept_state;
+      } catch (JSONException e) {
+          throw new NotAcceptableException("Wrong jsonObject");
+      }
     }
 
     public Connect(JSONObject json) throws NotAcceptableException {
