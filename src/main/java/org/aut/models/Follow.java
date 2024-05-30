@@ -42,7 +42,7 @@ public final class Follow {
 
     private static void validateFields(String follower, String followed) throws NotAcceptableException {
         if (follower == null || followed == null || followed.equals(follower))
-            throw new NotAcceptableException("Follower or Followed fields cannot be null");
+            throw new NotAcceptableException("some fields are null");
     }
 
     public String follower() {
