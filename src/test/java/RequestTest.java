@@ -59,9 +59,11 @@ public class RequestTest {
         con.setRequestProperty("Content-Type", "multipart/form-data");
         con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY");
         con.setDoInput(true);
+        InputStream inputStream = con.getInputStream();
 
         if (con.getResponseCode() / 100 == 2) {
-            InputStream inputStream = con.getInputStream();
+//            System.out.println(new String(inputStream.readAllBytes()));
+
             Profile profile = new Profile(MultipartHandler.readJson(inputStream, Profile.class));
             System.out.println(profile);
 

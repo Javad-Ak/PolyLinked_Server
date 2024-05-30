@@ -54,9 +54,7 @@ public class ProfileHandler implements HttpHandler {
 
                     File profilePicture = MediaAccessor.getProfile(profile.getUserId());
                     File background = MediaAccessor.getBackGround(profile.getUserId());
-
-                    code = 200;
-                    exchange.sendResponseHeaders(code, 0);
+                    exchange.sendResponseHeaders(200, -1);
 
                     OutputStream outputStream = exchange.getResponseBody();
                     MultipartHandler.writeJson(outputStream, profile);

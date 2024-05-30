@@ -11,13 +11,13 @@ public class MultipartHandler {
     private MultipartHandler() {
     }
 
-    public static <T extends JsonSerializable> void writeJson(OutputStream outputStream, T obj) throws IOException {
+    public static <T extends JsonSerializable> void writeJson(OutputStream outputStream, T obj) throws IOException, NotAcceptableException {
         writeHeaders(outputStream, obj.getClass().getSimpleName() + "/json", obj.toJson().toString().getBytes().length);
         outputStream.write(obj.toJson().toString().getBytes());
         outputStream.flush();
     }
 
-    public static void writeFromFile(OutputStream outputStream, File file) throws IOException {
+    public static void writeFromFile(OutputStream outputStream, File file) throws IOException, NotAcceptableException {
         int length = (int) file.length();
         writeHeaders(outputStream, file.getName() + "/file", length);
 
@@ -35,16 +35,17 @@ public class MultipartHandler {
         inputStream.close();
     }
 
-    private static void writeHeaders(OutputStream outputStream, String type, int length) throws IOException {
+    private static void writeHeaders(OutputStream outputStream, String type, int length) throws IOException, NotAcceptableException {
         JSONObject headers = new JSONObject();
         headers.put("Content-Type", type);
         headers.put("Content-Length", length);
+
         outputStream.write(headers.toString().getBytes());
         outputStream.flush();
     }
 
     public static void readToFile(InputStream inputStream, Path path) throws IOException, NotAcceptableException {
-        JSONObject headers = readHeaders(inputStream);
+        JSONObject headers = getJson(inputStream);
         String[] type = headers.getString("Content-Type").split("/");
         int length = headers.getInt("Content-Length");
         if (length == 0) return;
@@ -76,19 +77,15 @@ public class MultipartHandler {
     }
 
     public static <T extends JsonSerializable> JSONObject readJson(InputStream inputStream, Class<T> cls) throws IOException, NotAcceptableException {
-        JSONObject headers = readHeaders(inputStream);
+        JSONObject headers = getJson(inputStream);
         String[] type = headers.getString("Content-Type").split("/");
-        int length = headers.getInt("Content-Length");
         if (type.length < 1 || (!type[1].equals("json") || !cls.getSimpleName().equals(type[0])))
             throw new NotAcceptableException("Invalid Content-Type");
 
-        byte[] bytes = new byte[length];
-        if (inputStream.read(bytes) < length) throw new NotAcceptableException("Invalid Content-Length");
-
-        return new JSONObject(new String(bytes));
+        return getJson(inputStream);
     }
 
-    private static JSONObject readHeaders(InputStream inputStream) throws IOException, NotAcceptableException {
+    private static JSONObject getJson(InputStream inputStream) throws IOException, NotAcceptableException {
         StringBuilder res = new StringBuilder();
         int ch;
         while ((ch = inputStream.read()) != -1) {
