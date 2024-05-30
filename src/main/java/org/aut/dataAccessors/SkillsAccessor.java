@@ -1,6 +1,5 @@
 package org.aut.dataAccessors;
 
-import org.aut.models.Education;
 import org.aut.models.Skill;
 
 import java.io.IOException;
@@ -11,7 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class SkillsAccessor {
-    private static final Connection connection = DataBaseConnection.getConnection();
+    private static final Connection connection = DataBaseAccessor.getConnection();
 
     private SkillsAccessor() {
     }

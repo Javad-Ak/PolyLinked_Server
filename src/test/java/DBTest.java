@@ -1,5 +1,5 @@
 import org.aut.controllers.FollowController;
-import org.aut.dataAccessors.DataBaseConnection;
+import org.aut.dataAccessors.DataBaseAccessor;
 import org.aut.dataAccessors.ProfileAccessor;
 import org.aut.dataAccessors.UserAccessor;
 import org.aut.models.Follow;
@@ -16,7 +16,7 @@ public class DBTest {
     @Test
     @DisplayName("---- testing users table")
     public void UserTest() throws Exception {
-        DataBaseConnection.create();
+        DataBaseAccessor.create();
         try {
             UserAccessor.addUser(new User("reza@gmail.com", "ali1222345", "Ali", "akbari", "ll"));
         } catch (SQLException e) {
@@ -29,7 +29,7 @@ public class DBTest {
     @Test
     @DisplayName("---- testing follows table")
     public void FollowTest() throws Exception {
-        DataBaseConnection.create();
+        DataBaseAccessor.create();
         User user1, user2;
         UserAccessor.addUser(user1 = new User("ali3@gmail.com", "ali1222345", "Ali", "akbari", ""));
         UserAccessor.addUser(user2 = new User("ali4@gmail.com", "ali1222345", "Alireza", "athari", ""));
@@ -45,7 +45,7 @@ public class DBTest {
     @Test
     @DisplayName("---- testing profiles table")
     public void ProfileTest() throws Exception {
-        DataBaseConnection.create();
+        DataBaseAccessor.create();
 
         User user1 = new User("reza@gmail.com", "ali1222345", "Ali", "akbari", "ll");
         User user2 = new User("kasra@gmail.com", "ali1222345", "Ali", "akbari", "ll");

@@ -5,7 +5,7 @@ import com.sun.net.httpserver.HttpServer;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-import org.aut.dataAccessors.DataBaseConnection;
+import org.aut.dataAccessors.DataBaseAccessor;
 import org.aut.httpHandlers.FollowHandler;
 import org.aut.httpHandlers.LoginHandler;
 import org.aut.httpHandlers.ProfileHandler;
@@ -20,7 +20,7 @@ import org.aut.httpHandlers.UserHandler;
 public class Server {
     public static void main(String[] args) {
         try {
-            DataBaseConnection.create();
+            DataBaseAccessor.create();
             HttpServer server = HttpServer.create(new InetSocketAddress("localhost", 8080), 8);
 
             server.createContext("/users", new UserHandler());
@@ -30,7 +30,7 @@ public class Server {
 
             server.setExecutor(Executors.newFixedThreadPool(8));
             server.start();
-            Runtime.getRuntime().addShutdownHook(new DataBaseConnection("atExit"));
+            Runtime.getRuntime().addShutdownHook(new DataBaseAccessor("atExit"));
 
             System.out.println("Server is running (localhost:8080).");
         } catch (Exception e) {

@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class EducationAccessor {
-    private static final Connection connection = DataBaseConnection.getConnection();
+    private static final Connection connection = DataBaseAccessor.getConnection();
 
     private EducationAccessor() {
     }

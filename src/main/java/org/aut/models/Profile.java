@@ -15,7 +15,7 @@ public class Profile implements JsonSerializable {
     private final boolean notify;
     // + Skills(relatively), Educations, CallInfo
 
-    public Profile(String userID, String bio, String pathToPic, String pathToBG, String country, String city, Status status, Profession profession, boolean notify) {
+    public Profile(String userID, String bio, String pathToPic, String pathToBG, String country, String city, Status status, Profession profession, boolean notify) throws NotAcceptableException {
         validateFields(bio, country, city);
 
         this.userId = userID;
@@ -29,7 +29,7 @@ public class Profile implements JsonSerializable {
         this.notify = notify;
     }
 
-    public Profile(JSONObject profile) {
+    public Profile(JSONObject profile) throws NotAcceptableException {
         userId = profile.getString("userID");
         bio = profile.getString("bio");
         pathToPic = profile.getString("pathToPic");
@@ -39,6 +39,7 @@ public class Profile implements JsonSerializable {
         status = Status.valueOf(profile.getString("status"));
         profession = Profession.valueOf(profile.getString("profession"));
         notify = profile.getBoolean("notify");
+
         validateFields(bio, country, city);
     }
 
@@ -62,12 +63,12 @@ public class Profile implements JsonSerializable {
         return new JSONObject(toString());
     }
 
-    private void validateFields(String bio, String country, String city) {
+    private void validateFields(String bio, String country, String city) throws NotAcceptableException {
         if ((bio != null && bio.length() > 220) ||
                 (country != null && !country.matches("(?i)^[a-z]{0,60}$")) ||
                 (city != null && !city.matches("(?i)^[a-z]{0,60}$")))
 
-            throw new RuntimeException("invalid arguments");
+            throw new NotAcceptableException("invalid arguments");
     }
 
     public String getUserId() {

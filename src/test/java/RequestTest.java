@@ -1,6 +1,5 @@
 import org.aut.models.Profile;
-import org.aut.utils.RequestHandler;
-import org.jetbrains.annotations.NotNull;
+import org.aut.utils.MultipartHandler;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,20 +20,24 @@ import org.aut.utils.JsonHandler;
 @DisplayName("------ Testing requests...")
 public class RequestTest {
     @Test
-    @DisplayName("---- adding a user with httpClient")
+    @DisplayName("---- posting a profile")
     public void postProfile() throws Exception {
         Profile profile = new Profile("user719066ad-4efe-8f14", "aaa", "bbb", "ccc", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, true);
-        File pic = new File("src/test/resources/profile.jpg");
-        File bg = new File("src/test/resources/profile.jpg");
+        File pic = new File("./in/prof1.jpg");
+        File bg = new File("./in/prof2.png");
 
 
-        URL url = URI.create("http://localhost:8080/profiles").toURL();
+        URL url = new URI("http://localhost:8080/profiles").toURL();
         HttpURLConnection con = getPostConnection(url);
-        OutputStream out = con.getOutputStream();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "multipart/form-data");
+        con.setRequestProperty("Authorization", "**** ");
 
-//        RequestHandler.addJson(out, profile.toJson());
-//        RequestHandler.addFile(out, pic);
-//        RequestHandler.addFile(out, bg);
+        con.setDoOutput(true);
+        OutputStream out = con.getOutputStream();
+        MultipartHandler.writeJson(out, profile);
+        MultipartHandler.writeFromFile(out, pic);
+        MultipartHandler.writeFromFile(out, bg);
         out.close();
 
         if (con.getResponseCode() / 100 == 2) {
@@ -71,7 +74,7 @@ public class RequestTest {
         URL url = URI.create("http://localhost:8080/users").toURL();
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
-        con.setRequestProperty("Content-Type", "mu"); // not needed
+        con.setRequestProperty("Content-Type", "json"); // not needed
 
         con.setDoInput(true); // enables input stream, no need
         con.setDoOutput(true); // enables output stream
@@ -116,8 +119,7 @@ public class RequestTest {
 
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "multipart/form-data");
-        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMjM3NTBkMTQtNDdjMC1iMjIwIiwiaWF0IjoxNzE2OTg1NjA2LCJleHAiOjE3MTc1ODU2MDZ9.ej7LwjDK9sO_9XXPJk5HxH6tSrw_2enANFDosy6yOr8\n" +
-                "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMjM3NTBkMTQtNDdjMC1iMjIwIiwiaWF0IjoxNzE2OTg1NjA2LCJleHAiOjE3MTc1ODU2MDZ9.ej7LwjDK9sO_9XXPJk5HxH6tSrw_2enANFDosy6yOr8");
+        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMjM3NTBkMTQtNDdjMC1iMjIwIiwiaWF0IjoxNzE2OTg1NjA2LCJleHAiOjE3MTc1ODU2MDZ9.ej7LwjDK9sO_9XXPJk5HxH6tSrw_2enANFDosy6yOr8 eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMjM3NTBkMTQtNDdjMC1iMjIwIiwiaWF0IjoxNzE2OTg1NjA2LCJleHAiOjE3MTc1ODU2MDZ9.ej7LwjDK9sO_9XXPJk5HxH6tSrw_2enANFDosy6yOr8");
 
         con.setDoOutput(true); // enables output stream
         return con;

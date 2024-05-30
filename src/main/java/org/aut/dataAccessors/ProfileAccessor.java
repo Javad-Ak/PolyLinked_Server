@@ -1,17 +1,17 @@
 package org.aut.dataAccessors;
 
-import org.aut.models.CallInfo;
 import org.aut.models.Profile;
+import org.aut.utils.JsonHandler;
+import org.aut.utils.exceptions.NotAcceptableException;
+import org.aut.utils.exceptions.NotFoundException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class ProfileAccessor {
-    private static final Connection connection = DataBaseConnection.getConnection();
+    private static final Connection connection = DataBaseAccessor.getConnection();
 
     private ProfileAccessor() {
     }
@@ -56,6 +56,11 @@ public class ProfileAccessor {
         statement.close();
     }
 
+    public synchronized static Profile getProfile(String userId) throws SQLException, NotFoundException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM profiles WHERE userId = ?;");
+        return getProfileFromResultSet(userId, statement);
+    }
+
     public synchronized static void updateProfile(Profile profile) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("UPDATE profiles SET bio = ?, pathToPic = ?, pathToBG = ?, " +
                 "country = ?, city = ?, status = ?, profession = ?, notify = ? WHERE userId = ?;");
@@ -72,5 +77,24 @@ public class ProfileAccessor {
 
         statement.executeUpdate();
         statement.close();
+    }
+
+    private static Profile getProfileFromResultSet(String input, PreparedStatement statement) throws SQLException, NotFoundException {
+        statement.setString(1, input);
+        ResultSet resultSet = statement.executeQuery();
+        JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
+        resultSet.close();
+        statement.close();
+        if (jsonObject == null) {
+            throw new NotFoundException("Profile not Found");
+        } else {
+            Profile profile;
+            try {
+                profile = new Profile(jsonObject);
+            } catch (NotAcceptableException e) {
+                profile = null;
+            }
+            return profile;
+        }
     }
 }

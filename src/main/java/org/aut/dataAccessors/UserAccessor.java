@@ -11,7 +11,7 @@ import org.aut.utils.exceptions.NotFoundException;
 import org.json.JSONObject;
 
 public class UserAccessor {
-    private static final Connection connection = DataBaseConnection.getConnection();
+    private static final Connection connection = DataBaseAccessor.getConnection();
 
     private UserAccessor() {
     }

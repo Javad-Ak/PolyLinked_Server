@@ -1,18 +1,17 @@
 package org.aut.dataAccessors;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.nio.file.*;
 import java.sql.*;
 
-public class DataBaseConnection extends Thread {
+public class DataBaseAccessor extends Thread {
     private static final Path RESOURCES = Path.of("./src/main/resources");
     private static final Path DATABASE = Path.of("./src/main/resources/dataBase.db");
     private static final Path URL = Path.of("jdbc:sqlite:./src/main/resources/dataBase.db");
     private static final ArrayList<Connection> connections = new ArrayList<>();
 
-    public DataBaseConnection(String name) {
+    public DataBaseAccessor(String name) {
         super(name);
     }
 
