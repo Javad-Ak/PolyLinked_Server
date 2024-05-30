@@ -23,7 +23,6 @@ public class Connect {
         this.accept_state = AcceptState.valueOf(json.getString("accept_state"));
         this.note = json.getString("note");
         validateFields(applicant_id, acceptor_id, note);
-        System.out.println("hey 1.76");
     }
 
     public String getAcceptor_id() {

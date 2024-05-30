@@ -85,22 +85,6 @@ public class ConnectAccessor {
 
     }
 
-//    public synchronized static Connect getWatingConnect(String user1Id , String user2Id ) throws SQLException , NotAcceptableException {
-//        Connect connect = null;
-//        PreparedStatement statement = connection.prepareStatement("SELECT * FROM connects WHERE ((acceptor_id = ? AND connects.applicant_id = ?) || (applicant_id = ? AND acceptor_id = ?)) AND accept_state = ?");
-//        statement.setString(1, user1Id);
-//        statement.setString(2, user2Id);
-//        statement.setString(3, user1Id);
-//        statement.setString(4, user2Id);
-//        statement.setString(5, Connect.AcceptState.WAITING.toString());
-//        ResultSet resultSet = statement.executeQuery();
-//        JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
-//        if(jsonObject != null && !jsonObject.isEmpty()){
-//            connect = new Connect(jsonObject);
-//        }
-//        statement.close();
-//        return connect;
-//    }
 
     public synchronized static Connect getWaitingConnectOfAcceptor(String applicantId , String acceptorId ) throws SQLException , NotAcceptableException {
         Connect connect = null;
@@ -110,11 +94,8 @@ public class ConnectAccessor {
         statement.setString(3, Connect.AcceptState.WAITING.toString());
         ResultSet resultSet = statement.executeQuery();
         JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
-//        System.out.println(jsonObject);
         if(jsonObject != null && !jsonObject.isEmpty()){
-            System.out.println("hey 1.75");
             connect = new Connect(jsonObject);
-            System.out.println("hey 1.8");
         }
         statement.close();
         return connect;

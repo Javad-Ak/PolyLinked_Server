@@ -23,7 +23,6 @@ public class ConnectHandler implements HttpHandler {
         JSONObject jsonObject = JsonHandler.getObject(exchange.getRequestBody());
         String jwt = exchange.getRequestHeaders().getFirst("Authorization");
         try {
-            System.out.println("hey 0");
             Connect connect = new Connect(jsonObject);
             User user = LoginHandler.getUserByToken(jwt);
             switch (method) {
@@ -40,7 +39,6 @@ public class ConnectHandler implements HttpHandler {
                     if (!jsonObject.isEmpty() && user.getUserId().equals(connect.getAcceptor_id())) {
                         System.out.println(connect);
                         ConnectController.updateConnect(connect);
-                        System.out.println("hey3");
                         code = 200;
                     } else if (!jsonObject.isEmpty()) {
                         code = 401;
