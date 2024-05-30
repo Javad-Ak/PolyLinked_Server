@@ -6,10 +6,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
 import org.aut.dataAccessors.DataBaseConnection;
-import org.aut.httpHandlers.FollowHandler;
-import org.aut.httpHandlers.LoginHandler;
-import org.aut.httpHandlers.ProfileHandler;
-import org.aut.httpHandlers.UserHandler;
+import org.aut.httpHandlers.*;
 
 /**
  * Server of PolyLinked - A simulation of LinkedIn
@@ -27,6 +24,7 @@ public class Server {
             server.createContext("/users/login", new LoginHandler());
             server.createContext("/follows", new FollowHandler());
             server.createContext("/profiles", new ProfileHandler());
+            server.createContext("/connections", new ConnectHandler());
 
             server.setExecutor(Executors.newFixedThreadPool(8));
             server.start();

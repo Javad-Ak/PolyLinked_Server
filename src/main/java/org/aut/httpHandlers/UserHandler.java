@@ -64,11 +64,11 @@ public class UserHandler implements HttpHandler {
         } catch (SQLException e) {
             code = 500;
         } catch (NotAcceptableException e) {
-            code = 409;
+            code = 406;
         } catch (NotFoundException e){
             code = 404;
         } catch (UnauthorizedException e) {
-            code = 406;
+            code = 401;
         }
 
         exchange.sendResponseHeaders(code, 0);
