@@ -62,7 +62,7 @@ public class Connect {
 
     public static void validateFields(String applicantId, String acceptorId, String note) throws NotAcceptableException {
         if (applicantId == null || acceptorId == null || note == null || note.length() >= 500) {
-            throw new NotAcceptableException("Some fields are null");
+            throw new NotAcceptableException("invalid argument");
         }
     }
 
