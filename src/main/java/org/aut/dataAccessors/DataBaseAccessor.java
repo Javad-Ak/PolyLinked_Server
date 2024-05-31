@@ -32,6 +32,7 @@ public class DataBaseAccessor extends Thread {
         EducationAccessor.createTable();
         SkillsAccessor.createTable();
         CallInfoAccessor.createUserTable();
+        PostAccessor.createTable();
     }
 
     public static Connection getConnection() {

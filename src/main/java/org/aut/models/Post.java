@@ -61,7 +61,7 @@ public class Post {
         return text;
     }
 
-    public Date getDate() {
-        return date;
+    public long getDate() {
+        return date.getTime();
     }
 }

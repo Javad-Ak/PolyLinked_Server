@@ -87,7 +87,7 @@ public class UserAccessor {
             try {
                 user = new User(jsonObject);
             } catch (NotAcceptableException e) {
-                user = null;
+                throw new NotFoundException("User not Found");
             }
             return user;
         }
