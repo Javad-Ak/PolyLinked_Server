@@ -20,6 +20,7 @@ public class MultipartHandler {
     public static void writeFromFile(OutputStream outputStream, File file) throws IOException, NotAcceptableException {
         int length = (int) file.length();
         writeHeaders(outputStream, file.getName() + "/file", length);
+        if (length == 0) return;
 
         FileInputStream inputStream = new FileInputStream(file);
         int totalWrite = 0;
