@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class FollowAccessor {
     private static final Connection connection = DataBaseAccessor.getConnection();
@@ -53,19 +55,21 @@ public class FollowAccessor {
 
     public synchronized static ArrayList<User> getFollowers(String id) throws SQLException, NotAcceptableException {
         ArrayList<User> followers;
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM follows WHERE followed_id = ? ORDER BY follower_id DESC;");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM follows WHERE followed_id = ?");
         statement.setString(1, id);
         followers = getUserListFromStatement(statement);
         statement.close();
+        followers.sort(Comparator.comparing(User::getFirstName));
         return followers;
     }
 
     public synchronized static ArrayList<User> getFollowings(String id) throws SQLException, NotAcceptableException {
         ArrayList<User> followings;
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM follows WHERE follower_id = ? ORDER BY followed_id DESC;");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM follows WHERE follower_id = ? ");
         statement.setString(1, id);
         followings = getUserListFromStatement(statement);
         statement.close();
+        followings.sort(Comparator.comparing(User::getFirstName));
         return followings;
     }
 
