@@ -1,8 +1,10 @@
 package org.aut.dataAccessors;
 
+import org.aut.models.Connect;
 import org.aut.models.Message;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
+import org.aut.utils.exceptions.NotFoundException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -44,12 +46,21 @@ public class MessageAccessor {
         statement.executeUpdate();
         statement.close();
     }
-    public synchronized static void deleteMessage(Message message ) throws SQLException {
+    public synchronized static void deleteMessage(String messageId) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("DELETE FROM messages WHERE id = ?");
-        statement.setString(1, message.getId());
+        statement.setString(1, messageId);
         statement.executeUpdate();
         statement.close();
     }
+
+    public synchronized static boolean messageExists (String messageId) throws SQLException , NotAcceptableException , NotFoundException {
+        Message message = null;
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM messages WHERE id = ?");
+        statement.setString(1, messageId);
+        ResultSet resultSet = statement.executeQuery();
+        return resultSet.next();
+    }
+
 
     public synchronized static ArrayList<Message> getMessagesBetween(String user1 , String user2) throws SQLException, NotAcceptableException {
         ArrayList <Message> acceptedConnects ;

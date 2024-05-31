@@ -21,12 +21,13 @@ public class ConnectController {
         Connect waitingConnect;
         if ((waitingConnect = ConnectAccessor.getWaitingConnectOfAcceptor(connect.getAcceptor_id(), connect.getApplicant_id())) != null) {
             updateConnect(new Connect(waitingConnect.getApplicant_id(), waitingConnect.getAcceptor_id(), waitingConnect.getNote(), Connect.AcceptState.ACCEPTED));
+        } else {
+            ConnectAccessor.addConnect(connect);
         }
-        ConnectAccessor.addConnect(connect);
     }
 
-    public static void updateConnect(Connect connect) throws SQLException, NotFoundException , NotAcceptableException {
-        if ((ConnectAccessor.getWaitingConnectOfAcceptor(connect.getApplicant_id() , connect.getAcceptor_id()) != null &&
+    public static void updateConnect(Connect connect) throws SQLException, NotFoundException, NotAcceptableException {
+        if ((ConnectAccessor.getWaitingConnectOfAcceptor(connect.getApplicant_id(), connect.getAcceptor_id()) != null &&
                 (connect.getAccept_state().equals("ACCEPTED") || connect.getAccept_state().equals("REJECTED")))) {
             ConnectAccessor.updateConnect(connect);
         } else {
@@ -35,7 +36,7 @@ public class ConnectController {
     }
 
     public static void deleteConnect(Connect connect) throws SQLException, NotFoundException, NotAcceptableException {
-        if(ConnectAccessor.getAcceptedConnect(connect.getAcceptor_id() , connect.getApplicant_id()) == null) {
+        if (ConnectAccessor.getAcceptedConnect(connect.getAcceptor_id(), connect.getApplicant_id()) == null) {
             throw new NotFoundException("Connect not found");
         } else {
             ConnectAccessor.deleteConnect(connect);
