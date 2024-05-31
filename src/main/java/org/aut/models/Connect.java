@@ -11,22 +11,22 @@ public class Connect {
     private final AcceptState accept_state;
 
     public Connect(String applicant_id, String acceptor_id, String note, AcceptState accept_state) throws NotAcceptableException {
-      try {
-          validateFields(applicant_id, acceptor_id, note);
-          this.applicant_id = applicant_id;
-          this.acceptor_id = acceptor_id;
-          this.note = note;
-          this.accept_state = accept_state;
-      } catch (JSONException e) {
-          throw new NotAcceptableException("Wrong jsonObject");
-      }
+        validateFields(applicant_id, acceptor_id, note);
+        this.applicant_id = applicant_id;
+        this.acceptor_id = acceptor_id;
+        this.note = note;
+        this.accept_state = accept_state;
     }
 
     public Connect(JSONObject json) throws NotAcceptableException {
-        this.applicant_id = json.getString("applicant_id");
-        this.acceptor_id = json.getString("acceptor_id");
-        this.accept_state = AcceptState.valueOf(json.getString("accept_state"));
-        this.note = json.getString("note");
+        try {
+            this.applicant_id = json.getString("applicant_id");
+            this.acceptor_id = json.getString("acceptor_id");
+            this.accept_state = AcceptState.valueOf(json.getString("accept_state"));
+            this.note = json.getString("note");
+        } catch (JSONException e) {
+            throw new NotAcceptableException("Wrong jsonObject");
+        }
         validateFields(applicant_id, acceptor_id, note);
     }
 

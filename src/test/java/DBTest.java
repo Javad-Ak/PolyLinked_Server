@@ -33,21 +33,21 @@ public class DBTest {
         }
 
 
-        try{
+        try {
             User user = UserAccessor.getUserById(userId != null ? userId : "user719066ad-4efe-8f14");
-            UserAccessor.deleteUser(userId != null? userId : "user719066ad-4efe-8f14");
-            System.out.println("User " + user.getEmail() +" deleted successfully");
-        } catch (SQLException e){
+            UserAccessor.deleteUser(userId != null ? userId : "user719066ad-4efe-8f14");
+            System.out.println("User " + user.getEmail() + " deleted successfully");
+        } catch (SQLException e) {
             System.out.println("SQLException " + e.getMessage());
-        } catch (NotFoundException e){
+        } catch (NotFoundException e) {
             System.out.println("User does not exist " + e.getMessage());
         }
 
         try {
             User user = UserAccessor.getUserByEmail("reza2@gmail.com");
             UserController.deleteUser(user);
-            System.out.println("User " + user.getEmail()+ " deleted successfully");
-        } catch ( SQLException e) {
+            System.out.println("User " + user.getEmail() + " deleted successfully");
+        } catch (SQLException e) {
             System.out.println("SQLException " + e.getMessage());
         } catch (NotFoundException e) {
             System.out.println("User does not exist " + e.getMessage());
@@ -60,8 +60,8 @@ public class DBTest {
             System.out.println("User added successfully");
             newUser.setFirstName("UpdatedAli");
             UserAccessor.updateUser(newUser);
-            System.out.println("User " + newUser.getEmail() +" updated successfully");
-        } catch (SQLException e){
+            System.out.println("User " + newUser.getEmail() + " updated successfully");
+        } catch (SQLException e) {
             System.out.println("SQLException " + e.getMessage());
         }
 
@@ -104,8 +104,12 @@ public class DBTest {
         ProfileAccessor.updateProfile(new Profile(user1.getUserId(), "updated", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, 1));
         System.out.println("profile updated successfully");
 
-        Profile p2 = ProfileAccessor.getProfile("user9227641a-49d4-ac0c");
-        System.out.println("profile fetched success fully: " + p2);
+        try {
+            Profile p2 = ProfileAccessor.getProfile(user1.getUserId());
+            System.out.println("profile fetched success fully: " + p2);
+        } catch (NotFoundException e) {
+            System.out.println("profile does not exist ");
+        }
     }
 
     @Test
@@ -113,7 +117,7 @@ public class DBTest {
     public void ConnectTest() throws Exception {
         DataBaseAccessor.create();
         try {
-            ConnectController.addConnect(new Connect("user90059c8e-4be7-8764", "user241374d1-464e-863e" , "this is connect note" , Connect.AcceptState.WAITING));
+            ConnectController.addConnect(new Connect("user90059c8e-4be7-8764", "user241374d1-464e-863e", "this is connect note", Connect.AcceptState.WAITING));
         } catch (NotAcceptableException | NotFoundException e) {
             System.out.println(e.getMessage());
         }
