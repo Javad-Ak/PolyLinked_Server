@@ -70,6 +70,8 @@ public class PostHandler implements HttpHandler {
                     String path = exchange.getRequestURI().getPath().split("/")[2];
                     Post post = PostAccessor.getPostById(path);
 
+                    if (!post.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
+
                     File media = MediaAccessor.getMedia(post.getPostId(), MediaAccessor.MediaPath.POSTS);
                     Files.deleteIfExists(media.toPath());
                     PostAccessor.deletePost(post.getPostId());

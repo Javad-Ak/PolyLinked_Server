@@ -1,6 +1,7 @@
 package org.aut.dataAccessors;
 
 import org.aut.models.Like;
+import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
@@ -9,6 +10,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class LikeAccessor {
     private static final Connection connection = DataBaseAccessor.getConnection();
@@ -32,14 +34,19 @@ public class LikeAccessor {
         }
     }
 
-    public synchronized static void addLike(Like like) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO likes (postId, userId, date) " +
-                "VALUES (?,?,?);");
-        statement.setString(1, like.getPostId());
-        statement.setString(2, like.getUserId());
-        statement.setLong(3, like.getDate());
-        statement.executeUpdate();
-        statement.close();
+    public synchronized static void addLike(Like like) throws SQLException, NotAcceptableException {
+        try {
+            getLike(like.getPostId(), like.getUserId());
+            throw new NotAcceptableException("Like already exists.");
+        } catch (NotFoundException e) {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO likes (postId, userId, date) " +
+                    "VALUES (?,?,?);");
+            statement.setString(1, like.getPostId());
+            statement.setString(2, like.getUserId());
+            statement.setLong(3, like.getDate());
+            statement.executeUpdate();
+            statement.close();
+        }
     }
 
     public synchronized static void deleteLike(String postId, String userId) throws SQLException {
@@ -57,6 +64,22 @@ public class LikeAccessor {
         Like like = getLikeFromResultSet(statement.executeQuery());
         statement.close();
         return like;
+    }
+
+    public synchronized static ArrayList<User> getLikersOfPost(String postId, String userId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM posts WHERE postId = ?;");
+        statement.setString(1, postId);
+        ArrayList<JSONObject> jsonArray = JsonHandler.getArrayFromResultSet(statement.executeQuery());
+        statement.close();
+
+        ArrayList<User> users = new ArrayList<>();
+        for (JSONObject obj : jsonArray) {
+            try {
+                users.add(UserAccessor.getUserById(obj.getString("UserId")));
+            } catch (NotFoundException ignored) {
+            }
+        }
+        return users;
     }
 
     private static Like getLikeFromResultSet(ResultSet resultSet) throws SQLException, NotFoundException {
