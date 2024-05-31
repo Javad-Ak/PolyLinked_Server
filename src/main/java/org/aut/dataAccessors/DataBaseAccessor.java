@@ -1,6 +1,5 @@
 package org.aut.dataAccessors;
 
-import org.aut.models.Message;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ public class DataBaseAccessor extends Thread {
         SkillsAccessor.createTable();
         CallInfoAccessor.createUserTable();
         MessageAccessor.createMessageTable();
+        PostAccessor.createTable();
     }
 
     public static Connection getConnection() {
