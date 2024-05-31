@@ -59,13 +59,12 @@ public class UserHandler implements HttpHandler {
                 case "GET": {
                     String path = exchange.getRequestURI().getPath().split("/")[2];
                     User seekedUser = UserAccessor.getUserById(path);
-                    if (seekedUser == null) throw new NotFoundException("User with id " + path + " not found");
 
                     exchange.sendResponseHeaders(200, 0);
                     OutputStream outputStream = exchange.getResponseBody();
 
                     MultipartHandler.writeJson(outputStream, seekedUser);
-                    File profilePicture = MediaAccessor.getProfile(seekedUser.getUserId());
+                    File profilePicture = MediaAccessor.getMedia(seekedUser.getUserId(), MediaAccessor.MediaPath.PROFILES);
                     MultipartHandler.writeFromFile(outputStream, profilePicture);
 
                     outputStream.close();

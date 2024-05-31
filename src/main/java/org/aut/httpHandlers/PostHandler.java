@@ -3,8 +3,8 @@ package org.aut.httpHandlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.aut.dataAccessors.MediaAccessor;
-import org.aut.dataAccessors.ProfileAccessor;
-import org.aut.models.Profile;
+import org.aut.dataAccessors.PostAccessor;
+import org.aut.models.Post;
 import org.aut.models.User;
 import org.aut.utils.MultipartHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
@@ -19,7 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 
-public class ProfileHandler implements HttpHandler {
+public class PostHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
@@ -27,47 +27,50 @@ public class ProfileHandler implements HttpHandler {
 
         try {
             User user = LoginHandler.getUserByToken(jwt);
-
             switch (method) {
-                case "POST":
-                case "PUT": {
+                case "PUT":
+                case "POST": {
                     InputStream inputStream = exchange.getRequestBody();
 
-                    Profile profile = new Profile(MultipartHandler.readJson(inputStream, Profile.class));
-                    if (!profile.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
+                    Post post = new Post(MultipartHandler.readJson(inputStream, Post.class));
+                    if (!post.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
-                    if (method.equals("POST")) ProfileAccessor.addProfile(profile);
-                    else ProfileAccessor.updateProfile(profile);
+                    if (method.equals("POST")) PostAccessor.addPost(post);
+                    else PostAccessor.updatePost(post);
 
-                    File oldPic = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.PROFILES);
-                    File newPic = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.PROFILES.value() + "/" + profile.getUserId()));
-                    if (newPic.length() > 0 && oldPic.length() > 0) {
-                        Files.delete(oldPic.toPath());
+                    File oldMedia = MediaAccessor.getMedia(post.getUserId(), MediaAccessor.MediaPath.POSTS);
+                    File newMedia = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.POSTS.value() + "/" + post.getPostId()));
+                    if (newMedia.length() > 0 && oldMedia.length() > 0) {
+                        Files.delete(oldMedia.toPath());
                     }
 
-                    File oldBG = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.BACKGROUNDS);
-                    File newBG = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.BACKGROUNDS.value() + "/" + profile.getUserId()));
-                    if (oldBG.length() > 0 && newBG.length() > 0) {
-                        Files.delete(oldBG.toPath());
-                    }
                     inputStream.close();
                     exchange.sendResponseHeaders(200, 0);
                 }
                 break;
                 case "GET": {
                     String path = exchange.getRequestURI().getPath().split("/")[2];
-                    Profile profile = ProfileAccessor.getProfile(path);
+                    Post post = PostAccessor.getPostById(path);
 
-                    File profilePicture = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.PROFILES);
-                    File background = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.BACKGROUNDS);
+                    File media = MediaAccessor.getMedia(post.getPostId(), MediaAccessor.MediaPath.POSTS);
 
                     exchange.sendResponseHeaders(200, 0);
                     OutputStream outputStream = exchange.getResponseBody();
-                    MultipartHandler.writeJson(outputStream, profile);
-                    MultipartHandler.writeFromFile(outputStream, profilePicture);
-                    MultipartHandler.writeFromFile(outputStream, background);
+                    MultipartHandler.writeJson(outputStream, post);
+                    MultipartHandler.writeFromFile(outputStream, media);
 
                     outputStream.close();
+                }
+                break;
+                case "DELETE": {
+                    String path = exchange.getRequestURI().getPath().split("/")[2];
+                    Post post = PostAccessor.getPostById(path);
+
+                    File media = MediaAccessor.getMedia(post.getPostId(), MediaAccessor.MediaPath.POSTS);
+                    Files.deleteIfExists(media.toPath());
+                    PostAccessor.deletePost(post.getPostId());
+
+                    exchange.sendResponseHeaders(200, 0);
                 }
                 break;
                 default:

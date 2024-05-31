@@ -1,3 +1,4 @@
+import org.aut.models.Post;
 import org.aut.models.Profile;
 import org.aut.utils.MultipartHandler;
 import org.aut.dataAccessors.UserAccessor;
@@ -7,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.*;
@@ -23,7 +23,78 @@ import org.aut.utils.JsonHandler;
 @DisplayName("------ Testing requests...")
 public class RequestTest {
     @Test
-    @DisplayName("---- posting a profile")
+    @DisplayName("---- get a user")
+    public void PostTest() throws Exception {
+        // ##### POST
+        Post post = new Post("user75930fcf-4bc1-9675", "ddd");
+        File pic = new File("./in/prof1.jpg");
+
+        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/posts").toURL().openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "multipart/form-data");
+        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzU5MzBmY2YtNGJjMS05Njc1IiwiaWF0IjoxNzE3MTYzNzYzLCJleHAiOjE3MTc3NjM3NjN9.o58V5oeLY-CDuSm3ZmQMNDNXo8WVVfXyQUL_hiedt7s");
+
+        con.setDoOutput(true);
+        OutputStream out = con.getOutputStream();
+        MultipartHandler.writeJson(out, post);
+        MultipartHandler.writeFromFile(out, pic);
+        out.close();
+
+        if (con.getResponseCode() / 100 == 2) {
+            System.out.println("test result: " + con.getResponseCode());
+        } else {
+            System.out.println("Server returned HTTP code " + con.getResponseCode());
+        }
+        con.disconnect();
+
+        // ##### GET
+
+        Path media = Path.of("./out/prof1");
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/posts/" + post.getPostId()))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzU5MzBmY2YtNGJjMS05Njc1IiwiaWF0IjoxNzE3MTYzNzYzLCJleHAiOjE3MTc3NjM3NjN9.o58V5oeLY-CDuSm3ZmQMNDNXo8WVVfXyQUL_hiedt7s")
+                .GET()
+                .build();
+
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() / 100 == 2) {
+            InputStream inputStream = response.body();
+//            System.out.println(new String(inputStream.readAllBytes()));
+
+            Post seeked = new Post(MultipartHandler.readJson(inputStream, Post.class));
+            System.out.println(seeked);
+
+            MultipartHandler.readToFile(inputStream, media);
+            inputStream.close();
+            System.out.println("test result: " + response.statusCode());
+        } else {
+            System.out.println("Server returned HTTP code " + response.statusCode());
+        }
+        client.close();
+
+        // #### DELETE
+        HttpClient client2 = HttpClient.newHttpClient();
+        HttpRequest request2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/posts/" + post.getPostId()))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzU5MzBmY2YtNGJjMS05Njc1IiwiaWF0IjoxNzE3MTYzNzYzLCJleHAiOjE3MTc3NjM3NjN9.o58V5oeLY-CDuSm3ZmQMNDNXo8WVVfXyQUL_hiedt7s")
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response2 = client2.send(request2, HttpResponse.BodyHandlers.ofString());
+        if (response2.statusCode() / 100 == 2) {
+            System.out.println("test result: " + response.statusCode());
+        } else {
+            System.out.println("Server returned HTTP code " + response.statusCode());
+        }
+        client2.close();
+
+    }
+
+    @Test
+    @DisplayName("---- get a user")
     public void getUser() throws Exception {
         Path pic = Path.of("./out/prof1");
 
@@ -31,7 +102,7 @@ public class RequestTest {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/users/user75930fcf-4bc1-9675"))
                 .timeout(Duration.ofSeconds(10))
-                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY")
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzU5MzBmY2YtNGJjMS05Njc1IiwiaWF0IjoxNzE3MTYzNzYzLCJleHAiOjE3MTc3NjM3NjN9.o58V5oeLY-CDuSm3ZmQMNDNXo8WVVfXyQUL_hiedt7s")
                 .GET()
                 .build();
 

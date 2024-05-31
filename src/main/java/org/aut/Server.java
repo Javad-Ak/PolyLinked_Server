@@ -27,6 +27,7 @@ public class Server {
             server.createContext("/follows", new FollowHandler());
             server.createContext("/profiles", new ProfileHandler());
             server.createContext("/connections", new ConnectHandler());
+            server.createContext("/posts", new PostHandler());
 
             server.setExecutor(Executors.newFixedThreadPool(8));
             server.start();
