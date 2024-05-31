@@ -16,7 +16,7 @@ public class ConnectAccessor {
     private ConnectAccessor() {
     }
 
-    public static void createConnectTable() throws IOException {
+    static void createConnectTable() throws IOException {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS connects (" +
                     "applicant_id TEXT NOT NULL " +

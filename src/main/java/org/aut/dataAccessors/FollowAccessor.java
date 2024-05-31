@@ -17,7 +17,7 @@ public class FollowAccessor {
     private FollowAccessor() {
     }
 
-    public static void createFollowsTable() throws IOException {
+    static void createFollowsTable() throws IOException {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS follows (" +
                     "follower_id TEXT NOT NULL" +
