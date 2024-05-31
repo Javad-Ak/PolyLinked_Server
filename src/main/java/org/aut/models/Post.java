@@ -16,7 +16,7 @@ public class Post implements JsonSerializable {
     // + media file in resources
 
     public Post(String userId, String text) throws NotAcceptableException {
-        if (text == null || text.trim().isEmpty() || text.trim().length() > 3000)
+        if (text == null || text.trim().length() > 3000)
             throw new NotAcceptableException("invalid arguments");
 
         postId = "post" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
