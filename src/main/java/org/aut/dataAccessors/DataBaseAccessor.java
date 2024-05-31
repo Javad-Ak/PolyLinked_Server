@@ -35,6 +35,7 @@ public class DataBaseAccessor extends Thread {
         CallInfoAccessor.createUserTable();
         MessageAccessor.createMessageTable();
         PostAccessor.createTable();
+        LikeAccessor.createTable();
     }
 
     public static Connection getConnection() {
