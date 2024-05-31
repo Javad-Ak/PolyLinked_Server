@@ -35,18 +35,19 @@ public class PostHandler implements HttpHandler {
                     Post post = new Post(MultipartHandler.readJson(inputStream, Post.class));
                     if (!post.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
-                    File oldMedia = MediaAccessor.getMedia(post.getUserId(), MediaAccessor.MediaPath.POSTS);
                     File newMedia = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.POSTS.value() + "/" + post.getPostId()));
 
                     if (post.getText().trim().isEmpty() && newMedia.length() < 1)
                         throw new NotAcceptableException("Not acceptable");
 
                     if (method.equals("POST")) PostAccessor.addPost(post);
-                    else PostAccessor.updatePost(post);
-
-                    if (newMedia.length() > 0 && oldMedia.length() > 0) {
-                        Files.delete(oldMedia.toPath());
+                    else {
+                        PostAccessor.updatePost(post);
+                        File oldMedia = MediaAccessor.getMedia(post.getUserId(), MediaAccessor.MediaPath.POSTS);
+                        if (newMedia.length() > 0 && oldMedia.length() > 0)
+                            Files.delete(oldMedia.toPath());
                     }
+
                     inputStream.close();
                     exchange.sendResponseHeaders(200, 0);
                 }
