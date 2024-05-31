@@ -2,6 +2,7 @@ package org.aut.dataAccessors;
 
 import org.aut.models.Connect;
 import org.aut.models.Message;
+import org.aut.models.Post;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
@@ -61,6 +62,13 @@ public class MessageAccessor {
         return resultSet.next();
     }
 
+    public synchronized static Message getMessageById(String messageId) throws SQLException, NotFoundException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM messages WHERE id = ?;");
+        statement.setString(1, messageId);
+        ResultSet resultSet = statement.executeQuery();
+        return getMessageFromResultSet(resultSet);
+
+    }
 
     public synchronized static ArrayList<Message> getMessagesBetween(String user1 , String user2) throws SQLException, NotAcceptableException {
         ArrayList <Message> acceptedConnects ;
@@ -85,5 +93,19 @@ public class MessageAccessor {
         resultSet.close();
         return messages;
     }
-
+    private static Message getMessageFromResultSet(ResultSet resultSet) throws SQLException, NotFoundException {
+        JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
+        resultSet.close();
+        if (jsonObject == null) {
+            throw new NotFoundException("User not Found");
+        } else {
+            Message message ;
+            try {
+               message = new Message(jsonObject);
+            } catch (NotAcceptableException e) {
+                throw new NotFoundException("User not Found");
+            }
+            return message;
+        }
+    }
 }

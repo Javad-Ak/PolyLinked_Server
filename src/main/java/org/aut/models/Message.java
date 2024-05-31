@@ -74,7 +74,7 @@ public class Message implements JsonSerializable {
     }
 
     public static void validateFields(String senderId, String receiverId, String text) throws NotAcceptableException {
-        if (senderId == null || senderId.isEmpty() || receiverId == null || receiverId.isEmpty() || text == null || text.trim().isEmpty()) {
+        if (senderId == null || senderId.isEmpty() || receiverId == null || receiverId.isEmpty() || text == null) {
             throw new NotAcceptableException("invalid argument");
         }
     }
