@@ -3,8 +3,11 @@ package org.aut.httpHandlers;
 import org.aut.controllers.UserController;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.aut.dataAccessors.MediaAccessor;
+import org.aut.dataAccessors.UserAccessor;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
+import org.aut.utils.MultipartHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
 import org.aut.utils.exceptions.UnauthorizedException;
@@ -17,8 +20,6 @@ public class UserHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
-
-        int code = 405; // method not found
         try {
             User user = null;
             if (method.equals("PUT") || method.equals("DELETE")) {
@@ -31,47 +32,58 @@ public class UserHandler implements HttpHandler {
                     User newUser = new User(jsonObject);
                     if (!jsonObject.isEmpty()) {
                         UserController.addUser(newUser);
-                        code = 200; // success
+                        exchange.sendResponseHeaders(200, 0);
                     } else {
                         throw new NotAcceptableException("json object is empty");
                     }
                     break;
                 }
-
-
                 case "PUT": {
                     JSONObject jsonObject = JsonHandler.getObject(exchange.getRequestBody());
                     User newUser = new User(jsonObject);
-                    if(!user.getUserId().equals(newUser.getUserId())){
+                    if (!user.getUserId().equals(newUser.getUserId())) {
 
                         throw new UnauthorizedException("Unauthorized");
                     }
                     if (!jsonObject.isEmpty()) {
                         UserController.updateUser(newUser);
-                        code = 200; // success
+                        exchange.sendResponseHeaders(200, 0);
                     }
                     break;
                 }
-
-                case "DELETE":
-                {
-                        UserController.deleteUser(user);
-                        code = 200; // success
+                case "DELETE": {
+                    UserController.deleteUser(user);
+                    exchange.sendResponseHeaders(200, 0);
                     break;
                 }
+                case "GET": {
+                    String path = exchange.getRequestURI().getPath().split("/")[2];
+                    User seekedUser = UserAccessor.getUserById(path);
+                    if (seekedUser == null) throw new NotFoundException("User with id " + path + " not found");
 
+                    exchange.sendResponseHeaders(200, 0);
+                    OutputStream outputStream = exchange.getResponseBody();
+
+                    MultipartHandler.writeJson(outputStream, seekedUser);
+                    File profilePicture = MediaAccessor.getProfile(seekedUser.getUserId());
+                    MultipartHandler.writeFromFile(outputStream, profilePicture);
+
+                    outputStream.close();
+                    break;
+                }
+                default:
+                    exchange.sendResponseHeaders(405, 0);
+                    break;
             }
         } catch (SQLException e) {
-            code = 500;
+            exchange.sendResponseHeaders(500, 0);
         } catch (NotAcceptableException e) {
-            code = 406;
-        } catch (NotFoundException e){
-            code = 404;
+            exchange.sendResponseHeaders(406, 0);
+        } catch (NotFoundException e) {
+            exchange.sendResponseHeaders(404, 0);
         } catch (UnauthorizedException e) {
-            code = 401;
+            exchange.sendResponseHeaders(401, 0);
         }
-
-        exchange.sendResponseHeaders(code, 0);
         exchange.close();
     }
 }

@@ -24,15 +24,45 @@ import org.aut.utils.JsonHandler;
 public class RequestTest {
     @Test
     @DisplayName("---- posting a profile")
+    public void getUser() throws Exception {
+        Path pic = Path.of("./out/prof1");
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/users/user75930fcf-4bc1-9675"))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY")
+                .GET()
+                .build();
+
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() / 100 == 2) {
+            InputStream inputStream = response.body();
+//            System.out.println(new String(inputStream.readAllBytes()));
+
+            User user = new User(MultipartHandler.readJson(inputStream, User.class));
+            System.out.println(user);
+
+            MultipartHandler.readToFile(inputStream, pic);
+            inputStream.close();
+            System.out.println("test result: " + response.statusCode());
+        } else {
+            System.out.println("Server returned HTTP code " + response.statusCode());
+        }
+        client.close();
+    }
+
+    @Test
+    @DisplayName("---- posting a profile")
     public void postProfile() throws Exception {
-        Profile profile = new Profile("user719066ad-4efe-8f14", "ddd", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, 1);
+        Profile profile = new Profile("user75930fcf-4bc1-9675", "ddd", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, 1);
         File pic = new File("./in/prof1.jpg");
         File bg = new File("./in/prof2.png");
 
         HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/profiles").toURL().openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "multipart/form-data");
-        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY");
+        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzU5MzBmY2YtNGJjMS05Njc1IiwiaWF0IjoxNzE3MTU1MDYzLCJleHAiOjE3MTc3NTUwNjN9.0RT8KOkyiSx99dVcMXO5K0cmqzfFua8wwYLIyVM67p8");
 
         con.setDoOutput(true);
         OutputStream out = con.getOutputStream();
@@ -186,7 +216,7 @@ public class RequestTest {
                 .uri(URI.create("http://localhost:8080/users/login"))
                 .timeout(Duration.ofSeconds(10))
                 .header("Content-Type", "json")
-                .POST(HttpRequest.BodyPublishers.ofString(new JSONObject("{email: reza@gmail.com, password: ali1222345}").toString()))
+                .POST(HttpRequest.BodyPublishers.ofString(new JSONObject("{email: ali@gmail.com, password: ali1222345}").toString()))
                 .build();
 
         // Send the request and get the response
