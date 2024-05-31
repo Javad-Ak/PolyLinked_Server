@@ -4,11 +4,12 @@ import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
-public class Post {
+public class Post implements JsonSerializable {
     private final String postId;
     private final String userId;
     private final String text;
@@ -63,5 +64,10 @@ public class Post {
 
     public long getDate() {
         return date.getTime();
+    }
+
+    @Override
+    public JSONObject toJson() {
+        return new JSONObject(toString());
     }
 }

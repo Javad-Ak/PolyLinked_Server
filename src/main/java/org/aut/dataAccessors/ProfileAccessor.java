@@ -86,7 +86,7 @@ public class ProfileAccessor {
             try {
                 profile = new Profile(jsonObject);
             } catch (NotAcceptableException e) {
-                profile = null;
+                throw new NotFoundException("Profile not found.");
             }
             return profile;
         }

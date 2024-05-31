@@ -39,14 +39,14 @@ public class ProfileHandler implements HttpHandler {
                     if (method.equals("POST")) ProfileAccessor.addProfile(profile);
                     else ProfileAccessor.updateProfile(profile);
 
-                    File oldPic = MediaAccessor.getProfile(profile.getUserId());
-                    File newPic = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.PATH_TO_PROFILES + "/" + profile.getUserId()));
+                    File oldPic = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.PROFILES);
+                    File newPic = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.PROFILES.value() + "/" + profile.getUserId()));
                     if (newPic.length() > 0 && oldPic.length() > 0) {
                         Files.delete(oldPic.toPath());
                     }
 
-                    File oldBG = MediaAccessor.getBackGround(profile.getUserId());
-                    File newBG = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.PATH_TO_BACKGROUNDS + "/" + profile.getUserId()));
+                    File oldBG = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.BACKGROUNDS);
+                    File newBG = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.BACKGROUNDS.value() + "/" + profile.getUserId()));
                     if (oldBG.length() > 0 && newBG.length() > 0) {
                         Files.delete(oldBG.toPath());
                     }
@@ -57,10 +57,9 @@ public class ProfileHandler implements HttpHandler {
                 case "GET": {
                     String path = exchange.getRequestURI().getPath().split("/")[2];
                     Profile profile = ProfileAccessor.getProfile(path);
-                    if (profile == null) throw new NotFoundException("Profile not found");
 
-                    File profilePicture = MediaAccessor.getProfile(profile.getUserId());
-                    File background = MediaAccessor.getBackGround(profile.getUserId());
+                    File profilePicture = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.PROFILES);
+                    File background = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.BACKGROUNDS);
 
                     exchange.sendResponseHeaders(200, 0);
                     OutputStream outputStream = exchange.getResponseBody();
