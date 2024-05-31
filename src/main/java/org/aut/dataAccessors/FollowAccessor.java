@@ -12,7 +12,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class FollowAccessor {
-    private static final Connection connection = DataBaseConnection.getConnection();
+    private static final Connection connection = DataBaseAccessor.getConnection();
 
     private FollowAccessor() {
     }

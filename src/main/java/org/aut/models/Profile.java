@@ -1,26 +1,24 @@
 package org.aut.models;
 
+import org.aut.utils.exceptions.NotAcceptableException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Profile {
+public class Profile implements JsonSerializable {
     private final String userId; // same as user id -> foreign key
     private final String bio; // 220 ch
-    private final String pathToPic; // 400*400, 1 mb
-    private final String pathToBG; // 1584*396
     private final String country; // 60 ch
     private final String city;  // 60 ch
     private final Status status;
     private final Profession profession;
-    private final boolean notify;
+    private final int notify;
     // + Skills(relatively), Educations, CallInfo
 
-    public Profile(String userID, String bio, String pathToPic, String pathToBG, String country, String city, Status status, Profession profession, boolean notify) {
+    public Profile(String userID, String bio, String country, String city, Status status, Profession profession, int notify) throws NotAcceptableException {
         validateFields(bio, country, city);
 
         this.userId = userID;
         this.bio = bio;
-        this.pathToPic = pathToPic;
-        this.pathToBG = pathToBG;
         this.country = country.toUpperCase();
         this.city = city.toUpperCase();
         this.status = status;
@@ -28,43 +26,45 @@ public class Profile {
         this.notify = notify;
     }
 
-    public Profile(JSONObject profile) {
-        userId = profile.getString("userID");
-        bio = profile.getString("bio");
-        pathToPic = profile.getString("pathToPic");
-        pathToBG = profile.getString("pathToBG");
-        country = profile.getString("country");
-        city = profile.getString("city");
-        status = Status.valueOf(profile.getString("status"));
-        profession = Profession.valueOf(profile.getString("profession"));
-        notify = profile.getBoolean("notify");
+    public Profile(JSONObject profile) throws NotAcceptableException {
+        try {
+            userId = profile.getString("userId");
+            bio = profile.getString("bio");
+            country = profile.getString("country");
+            city = profile.getString("city");
+            status = Status.valueOf(profile.getString("status"));
+            profession = Profession.valueOf(profile.getString("profession"));
+            notify = profile.getInt("notify");
+        } catch (JSONException e) {
+            throw new NotAcceptableException("JSON could not be parsed");
+        }
+        validateFields(bio, country, city);
     }
 
     @Override
     public String toString() {
         return '{' +
-                "userID: " + userId +
+                "userId: " + userId +
                 ", bio: " + bio +
-                ", pathToPic: " + pathToPic +
-                ", pathToBG: " + pathToBG +
                 ", country: " + country.toUpperCase() +
                 ", city: " + city.toUpperCase() +
-                ", status: " + status +
-                ", profession: " + profession +
+                ", status: " + status.toString() +
+                ", profession: " + profession.toString() +
                 ", notify: " + notify +
                 '}';
     }
 
+    @Override
     public JSONObject toJson() {
         return new JSONObject(toString());
     }
 
-    private void validateFields(String bio, String country, String city) {
+    private void validateFields(String bio, String country, String city) throws NotAcceptableException {
         if ((bio != null && bio.length() > 220) ||
                 (country != null && !country.matches("(?i)^[a-z]{0,60}$")) ||
                 (city != null && !city.matches("(?i)^[a-z]{0,60}$")))
 
-            throw new RuntimeException("invalid arguments");
+            throw new NotAcceptableException("invalid arguments");
     }
 
     public String getUserId() {
@@ -73,14 +73,6 @@ public class Profile {
 
     public String getBio() {
         return bio;
-    }
-
-    public String getPathToPic() {
-        return pathToPic;
-    }
-
-    public String getPathToBG() {
-        return pathToBG;
     }
 
     public String getCountry() {
@@ -99,7 +91,7 @@ public class Profile {
         return profession.toString();
     }
 
-    public boolean getNotify() {
+    public int getNotify() {
         return notify;
     }
 

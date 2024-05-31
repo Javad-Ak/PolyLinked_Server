@@ -33,7 +33,7 @@ public class JsonHandler {
         JSONObject jsonObject = new JSONObject();
         if (set.next()) {
             for (int i = 1; i <= set.getMetaData().getColumnCount(); i++)
-                jsonObject.put(set.getMetaData().getColumnName(i), set.getObject(i));//expected bug
+                jsonObject.put(set.getMetaData().getColumnName(i), set.getObject(i));
         }
         return jsonObject.isEmpty() ? null : jsonObject;
     }

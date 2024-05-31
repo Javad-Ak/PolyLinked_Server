@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
-public class Education {
+public class Education implements JsonSerializable {
     private final String educationId;
     private final String userId;
     private final String institute; // 40 chars
@@ -63,6 +63,11 @@ public class Education {
                 ", activities:" + activities +
                 ", about:" + about +
                 '}';
+    }
+
+    @Override
+    public JSONObject toJson() {
+        return new JSONObject(toString());
     }
 
     private void validateFields(String institute, String field, Date start, Date end, int grade, String activities, String about) throws NotAcceptableException {

@@ -4,10 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 public class MediaAccessor {
-    private static final Path PATH_TO_PROFILES = Path.of("./src/main/resources/profiles");
-    private static final Path PATH_TO_BACKGROUNDS = Path.of("./src/main/resources/backgrounds");
+    public static final Path PATH_TO_PROFILES = Path.of("./src/main/resources/profiles");
+    public static final Path PATH_TO_BACKGROUNDS = Path.of("./src/main/resources/backgrounds");
 
     private MediaAccessor() {
     }
@@ -18,12 +19,22 @@ public class MediaAccessor {
     }
 
     public static File getProfile(String userId) {
-        File file = new File(PATH_TO_PROFILES.toString() + '/' + userId + ".jpg");
-        return file.isFile() ? file : null;
+        try (Stream<Path> paths = Files.list(PATH_TO_PROFILES)) {
+            for (Path path : paths.toList()) {
+                if (path.toString().contains(userId)) return path.toFile();
+            }
+        } catch (IOException ignored) {
+        }
+        return new File("null");
     }
 
     public static File getBackGround(String userId) {
-        File file = new File(PATH_TO_BACKGROUNDS.toString() + '/' + userId + ".jpg");
-        return file.isFile() ? file : null;
+        try (Stream<Path> paths = Files.list(PATH_TO_BACKGROUNDS)) {
+            for (Path path : paths.toList()) {
+                if (path.toString().contains(userId)) return path.toFile();
+            }
+        } catch (IOException ignored) {
+        }
+        return new File("null");
     }
 }

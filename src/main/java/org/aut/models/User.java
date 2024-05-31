@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 import java.util.UUID;
 
-public class User {
+public class User implements JsonSerializable {
     private final String userId; // UUID
     private String email; // valid
     private String password; // > 7 ch, int
@@ -21,7 +21,7 @@ public class User {
     public User(String email, String password, String firstName, String lastName, String additionalName) throws NotAcceptableException {
         String id = "user" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
         try {
-            validateFields(id, email, password, firstName, lastName, additionalName);
+            validateFields(email, password, firstName, lastName, additionalName);
             this.userId = id;
             this.email = email;
             this.password = password;
@@ -36,7 +36,7 @@ public class User {
 
     public User(JSONObject json) throws NotAcceptableException {
         try {
-            validateFields(json.getString("userId"), json.getString("email"), json.getString("password"), json.getString("firstName"), json.getString("lastName"), json.getString("additionalName"));
+            validateFields(json.getString("email"), json.getString("password"), json.getString("firstName"), json.getString("lastName"), json.getString("additionalName"));
             userId = json.getString("userId");
             email = json.getString("email");
             password = json.getString("password");
@@ -63,7 +63,8 @@ public class User {
                 '}';
     }
 
-    public JSONObject toJSON() {
+    @Override
+    public JSONObject toJson() {
         return new JSONObject(toString());
     }
 
@@ -95,8 +96,8 @@ public class User {
         return createDate;
     }
 
-    private static void validateFields(String id, String email, String password, String firstName, String lastName, String additionalName) throws NotAcceptableException {
-        if ((firstName == null || lastName == null || email == null || password == null || id == null) ||
+    private static void validateFields(String email, String password, String firstName, String lastName, String additionalName) throws NotAcceptableException {
+        if ((firstName == null || lastName == null || email == null || password == null) ||
                 (!email.matches("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")) ||
                 (!password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,20}$")) ||
                 (!firstName.matches("(?i)^[a-z]{1,20}$")) ||
