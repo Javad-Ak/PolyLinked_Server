@@ -4,9 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.aut.dataAccessors.MediaAccessor;
 import org.aut.dataAccessors.PostAccessor;
-import org.aut.dataAccessors.ProfileAccessor;
 import org.aut.models.Post;
-import org.aut.models.Profile;
 import org.aut.models.User;
 import org.aut.utils.MultipartHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
@@ -29,7 +27,6 @@ public class PostHandler implements HttpHandler {
 
         try {
             User user = LoginHandler.getUserByToken(jwt);
-
             switch (method) {
                 case "PUT":
                 case "POST": {
@@ -63,6 +60,17 @@ public class PostHandler implements HttpHandler {
                     MultipartHandler.writeFromFile(outputStream, media);
 
                     outputStream.close();
+                }
+                break;
+                case "DELETE": {
+                    String path = exchange.getRequestURI().getPath().split("/")[2];
+                    Post post = PostAccessor.getPostById(path);
+
+                    File media = MediaAccessor.getMedia(post.getPostId(), MediaAccessor.MediaPath.POSTS);
+                    Files.deleteIfExists(media.toPath());
+                    PostAccessor.deletePost(post.getPostId());
+
+                    exchange.sendResponseHeaders(200, 0);
                 }
                 break;
                 default:

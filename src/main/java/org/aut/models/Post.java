@@ -4,7 +4,6 @@ import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
@@ -44,9 +43,9 @@ public class Post implements JsonSerializable {
     public String toString() {
         return "{" +
                 "postId:" + postId +
-                "userId:" + userId +
-                "text:" + text +
-                "date:" + date.getTime() +
+                ", userId:" + userId +
+                ", text:" + text +
+                ", date:" + date.getTime() +
                 '}';
     }
 
