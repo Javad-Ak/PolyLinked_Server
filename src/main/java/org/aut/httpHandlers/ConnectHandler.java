@@ -2,53 +2,58 @@ package org.aut.httpHandlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.aut.controllers.FollowController;
-import org.aut.dataAccessors.FollowAccessor;
-import org.aut.models.Follow;
+import org.aut.controllers.ConnectController;
+import org.aut.models.Connect;
 import org.aut.models.User;
-
 import org.aut.utils.JsonHandler;
-import org.aut.utils.exceptions.NotFoundException;
 import org.aut.utils.exceptions.NotAcceptableException;
+import org.aut.utils.exceptions.NotFoundException;
 import org.aut.utils.exceptions.UnauthorizedException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class FollowHandler implements HttpHandler {
+public class ConnectHandler implements HttpHandler {
+    //may need to change
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
         int code = 405;
-
         JSONObject jsonObject = JsonHandler.getObject(exchange.getRequestBody());
         String jwt = exchange.getRequestHeaders().getFirst("Authorization");
         try {
+            Connect connect = new Connect(jsonObject);
             User user = LoginHandler.getUserByToken(jwt);
-            Follow newFollow = new Follow(jsonObject);
-            System.out.println(newFollow);
-            if (!user.getUserId().equals(newFollow.getFollower()))
-                throw new UnauthorizedException("User unauthorized");
-
             switch (method) {
                 case "POST":
-                    if (!jsonObject.isEmpty()) {
-                        FollowController.addFollow(newFollow);
+                    if (!jsonObject.isEmpty() && user.getUserId().equals(connect.getApplicant_id())) {
+                        ConnectController.addConnect(connect);
                         code = 200;
+                    } else if (!jsonObject.isEmpty()) {
+                        code = 401;
+                    }
+                    break;
+
+                case "PUT":
+                    if (!jsonObject.isEmpty() && user.getUserId().equals(connect.getAcceptor_id())) {
+                        System.out.println(connect);
+                        ConnectController.updateConnect(connect);
+                        code = 200;
+                    } else if (!jsonObject.isEmpty()) {
+                        code = 401;
                     }
                     break;
 
                 case "DELETE":
-                    Follow follow = new Follow(jsonObject);
-                    if (!jsonObject.isEmpty()) {
-                        FollowAccessor.deleteFollow(follow);
+                    if (!jsonObject.isEmpty() && (user.getUserId().equals(connect.getApplicant_id()) || user.getUserId().equals(connect.getAcceptor_id()))) {
+                        ConnectController.deleteConnect(connect);
                         code = 200;
-
-                    } else if (!FollowAccessor.followExists(follow)) {
-                        throw new NotFoundException("User not found");
+                    } else if (!jsonObject.isEmpty()) {
+                        code = 401;
                     }
                     break;
+
             }
         } catch (UnauthorizedException e) {
             code = 401;
@@ -59,7 +64,6 @@ public class FollowHandler implements HttpHandler {
         } catch (NotFoundException e) {
             code = 404;
         }
-
         exchange.sendResponseHeaders(code, 0);
         exchange.close();
     }

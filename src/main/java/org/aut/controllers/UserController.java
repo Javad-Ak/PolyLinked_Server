@@ -2,6 +2,7 @@ package org.aut.controllers;
 
 import org.aut.dataAccessors.UserAccessor;
 import org.aut.models.User;
+import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
 
 import java.sql.SQLException;
@@ -10,8 +11,20 @@ public class UserController {
     private UserController() {
     }
 
-    public static void addUser(User user) throws SQLException {
-        if (!userExistsByEmail(user.getEmail())) UserAccessor.addUser(user);
+    public static void addUser(User user) throws SQLException, NotAcceptableException {
+        if (!userExistsByEmail(user.getEmail())) {
+            UserAccessor.addUser(user);
+        } else {
+            throw new NotAcceptableException("User already exists");
+        }
+
+    }
+    public static void deleteUser(User user) throws SQLException, NotFoundException {
+        if (userExistsByEmail(user.getEmail())) {
+            UserAccessor.deleteUser(user.getUserId());
+        } else {
+            throw new NotFoundException("User Not Found");
+        }
     }
 
     public static boolean userExistsByEmail(String email) throws SQLException {
@@ -29,6 +42,14 @@ public class UserController {
             return true;
         } catch (NotFoundException e) {
             return false;
+        }
+    }
+
+    public static void updateUser(User user) throws SQLException, NotFoundException {
+        if (userExistsById(user.getUserId())) {
+            UserAccessor.updateUser(user);
+        } else {
+            throw new NotFoundException("User not found");
         }
     }
 

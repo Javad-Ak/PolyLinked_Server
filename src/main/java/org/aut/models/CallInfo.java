@@ -1,6 +1,8 @@
 package org.aut.models;
 
 import org.aut.utils.exceptions.NotAcceptableException;
+import org.aut.utils.exceptions.NotFoundException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
@@ -30,17 +32,20 @@ public class CallInfo implements JsonSerializable {
         this.socialMedia = socialMedia;
     }
 
-    public CallInfo(JSONObject jsonObject) throws NotAcceptableException {
-        userId = jsonObject.getString("userId");
-        email = jsonObject.getString("emailAddress");
-        mobileNumber = jsonObject.getString("mobileNumber");
-        homeNumber = jsonObject.getString("homeNumber");
-        workNumber = jsonObject.getString("workNumber");
-        address = jsonObject.getString("Address");
-        birthDay = new Date(jsonObject.getLong("birthDay"));
-        privacyPolitics = PrivacyPolitics.valueOf(jsonObject.getString("privacyPolitics"));
-        socialMedia = jsonObject.getString("socialMedia");
-
+    public CallInfo(JSONObject jsonObject) throws NotAcceptableException, NotFoundException {
+        try {
+            userId = jsonObject.getString("userId");
+            email = jsonObject.getString("emailAddress");
+            mobileNumber = jsonObject.getString("mobileNumber");
+            homeNumber = jsonObject.getString("homeNumber");
+            workNumber = jsonObject.getString("workNumber");
+            address = jsonObject.getString("Address");
+            birthDay = new Date(jsonObject.getLong("birthDay"));
+            privacyPolitics = PrivacyPolitics.valueOf(jsonObject.getString("privacyPolitics"));
+            socialMedia = jsonObject.getString("socialMedia");
+        } catch (JSONException e) {
+            throw new NotAcceptableException("Wrong jsonObject");
+        }
         validateFields(userId, email, mobileNumber, homeNumber, workNumber, address, socialMedia);
     }
 

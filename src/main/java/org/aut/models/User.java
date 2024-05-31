@@ -4,40 +4,50 @@ import java.util.Date;
 import java.util.Random;
 
 import org.aut.utils.exceptions.NotAcceptableException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.UUID;
 
 public class User implements JsonSerializable {
     private final String userId; // UUID
-    private final String email; // valid
-    private final String password; // > 7 ch, int
-    private final String firstName; // 20 ch
-    private final String lastName; // 40 ch
-    private final String additionalName; // 20 ch
-    private final Date createDate;
+    private String email; // valid
+    private String password; // > 7 ch, int
+    private String firstName; // 20 ch
+    private String lastName; // 40 ch
+    private String additionalName; // 20 ch
+    private Date createDate;
 
     public User(String email, String password, String firstName, String lastName, String additionalName) throws NotAcceptableException {
         String id = "user" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
-        validateFields(email, password, firstName, lastName, additionalName);
-        this.userId = id;
-        this.email = email;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.additionalName = additionalName;
-        createDate = new Date(System.currentTimeMillis());
+        try {
+            validateFields(email, password, firstName, lastName, additionalName);
+            this.userId = id;
+            this.email = email;
+            this.password = password;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.additionalName = additionalName;
+            createDate = new Date(System.currentTimeMillis());
+        } catch (JSONException e) {
+            throw new NotAcceptableException("Wrong jsonObject");
+        }
     }
 
     public User(JSONObject json) throws NotAcceptableException {
-        userId = json.getString("userId");
-        email = json.getString("email");
-        password = json.getString("password");
-        firstName = json.getString("firstName");
-        lastName = json.getString("lastName");
-        additionalName = json.getString("additionalName");
-        createDate = new Date(json.getLong("createDate"));
-        validateFields(email, password, firstName, lastName, additionalName);
+        try {
+            validateFields(json.getString("email"), json.getString("password"), json.getString("firstName"), json.getString("lastName"), json.getString("additionalName"));
+            userId = json.getString("userId");
+            email = json.getString("email");
+            password = json.getString("password");
+            firstName = json.getString("firstName");
+            lastName = json.getString("lastName");
+            additionalName = json.getString("additionalName");
+            createDate = new Date(json.getLong("createDate"));
+        } catch (JSONException e) {
+            throw new NotAcceptableException("Wrong jsonObject");
+
+        }
     }
 
     @Override
@@ -94,5 +104,29 @@ public class User implements JsonSerializable {
                 (!lastName.matches("(?i)^[a-z]{1,40}$")) ||
                 (!additionalName.matches("(?i)^[a-z]{0,20}$")))
             throw new NotAcceptableException("invalid argument");
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setAdditionalName(String additionalName) {
+        this.additionalName = additionalName;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 }

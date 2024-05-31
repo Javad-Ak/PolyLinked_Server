@@ -1,5 +1,6 @@
 import org.aut.models.Profile;
 import org.aut.utils.MultipartHandler;
+import org.aut.dataAccessors.UserAccessor;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,6 @@ import java.time.Duration;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 
-
 @DisplayName("------ Testing requests...")
 public class RequestTest {
     @Test
@@ -28,7 +28,7 @@ public class RequestTest {
         File pic = new File("./in/prof1.jpg");
         File bg = new File("./in/prof2.png");
 
-        HttpURLConnection con = getPostConnection(URI.create("http://localhost:8080/profiles").toURL());
+        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/profiles").toURL().openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "multipart/form-data");
         con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY");
@@ -55,7 +55,7 @@ public class RequestTest {
         File bg = new File("./in/prof1.jpg");
         File pic = new File("./in/prof2.png");
 
-        HttpURLConnection con = getPostConnection(URI.create("http://localhost:8080/profiles").toURL());
+        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/profiles").toURL().openConnection();
         con.setRequestMethod("PUT");
         con.setRequestProperty("Content-Type", "multipart/form-data");
         con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY");
@@ -199,14 +199,22 @@ public class RequestTest {
         client.close();
     }
 
-    private static HttpURLConnection getPostConnection(URL url) throws IOException {
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Content-Type", "multipart/form-data");
-        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMjM3NTBkMTQtNDdjMC1iMjIwIiwiaWF0IjoxNzE2OTg1NjA2LCJleHAiOjE3MTc1ODU2MDZ9.ej7LwjDK9sO_9XXPJk5HxH6tSrw_2enANFDosy6yOr8 eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMjM3NTBkMTQtNDdjMC1iMjIwIiwiaWF0IjoxNzE2OTg1NjA2LCJleHAiOjE3MTc1ODU2MDZ9.ej7LwjDK9sO_9XXPJk5HxH6tSrw_2enANFDosy6yOr8");
-
-        con.setDoOutput(true); // enables output stream
-        return con;
+    @Test
+    @DisplayName("---- update a user with httpClient")
+    public void updateUser() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        User user = UserAccessor.getUserById("user769286ee-4627-ad72");
+        user.setLastName("UpdatedAkbari");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/users"))
+                .timeout(Duration.ofSeconds(10))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzY5Mjg2ZWUtNDYyNy1hZDcyIiwiaWF0IjoxNzE" +
+                        "3MDExMTQyLCJleHAiOjE3MTc2MTExNDJ9.TaYK4qpCR6AKPDjma1IdOXVBVdV-MhfHbL10GkKubVg")
+                .PUT(HttpRequest.BodyPublishers.ofString(user.toString()))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("Response Code: " + response.statusCode());
+        client.close();
     }
 }

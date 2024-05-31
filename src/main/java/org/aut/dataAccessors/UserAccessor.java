@@ -45,6 +45,12 @@ public class UserAccessor {
         statement.executeUpdate();
         statement.close();
     }
+    public synchronized static void deleteUser(String userId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("DELETE FROM users WHERE userId = ?;");
+        statement.setString(1, userId);
+        statement.executeUpdate();
+        statement.close();
+    }
 
 
     public synchronized static User getUserByEmail(String email) throws SQLException, NotFoundException {
@@ -55,6 +61,17 @@ public class UserAccessor {
     public synchronized static User getUserById(String id) throws SQLException, NotFoundException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE userId = ?;");
         return getUserFromResultSet(id, statement);
+    }
+    public synchronized static void updateUser(User user) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("UPDATE users SET email = ? , password = ? , firstName = ? , lastName = ? , additionalName = ?  WHERE userId = ?;");
+        statement.setString(1, user.getEmail());
+        statement.setString(2, user.getPassword());
+        statement.setString(3, user.getFirstName());
+        statement.setString(4, user.getLastName());
+        statement.setString(5, user.getAdditionalName());
+        statement.setString(6, user.getUserId());
+        statement.executeUpdate();
+        statement.close();
     }
 
     private static User getUserFromResultSet(String input, PreparedStatement statement) throws SQLException, NotFoundException {

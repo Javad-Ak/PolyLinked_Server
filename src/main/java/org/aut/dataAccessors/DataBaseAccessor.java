@@ -27,6 +27,7 @@ public class DataBaseAccessor extends Thread {
         MediaAccessor.createDirectories();
         UserAccessor.createUserTable();
         FollowAccessor.createFollowsTable();
+        ConnectAccessor.createConnectTable();
         ProfileAccessor.createTable();
         EducationAccessor.createTable();
         SkillsAccessor.createTable();

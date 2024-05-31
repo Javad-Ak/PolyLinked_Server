@@ -1,14 +1,19 @@
+import org.aut.controllers.ConnectController;
 import org.aut.controllers.FollowController;
-import org.aut.dataAccessors.DataBaseAccessor;
+import org.aut.controllers.UserController;
 import org.aut.dataAccessors.ProfileAccessor;
+import org.aut.dataAccessors.DataBaseAccessor;
 import org.aut.dataAccessors.UserAccessor;
+import org.aut.models.Connect;
 import org.aut.models.Follow;
 import org.aut.models.Profile;
 import org.aut.models.User;
 import org.aut.utils.exceptions.NotAcceptableException;
+import org.aut.utils.exceptions.NotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Date;
 import java.sql.SQLException;
 
 @DisplayName("------ testing DataBase...")
@@ -17,13 +22,49 @@ public class DBTest {
     @DisplayName("---- testing users table")
     public void UserTest() throws Exception {
         DataBaseAccessor.create();
+        String userId = null;
         try {
-            UserAccessor.addUser(new User("reza@gmail.com", "ali1222345", "Ali", "akbari", "ll"));
+            User user = new User("reza@gmail.com", "ali1222345", "Ali", "akbari", "ll");
+            UserAccessor.addUser(user);
+            userId = user.getUserId();
+            System.out.println("User added successfully");
         } catch (SQLException e) {
-            System.out.println("User exists" + e.getMessage());
+            System.out.println("User exists " + e.getMessage());
         }
 
-        System.out.println("User added successfully");
+
+        try{
+            User user = UserAccessor.getUserById(userId != null ? userId : "user719066ad-4efe-8f14");
+            UserAccessor.deleteUser(userId != null? userId : "user719066ad-4efe-8f14");
+            System.out.println("User " + user.getEmail() +" deleted successfully");
+        } catch (SQLException e){
+            System.out.println("SQLException " + e.getMessage());
+        } catch (NotFoundException e){
+            System.out.println("User does not exist " + e.getMessage());
+        }
+
+        try {
+            User user = UserAccessor.getUserByEmail("reza2@gmail.com");
+            UserController.deleteUser(user);
+            System.out.println("User " + user.getEmail()+ " deleted successfully");
+        } catch ( SQLException e) {
+            System.out.println("SQLException " + e.getMessage());
+        } catch (NotFoundException e) {
+            System.out.println("User does not exist " + e.getMessage());
+        }
+
+        try {
+            User newUser = new User("reza2@gmail.com", "ali1222345", "Ali", "akbari", "ll");
+
+            UserAccessor.addUser(newUser);
+            System.out.println("User added successfully");
+            newUser.setFirstName("UpdatedAli");
+            UserAccessor.updateUser(newUser);
+            System.out.println("User " + newUser.getEmail() +" updated successfully");
+        } catch (SQLException e){
+            System.out.println("SQLException " + e.getMessage());
+        }
+
     }
 
     @Test
@@ -65,5 +106,17 @@ public class DBTest {
 
         Profile p2 = ProfileAccessor.getProfile("user9227641a-49d4-ac0c");
         System.out.println("profile fetched success fully: " + p2);
+    }
+
+    @Test
+    @DisplayName("---- testing connect table")
+    public void ConnectTest() throws Exception {
+        DataBaseAccessor.create();
+        try {
+            ConnectController.addConnect(new Connect("user90059c8e-4be7-8764", "user241374d1-464e-863e" , "this is connect note" , Connect.AcceptState.WAITING));
+        } catch (NotAcceptableException | NotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        System.out.println("Connect added successfully");
     }
 }

@@ -2,6 +2,7 @@
 package org.aut.models;
 
 import org.aut.utils.exceptions.NotAcceptableException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class Follow implements JsonSerializable {
@@ -15,9 +16,13 @@ public final class Follow implements JsonSerializable {
     }
 
     public Follow(JSONObject json) throws NotAcceptableException {
-        validateFields(json.getString("follower"), json.getString("followed"));
-        follower = json.getString("follower");
-        followed = json.getString("followed");
+        try {
+            validateFields(json.getString("follower"), json.getString("followed"));
+            follower = json.getString("follower");
+            followed = json.getString("followed");
+        } catch (JSONException e) {
+            throw new NotAcceptableException("Wrong jsonObject");
+        }
     }
 
     public String getFollowed() {
@@ -43,7 +48,7 @@ public final class Follow implements JsonSerializable {
 
     private static void validateFields(String follower, String followed) throws NotAcceptableException {
         if (follower == null || followed == null || followed.equals(follower))
-            throw new NotAcceptableException("Follower or Followed fields cannot be null");
+            throw new NotAcceptableException("some fields are null");
     }
 
     public String follower() {
