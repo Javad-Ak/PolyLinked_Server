@@ -24,7 +24,7 @@ public class RequestTest {
     @Test
     @DisplayName("---- posting a profile")
     public void postProfile() throws Exception {
-        Profile profile = new Profile("user719066ad-4efe-8f14", "ddd", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, true);
+        Profile profile = new Profile("user719066ad-4efe-8f14", "ddd", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, 1);
         File pic = new File("./in/prof1.jpg");
         File bg = new File("./in/prof2.png");
 
@@ -50,24 +50,73 @@ public class RequestTest {
 
     @Test
     @DisplayName("---- posting a profile")
+    public void putProfile() throws Exception {
+        Profile profile = new Profile("user719066ad-4efe-8f14", "ddd", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, 1);
+        File bg = new File("./in/prof1.jpg");
+        File pic = new File("./in/prof2.png");
+
+        HttpURLConnection con = getPostConnection(URI.create("http://localhost:8080/profiles").toURL());
+        con.setRequestMethod("PUT");
+        con.setRequestProperty("Content-Type", "multipart/form-data");
+        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY");
+
+        con.setDoOutput(true);
+        OutputStream out = con.getOutputStream();
+        MultipartHandler.writeJson(out, profile);
+        MultipartHandler.writeFromFile(out, pic);
+        MultipartHandler.writeFromFile(out, bg);
+        out.close();
+
+        if (con.getResponseCode() / 100 == 2) {
+            System.out.println("test result: " + con.getResponseCode());
+        } else {
+            System.out.println("Server returned HTTP code " + con.getResponseCode());
+        }
+        con.disconnect();
+    }
+
+    @Test
+    @DisplayName("---- posting a profile")
     public void getProfile() throws Exception {
         Path pic = Path.of("./out/prof1");
         Path bg = Path.of("./out/prof2");
 
-//        HttpClient client = HttpClient.newHttpClient();
-//        HttpRequest request = HttpRequest.newBuilder()
-//                .uri(URI.create("http://localhost:8080/profiles/user719066ad-4efe-8f14"))
-//                .timeout(Duration.ofSeconds(10))
-//                .header("Content-Type", "multipart/form-data")
-//                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY")
-//                .GET()
-//                .build();
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/profiles/user719066ad-4efe-8f14"))
+                .timeout(Duration.ofSeconds(10))
+                .header("Content-Type", "multipart/form-data")
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY")
+                .GET()
+                .build();
+
+        // Send the request and get the response
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+
+        if (response.statusCode() / 100 == 2) {
+            InputStream inputStream = response.body();
+//            System.out.println(new String(inputStream.readAllBytes()));
+
+            Profile profile = new Profile(MultipartHandler.readJson(inputStream, Profile.class));
+            System.out.println(profile);
+
+            MultipartHandler.readToFile(inputStream, pic);
+            MultipartHandler.readToFile(inputStream, bg);
+            inputStream.close();
+
+            System.out.println("test result: " + response.statusCode());
+        } else {
+            System.out.println("Server returned HTTP code " + response.statusCode());
+        }
+        client.close();
+
+//        HttpURLConnection con = getPostConnection(URI.create("http://localhost:8080/profiles/user719066ad-4efe-8f14").toURL());
+//        con.setRequestMethod("GET");
+//        con.setRequestProperty("Content-Type", "multipart/form-data");
+//        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY");
 //
-//        // Send the request and get the response
-//        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-//
-//        if (response.statusCode() / 100 == 2) {
-//            InputStream inputStream = response.body();
+//        InputStream inputStream = con.getInputStream();
+//        if (con.getResponseCode() / 100 == 2) {
 //            System.out.println(new String(inputStream.readAllBytes()));
 //
 ////            Profile profile = new Profile(MultipartHandler.readJson(inputStream, Profile.class));
@@ -77,32 +126,11 @@ public class RequestTest {
 ////            MultipartHandler.readToFile(inputStream, bg);
 //            inputStream.close();
 //
-//            System.out.println("test result: " + response.statusCode());
+//            System.out.println("test result: " + con.getResponseCode());
 //        } else {
-//            System.out.println("Server returned HTTP code " + response.statusCode());
+//            System.out.println("Server returned HTTP code " + con.getResponseCode());
 //        }
-//        client.close();
-
-        HttpURLConnection con = getPostConnection(URI.create("http://localhost:8080/profiles/user719066ad-4efe-8f14").toURL());
-        con.setRequestMethod("GET");
-        con.setRequestProperty("Content-Type", "multipart/form-data");
-        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY");
-
-        if (con.getResponseCode() / 100 == 2) {
-            InputStream inputStream = con.getInputStream();
-
-            Profile profile = new Profile(MultipartHandler.readJson(inputStream, Profile.class));
-            System.out.println(profile);
-
-            MultipartHandler.readToFile(inputStream, pic);
-            MultipartHandler.readToFile(inputStream, bg);
-            inputStream.close();
-
-            System.out.println("test result: " + con.getResponseCode());
-        } else {
-            System.out.println("Server returned HTTP code " + con.getResponseCode());
-        }
-        con.disconnect();
+//        con.disconnect();
     }
 
     @Test

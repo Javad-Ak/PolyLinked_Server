@@ -31,6 +31,7 @@ public class MultipartHandler {
             outputStream.write(buffer, 0, read);
             totalWrite += read;
         }
+
         outputStream.flush();
         inputStream.close();
     }
@@ -44,11 +45,12 @@ public class MultipartHandler {
         outputStream.flush();
     }
 
-    public static void readToFile(InputStream inputStream, Path path) throws IOException, NotAcceptableException {
+    public static File readToFile(InputStream inputStream, Path path) throws IOException, NotAcceptableException {
+        // path = directory + name without type
         JSONObject headers = getJson(inputStream);
         String[] type = headers.getString("Content-Type").split("/");
         int length = headers.getInt("Content-Length");
-        if (length == 0) return;
+        if (length == 0) return new File("null");
         if (!type[1].equals("file")) throw new NotAcceptableException("Invalid Content-Type");
 
         File file = new File(path + type[0].substring(type[0].lastIndexOf('.')));
@@ -74,6 +76,7 @@ public class MultipartHandler {
         }
         outputStream.flush();
         outputStream.close();
+        return file;
     }
 
     public static <T extends JsonSerializable> JSONObject readJson(InputStream inputStream, Class<T> cls) throws IOException, NotAcceptableException {

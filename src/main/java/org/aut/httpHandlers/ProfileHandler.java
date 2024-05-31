@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 
@@ -39,8 +40,17 @@ public class ProfileHandler implements HttpHandler {
                     if (method.equals("POST")) ProfileAccessor.addProfile(profile);
                     else ProfileAccessor.updateProfile(profile);
 
-                    MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.PATH_TO_PROFILES + "/" + profile.getUserId()));
-                    MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.PATH_TO_BACKGROUNDS + "/" + profile.getUserId()));
+                    File oldPic = MediaAccessor.getProfile(profile.getUserId());
+                    File newPic = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.PATH_TO_PROFILES + "/" + profile.getUserId()));
+                    if (newPic.length() > 0 && oldPic.length() > 0) {
+                        Files.delete(oldPic.toPath());
+                    }
+
+                    File oldBG = MediaAccessor.getBackGround(profile.getUserId());
+                    File newBG = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.PATH_TO_BACKGROUNDS + "/" + profile.getUserId()));
+                    if (oldBG.length() > 0 && newBG.length() > 0) {
+                        Files.delete(oldBG.toPath());
+                    }
 
                     inputStream.close();
                     code = 200;
@@ -48,7 +58,6 @@ public class ProfileHandler implements HttpHandler {
                 }
                 break;
                 case "GET": {
-                    exchange.sendResponseHeaders(200, 0);
                     String path = exchange.getRequestURI().getPath().split("/")[2];
                     Profile profile = ProfileAccessor.getProfile(path);
                     if (profile == null) throw new NotFoundException("Profile not found");
@@ -56,6 +65,7 @@ public class ProfileHandler implements HttpHandler {
                     File profilePicture = MediaAccessor.getProfile(profile.getUserId());
                     File background = MediaAccessor.getBackGround(profile.getUserId());
 
+                    exchange.sendResponseHeaders(200, 0);
                     OutputStream outputStream = exchange.getResponseBody();
                     MultipartHandler.writeJson(outputStream, profile);
                     MultipartHandler.writeFromFile(outputStream, profilePicture);

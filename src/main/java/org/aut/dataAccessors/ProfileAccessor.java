@@ -25,7 +25,7 @@ public class ProfileAccessor {
                     ", city TEXT" +
                     ", status TEXT" +
                     ", profession TEXT" +
-                    ", notify TEXT" +
+                    ", notify INT" +
                     ", FOREIGN KEY (userId)" +
                     " REFERENCES users (userId)" +
                     " ON UPDATE CASCADE" +
@@ -46,7 +46,7 @@ public class ProfileAccessor {
         statement.setString(4, profile.getCity());
         statement.setString(5, profile.getStatus());
         statement.setString(6, profile.getProfession());
-        statement.setBoolean(7, profile.getNotify());
+        statement.setInt(7, profile.getNotify());
 
         statement.executeUpdate();
         statement.close();
@@ -66,7 +66,7 @@ public class ProfileAccessor {
         statement.setString(3, profile.getCity());
         statement.setString(4, profile.getStatus());
         statement.setString(5, profile.getProfession());
-        statement.setBoolean(6, profile.getNotify());
+        statement.setInt(6, profile.getNotify());
         statement.setString(7, profile.getUserId());
 
         statement.executeUpdate();

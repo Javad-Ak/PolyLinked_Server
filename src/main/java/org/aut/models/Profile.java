@@ -11,10 +11,10 @@ public class Profile implements JsonSerializable {
     private final String city;  // 60 ch
     private final Status status;
     private final Profession profession;
-    private final Boolean notify;
+    private final int notify;
     // + Skills(relatively), Educations, CallInfo
 
-    public Profile(String userID, String bio, String country, String city, Status status, Profession profession, boolean notify) throws NotAcceptableException {
+    public Profile(String userID, String bio, String country, String city, Status status, Profession profession, int notify) throws NotAcceptableException {
         validateFields(bio, country, city);
 
         this.userId = userID;
@@ -34,7 +34,7 @@ public class Profile implements JsonSerializable {
             city = profile.getString("city");
             status = Status.valueOf(profile.getString("status"));
             profession = Profession.valueOf(profile.getString("profession"));
-            notify = profile.getBoolean("notify");
+            notify = profile.getInt("notify");
         } catch (JSONException e) {
             throw new NotAcceptableException("JSON could not be parsed");
         }
@@ -50,7 +50,7 @@ public class Profile implements JsonSerializable {
                 ", city: " + city.toUpperCase() +
                 ", status: " + status.toString() +
                 ", profession: " + profession.toString() +
-                ", notify: " + notify.toString() +
+                ", notify: " + notify +
                 '}';
     }
 
@@ -91,7 +91,7 @@ public class Profile implements JsonSerializable {
         return profession.toString();
     }
 
-    public boolean getNotify() {
+    public int getNotify() {
         return notify;
     }
 

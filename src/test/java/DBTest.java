@@ -56,11 +56,11 @@ public class DBTest {
             System.out.println("User exists" + e.getMessage());
         }
 
-        Profile prof = new Profile(user1.getUserId(), "aaa", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, true);
+        Profile prof = new Profile(user1.getUserId(), "aaa", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, 1);
         ProfileAccessor.addProfile(prof);
         System.out.println("profile added successfully");
 
-        ProfileAccessor.updateProfile(new Profile(user1.getUserId(), "updated", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, true));
+        ProfileAccessor.updateProfile(new Profile(user1.getUserId(), "updated", "ddd", "jjj", Profile.Status.JOB_SEARCHER, Profile.Profession.ACTOR, 1));
         System.out.println("profile updated successfully");
 
         Profile p2 = ProfileAccessor.getProfile("user9227641a-49d4-ac0c");
