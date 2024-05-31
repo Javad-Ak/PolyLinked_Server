@@ -21,11 +21,13 @@ public class Skill implements JsonSerializable {
         this.text = text;
     }
 
-    public Skill(JSONObject jsonObject) {
+    public Skill(JSONObject jsonObject) throws NotAcceptableException {
         this.skillId = jsonObject.getString("skillId");
         this.userId = jsonObject.getString("profile_id");
         this.educationId = jsonObject.getString("education_id");
         this.text = jsonObject.getString("name");
+
+        if (text == null || text.length() > 40) throw new NotAcceptableException("Invalid Arguments");
     }
 
     public String getSkillId() {

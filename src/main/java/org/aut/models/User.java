@@ -20,18 +20,15 @@ public class User implements JsonSerializable {
 
     public User(String email, String password, String firstName, String lastName, String additionalName) throws NotAcceptableException {
         String id = "user" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
-        try {
-            validateFields(email, password, firstName, lastName, additionalName);
-            this.userId = id;
-            this.email = email;
-            this.password = password;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.additionalName = additionalName;
-            createDate = new Date(System.currentTimeMillis());
-        } catch (JSONException e) {
-            throw new NotAcceptableException("Wrong jsonObject");
-        }
+
+        validateFields(email, password, firstName, lastName, additionalName);
+        this.userId = id;
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.additionalName = additionalName;
+        createDate = new Date(System.currentTimeMillis());
     }
 
     public User(JSONObject json) throws NotAcceptableException {
