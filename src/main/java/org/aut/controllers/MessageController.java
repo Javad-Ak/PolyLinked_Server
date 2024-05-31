@@ -2,8 +2,6 @@ package org.aut.controllers;
 
 import org.aut.dataAccessors.ConnectAccessor;
 import org.aut.dataAccessors.MessageAccessor;
-import org.aut.dataAccessors.UserAccessor;
-import org.aut.models.Connect;
 import org.aut.models.Message;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
@@ -21,11 +19,13 @@ public class MessageController {
         }
         MessageAccessor.addMessage(message);
     }
+
     public static void deleteMessage(String messageId) throws SQLException, NotFoundException, NotAcceptableException {
-        if (!MessageAccessor.messageExists(messageId)) {
+        if (messageId == null || messageId.isEmpty()) {
+            throw new NotAcceptableException("Null or empty messageId");
+        } else if (!MessageAccessor.messageExists(messageId)) {
             throw new NotFoundException("Message not found");
-        } else {
-            MessageAccessor.deleteMessage(messageId);
         }
+        MessageAccessor.deleteMessage(messageId);
     }
 }
