@@ -25,7 +25,6 @@ public class ProfileHandler implements HttpHandler {
         String method = exchange.getRequestMethod();
         String jwt = exchange.getRequestHeaders().getFirst("Authorization");
 
-        int code = 405;
         try {
             User user = LoginHandler.getUserByToken(jwt);
 
@@ -51,10 +50,8 @@ public class ProfileHandler implements HttpHandler {
                     if (oldBG.length() > 0 && newBG.length() > 0) {
                         Files.delete(oldBG.toPath());
                     }
-
                     inputStream.close();
-                    code = 200;
-                    exchange.sendResponseHeaders(code, 0);
+                    exchange.sendResponseHeaders(200, 0);
                 }
                 break;
                 case "GET": {
@@ -75,20 +72,17 @@ public class ProfileHandler implements HttpHandler {
                 }
                 break;
                 default:
-                    exchange.sendResponseHeaders(code, 0);
+                    exchange.sendResponseHeaders(405, 0);
+                    break;
             }
         } catch (UnauthorizedException e) {
-            code = 401;
-            exchange.sendResponseHeaders(code, 0);
+            exchange.sendResponseHeaders(401, 0);
         } catch (SQLException e) {
-            code = 500;
-            exchange.sendResponseHeaders(code, 0);
+            exchange.sendResponseHeaders(500, 0);
         } catch (NotAcceptableException e) {
-            code = 406;
-            exchange.sendResponseHeaders(code, 0);
+            exchange.sendResponseHeaders(406, 0);
         } catch (NotFoundException e) {
-            code = 404;
-            exchange.sendResponseHeaders(code, 0);
+            exchange.sendResponseHeaders(404, 0);
         }
         exchange.close();
     }
