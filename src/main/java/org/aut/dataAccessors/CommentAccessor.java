@@ -57,7 +57,7 @@ public class CommentAccessor {
         }
     }
 
-    private synchronized static ArrayList<Comment> getCommentsOfPost(String postId) throws SQLException {
+    public synchronized static ArrayList<Comment> getCommentsOfPost(String postId) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM comments WHERE postId = ?");
         statement.setString(1, postId);
         ResultSet resultSet = statement.executeQuery();
@@ -73,5 +73,17 @@ public class CommentAccessor {
             }
         }
         return comments;
+    }
+
+    public synchronized static int countPostComments(String postId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM comments WHERE postId = ?;");
+        statement.setString(1, postId);
+        ResultSet resultSet = statement.executeQuery();
+        resultSet.last();
+        int count = resultSet.getRow();
+
+        statement.close();
+        resultSet.close();
+        return count;
     }
 }

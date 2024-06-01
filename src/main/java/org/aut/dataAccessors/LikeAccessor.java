@@ -62,6 +62,18 @@ public class LikeAccessor {
         return like;
     }
 
+    public synchronized static int countPostLikes(String postId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM likes WHERE postId = ?;");
+        statement.setString(1, postId);
+        ResultSet resultSet = statement.executeQuery();
+        resultSet.last();
+        int count = resultSet.getRow();
+
+        statement.close();
+        resultSet.close();
+        return count;
+    }
+
     public synchronized static ArrayList<User> getLikersOfPost(String postId) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE userId = (SELECT likes.userId FROM likes where postId = ?);");
         statement.setString(1, postId);

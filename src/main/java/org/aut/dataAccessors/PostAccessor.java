@@ -58,7 +58,10 @@ public class PostAccessor {
 
     public synchronized static Post getPostById(String postId) throws SQLException, NotFoundException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM posts WHERE postId = ?;");
-        return getPostFromResultSet(postId, statement);
+        Post post = getPostFromResultSet(postId, statement);
+        post.setCommentsCount(CommentAccessor.countPostComments(postId));
+        post.setLikesCount(LikeAccessor.countPostLikes(postId));
+        return post;
     }
 
     public synchronized static void updatePost(Post post) throws SQLException {
