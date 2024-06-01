@@ -4,11 +4,14 @@ import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
+
 public class Connect {
     private final String applicant_id;
     private final String acceptor_id;
     private final String note;
     private final AcceptState accept_state;
+    private final Date create_date;
 
     public Connect(String applicant_id, String acceptor_id, String note, AcceptState accept_state) throws NotAcceptableException {
         validateFields(applicant_id, acceptor_id, note);
@@ -16,6 +19,7 @@ public class Connect {
         this.acceptor_id = acceptor_id;
         this.note = note;
         this.accept_state = accept_state;
+        this.create_date = new Date(System.currentTimeMillis());
     }
 
     public Connect(JSONObject json) throws NotAcceptableException {
@@ -24,6 +28,7 @@ public class Connect {
             this.acceptor_id = json.getString("acceptor_id");
             this.accept_state = AcceptState.valueOf(json.getString("accept_state"));
             this.note = json.getString("note");
+            this.create_date = new Date(json.getLong("create_date"));
         } catch (JSONException e) {
             throw new NotAcceptableException("Wrong jsonObject");
         }
@@ -46,6 +51,10 @@ public class Connect {
         return accept_state.value;
     }
 
+    public Date getCreate_date() {
+        return create_date;
+    }
+
     @Override
     public String toString() {
         return "{" +
@@ -53,6 +62,7 @@ public class Connect {
                 ", acceptor_id:" + acceptor_id +
                 ", accept_state:" + accept_state.toString() +
                 ", note:" + note +
+                ", create_date:" + create_date.getTime() +
                 "}";
     }
 
@@ -62,7 +72,7 @@ public class Connect {
 
     public static void validateFields(String applicantId, String acceptorId, String note) throws NotAcceptableException {
         if (applicantId == null || acceptorId == null || note == null || note.length() >= 500) {
-            throw new NotAcceptableException("Some fields are null");
+            throw new NotAcceptableException("invalid argument");
         }
     }
 

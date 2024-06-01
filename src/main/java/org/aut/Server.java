@@ -29,6 +29,7 @@ public class Server {
             server.createContext("/connections", new ConnectHandler());
             server.createContext("/posts", new PostHandler());
             server.createContext("/likes", new LikeHandler());
+            server.createContext("/messages" , new MessageHandler());
 
             server.setExecutor(Executors.newFixedThreadPool(8));
             server.start();

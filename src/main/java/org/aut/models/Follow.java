@@ -48,7 +48,7 @@ public final class Follow implements JsonSerializable {
 
     private static void validateFields(String follower, String followed) throws NotAcceptableException {
         if (follower == null || followed == null || followed.equals(follower))
-            throw new NotAcceptableException("some fields are null");
+            throw new NotAcceptableException("invalid argument");
     }
 
     public String follower() {

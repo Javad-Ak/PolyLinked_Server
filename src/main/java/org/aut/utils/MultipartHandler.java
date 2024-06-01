@@ -1,6 +1,7 @@
 package org.aut.utils;
 
 import org.aut.models.JsonSerializable;
+import org.aut.models.MediaLinked;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONObject;
 
@@ -39,14 +40,14 @@ public class MultipartHandler {
         inputStream.close();
     }
 
-    public static <T extends JsonSerializable> void writeMap(OutputStream outputStream, HashMap<T, File> map) throws NotAcceptableException, IOException {
+    public static <T extends JsonSerializable & MediaLinked> void writeMap(OutputStream outputStream, HashMap<T, File> map) throws NotAcceptableException, IOException {
         for (T obj : map.keySet()) {
             writeJson(outputStream, obj);
             writeFromFile(outputStream, map.get(obj));
         }
     }
 
-    private static void writeHeaders(OutputStream outputStream, String type, int length) throws IOException, NotAcceptableException {
+    private static void writeHeaders(OutputStream outputStream, String type, int length) throws IOException {
         JSONObject headers = new JSONObject();
         headers.put("Content-Type", type);
         headers.put("Content-Length", length);
@@ -89,20 +90,20 @@ public class MultipartHandler {
         return file;
     }
 
-    public static <T extends JsonSerializable> JSONObject readJson(InputStream inputStream, Class<T> cls) throws IOException, NotAcceptableException {
+    public static <T extends JsonSerializable> T readJson(InputStream inputStream, Class<T> cls) throws IOException, NotAcceptableException {
         JSONObject headers = getJson(inputStream);
         String[] type = headers.getString("Content-Type").split("/");
         if (type.length < 1 || (!type[1].equals("json") || !cls.getSimpleName().equals(type[0])))
             throw new NotAcceptableException("Invalid Content-Type");
 
-        return getJson(inputStream);
+        return JsonSerializable.fromJson(getJson(inputStream), cls);
     }
 
-    public static <T extends JsonSerializable> HashMap<JSONObject, File> readMap(InputStream inputStream, ArrayList<Path> paths, Class<T> cls) throws NotAcceptableException, IOException {
-        HashMap<JSONObject, File> map = new HashMap<>();
-        for (Path path : paths) {
-            map.put(readJson(inputStream, cls), readToFile(inputStream, path));
-            cls.
+    public static <T extends JsonSerializable & MediaLinked > HashMap<T, File> readMap(InputStream inputStream, Path dir, Class<T> cls, int count) throws NotAcceptableException, IOException{
+        HashMap<T, File> map = new HashMap<>();
+        for (int i = 1; i <= count; i++) {
+            T obj = readJson(inputStream, cls);
+            map.put(obj, readToFile(inputStream, Path.of(dir + "/" + obj.getMediaId()))); //may need change
         }
         return map;
     }

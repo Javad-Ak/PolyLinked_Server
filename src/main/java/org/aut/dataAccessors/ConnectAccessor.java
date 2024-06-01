@@ -16,13 +16,14 @@ public class ConnectAccessor {
     private ConnectAccessor() {
     }
 
-    public static void createConnectTable() throws IOException {
+    static void createConnectTable() throws IOException {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS connects (" +
                     "applicant_id TEXT NOT NULL " +
                     ", acceptor_id TEXT NOT NULL" +
                     ", note TEXT NOT NULL" +
                     ", accept_state TEXT NOT NULL" +
+                    ", create_date BIGINT(20)" +
                     ", FOREIGN KEY (applicant_id , acceptor_id)" +
                     " REFERENCES users (userId, userId)" +
                     " ON UPDATE CASCADE" +
@@ -33,12 +34,13 @@ public class ConnectAccessor {
         }
     }
     public synchronized static void addConnect(Connect connect) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO connects (applicant_id , acceptor_id , note , accept_state) " +
-                "VALUES (?, ?, ? , ?)");
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO connects (applicant_id , acceptor_id , note , accept_state , create_date) " +
+                "VALUES (?, ?, ? , ? , ?)");
         statement.setString( 1, connect.getApplicant_id());
         statement.setString( 2, connect.getAcceptor_id());
         statement.setString(3 , connect.getNote());
         statement.setString(4 , connect.getAccept_state());
+        statement.setLong (5 , connect.getCreate_date().getTime());
         statement.executeUpdate();
         statement.close();
     }
@@ -64,7 +66,7 @@ public class ConnectAccessor {
 
     public synchronized static ArrayList<Connect> getRejectedConnectsOf(String userId) throws SQLException, NotAcceptableException {
         ArrayList<Connect> acceptedConnects ;
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM connects WHERE (applicant_id = ? OR acceptor_id = ?) AND accept_state = ?");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM connects WHERE (applicant_id = ? OR acceptor_id = ?) AND accept_state = ? ORDER BY create_date DESC ");
         statement.setString(1, userId);
         statement.setString(2, userId);
         statement.setString(3, Connect.AcceptState.REJECTED.toString());
@@ -76,7 +78,7 @@ public class ConnectAccessor {
 
     public synchronized static ArrayList<Connect> getWatingConnectsOf(String userId) throws SQLException, NotAcceptableException {
         ArrayList<Connect> acceptedConnects ;
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM connects WHERE acceptor_id = ? AND accept_state = ?");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM connects WHERE acceptor_id = ? AND accept_state = ? ORDER BY create_date DESC ");
         statement.setString(1, userId);
         statement.setString(2, Connect.AcceptState.WAITING.toString());
         acceptedConnects = getConnectListFromStatement(statement);

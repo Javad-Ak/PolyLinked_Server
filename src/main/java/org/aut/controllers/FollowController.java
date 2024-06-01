@@ -18,8 +18,18 @@ public class FollowController {
         } else if (follow.getFollowed().equals(follow.getFollower())) {
             throw new NotAcceptableException("User Can't follow himself");
         }
-
         FollowAccessor.addFollow(follow);
+    }
+
+    public static void deleteFollow(Follow follow) throws SQLException, NotFoundException, NotAcceptableException {
+        if (follow == null) {
+            throw new NotAcceptableException("Null follow");
+        } else if (!UserController.userExistsById(follow.getFollowed()) || !UserController.userExistsById(follow.getFollower())) {
+            throw new NotFoundException("User not found");
+        } else if (!FollowAccessor.followExists(follow)) {
+            throw new NotFoundException("Follow not found");
+        }
+        FollowAccessor.deleteFollow(follow);
     }
 
 }

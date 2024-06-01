@@ -1,27 +1,25 @@
-import org.aut.dataAccessors.*;
-import org.aut.models.Like;
+import org.aut.models.Message;
 import org.aut.models.Post;
 import org.aut.models.Profile;
-import org.aut.utils.JwtHandler;
 import org.aut.utils.MultipartHandler;
-import org.aut.utils.exceptions.NotAcceptableException;
+import org.aut.dataAccessors.UserAccessor;
 import org.aut.utils.exceptions.NotFoundException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
@@ -29,64 +27,7 @@ import org.aut.utils.JsonHandler;
 @DisplayName("------ Testing requests...")
 public class RequestTest {
     @Test
-    @DisplayName("---- Post test")
-    public void LikeTest() throws Exception {
-        // #### initial adding
-        DataBaseAccessor.create();
-        User user1 = new User("ali@gmail.com", "ali1222345", "Ali", "akbari", "ll");
-        User user2 = new User("javad@gmail.com", "ali1222345", "Ali", "akbari", "ll");
-        User user3 = new User("kasra@gmail.com", "ali1222345", "Ali", "akbari", "ll");
-        User[] users = {user1, user2, user3};
-
-        Post post = new Post(user1.getUserId(), "hey");
-        for (User user : users) {
-            try {
-                UserAccessor.addUser(user);
-            } catch (SQLException ignored) {
-            }
-        }
-        try {
-            PostAccessor.addPost(post);
-        } catch (NotAcceptableException ignored) {
-        }
-        Like like1 = new Like(post.getPostId(), user1.getUserId());
-        Like like2 = new Like(post.getPostId(), user2.getUserId());
-        try {
-            LikeAccessor.addLike(like1);
-            LikeAccessor.addLike(like2);
-        } catch (NotAcceptableException ignored) {
-        }
-
-        // ##### GET
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/likes/" + post.getPostId()))
-                .timeout(Duration.ofSeconds(10))
-                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzM3MTgxOWUtNDhkZC04NGE2IiwiaWF0IjoxNzE3MjQwMDgyLCJleHAiOjE3MTc4NDAwODJ9.dLa2qBp2irLr0J7LZyf4YHPnDQWmsgrRdz5ZYXrpaP4")
-                .GET()
-                .build();
-
-        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-        if (response.statusCode() / 100 == 2) {
-            InputStream inputStream = response.body();
-            System.out.println(response.headers());
-
-            ArrayList<Path> paths = new ArrayList<>();
-            paths.add(Path.of("./out/file1"));
-            paths.add(Path.of("./out/file2"));
-//            MultipartHandler.readMap(inputStream, paths, User.class);
-
-            inputStream.close();
-            System.out.println("test result: " + response.statusCode());
-        } else {
-            System.out.println("Server returned HTTP code " + response.statusCode());
-        }
-        client.close();
-    }
-
-    @Test
-    @DisplayName("---- Post test")
+    @DisplayName("---- post")
     public void PostTest() throws Exception {
         // ##### POST
         Post post = new Post("user75930fcf-4bc1-9675", "ddd");
@@ -126,7 +67,7 @@ public class RequestTest {
             InputStream inputStream = response.body();
 //            System.out.println(new String(inputStream.readAllBytes()));
 
-            Post seeked = new Post(MultipartHandler.readJson(inputStream, Post.class));
+            Post seeked = MultipartHandler.readJson(inputStream, Post.class);
             System.out.println(seeked);
 
             MultipartHandler.readToFile(inputStream, media);
@@ -148,9 +89,87 @@ public class RequestTest {
 
         HttpResponse<String> response2 = client2.send(request2, HttpResponse.BodyHandlers.ofString());
         if (response2.statusCode() / 100 == 2) {
+            System.out.println("test result: " + response2.statusCode());
+        } else {
+            System.out.println("Server returned HTTP code " + response2.statusCode());
+        }
+        client2.close();
+
+    }
+
+
+    @Test
+    @DisplayName("---- message")
+    public void MessageTest() throws Exception {
+        // ##### POST
+        Message message = new Message("user32734239-4c34-9d2f" , "user33374acb-40de-b57b", "ddd");
+        File pic = new File("./in/message1.jpg");
+
+        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/messages" ).toURL().openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "multipart/form-data");
+        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc");
+
+        con.setDoOutput(true);
+        OutputStream out = con.getOutputStream();
+        MultipartHandler.writeJson(out, message);
+        MultipartHandler.writeFromFile(out, pic);
+        out.close();
+
+        if (con.getResponseCode() / 100 == 2) {
+            System.out.println("POST test result: " + con.getResponseCode());
+        } else {
+            System.out.println("POST: Server returned HTTP code " + con.getResponseCode());
+        }
+        con.disconnect();
+
+//         ##### GET
+        ArrayList<Path> paths = new ArrayList<>();
+        Path media = Path.of("./out/prof1");
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/messages/" +message.getSenderId() + "&" + message.getReceiverId()))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc")
+                .GET()
+                .build();
+
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() / 100 == 2) {
+            InputStream inputStream = response.body();
+            HashMap <Message , File > fullMessages = new HashMap<>();
+            for(int i = 1; i <= Integer.parseInt(String.valueOf(response.headers().firstValue("X-Total-Count"))) ; i ++){
+                Message seeked = MultipartHandler.readJson(inputStream, Message.class);
+                File seekedFile = MultipartHandler.readToFile(inputStream, media);
+                fullMessages.put(seeked , seekedFile);
+                System.out.println("\n"+seeked + "\n");
+                System.out.println(seekedFile);
+
+            }
+//            System.out.println(new String(inputStream.readAllBytes()));
+//            MultipartHandler.readMap(inputStream , )
+
+            inputStream.close();
             System.out.println("test result: " + response.statusCode());
         } else {
             System.out.println("Server returned HTTP code " + response.statusCode());
+        }
+        client.close();
+
+        // #### DELETE
+        HttpClient client2 = HttpClient.newHttpClient();
+        HttpRequest request2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/messages/" + message.getId()))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc")
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response2 = client2.send(request2, HttpResponse.BodyHandlers.ofString());
+        if (response2.statusCode() / 100 == 2) {
+            System.out.println("DELETE test result: " + response2.statusCode());
+        } else {
+            System.out.println("DELETE: Server returned HTTP code " + response2.statusCode());
         }
         client2.close();
 
@@ -174,7 +193,7 @@ public class RequestTest {
             InputStream inputStream = response.body();
 //            System.out.println(new String(inputStream.readAllBytes()));
 
-            User user = new User(MultipartHandler.readJson(inputStream, User.class));
+            User user = MultipartHandler.readJson(inputStream, User.class);
             System.out.println(user);
 
             MultipartHandler.readToFile(inputStream, pic);
@@ -262,7 +281,7 @@ public class RequestTest {
             InputStream inputStream = response.body();
 //            System.out.println(new String(inputStream.readAllBytes()));
 
-            Profile profile = new Profile(MultipartHandler.readJson(inputStream, Profile.class));
+            Profile profile = MultipartHandler.readJson(inputStream, Profile.class);
             System.out.println(profile);
 
             MultipartHandler.readToFile(inputStream, pic);
