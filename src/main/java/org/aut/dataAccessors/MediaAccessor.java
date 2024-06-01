@@ -29,7 +29,8 @@ public class MediaAccessor {
         PROFILES(Path.of("./src/main/resources/profiles")),
         BACKGROUNDS(Path.of("./src/main/resources/backgrounds")),
         POSTS(Path.of("./src/main/resources/posts")),
-        MESSAGES(Path.of("./src/main/resources/messages"));
+        MESSAGES(Path.of("./src/main/resources/messages")),
+        COMMENTS(Path.of("./src/main/resources/comments"));
 
         private final Path value;
 

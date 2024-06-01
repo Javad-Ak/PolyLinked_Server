@@ -15,11 +15,12 @@ import java.util.ArrayList;
 
 public class MessageAccessor {
     private static final Connection connection = DataBaseAccessor.getConnection();
-    private MessageAccessor(){
+
+    private MessageAccessor() {
     }
 
     static void createMessageTable() throws IOException {
-        try(Statement statement = connection.createStatement()){
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS messages (" +
                     "id TEXT NOT NULL PRIMARY KEY" +
                     ", senderId TEXT NOT NULL" +
@@ -31,22 +32,23 @@ public class MessageAccessor {
                     "ON UPDATE CASCADE " +
                     "ON DELETE CASCADE " +
                     ");");
-        } catch ( Exception e) {
+        } catch (Exception e) {
             throw new RemoteException(e.getMessage());
         }
     }
 
-    public synchronized static void addMessage(Message message ) throws SQLException {
+    public synchronized static void addMessage(Message message) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("INSERT INTO messages (id , senderId , receiverId , text , createDate) " +
                 "VALUES (?, ?, ? , ? ,?)");
-        statement.setString( 1, message.getId() );
-        statement.setString( 2, message.getSenderId());
-        statement.setString(3 , message.getReceiverId());
-        statement.setString(4 , message.getText());
-        statement.setLong(5 , message.getCreateDate().getTime());
+        statement.setString(1, message.getId());
+        statement.setString(2, message.getSenderId());
+        statement.setString(3, message.getReceiverId());
+        statement.setString(4, message.getText());
+        statement.setLong(5, message.getCreateDate().getTime());
         statement.executeUpdate();
         statement.close();
     }
+
     public synchronized static void deleteMessage(String messageId) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("DELETE FROM messages WHERE id = ?");
         statement.setString(1, messageId);
@@ -54,12 +56,12 @@ public class MessageAccessor {
         statement.close();
     }
 
-    public synchronized static boolean messageExists (String messageId) throws SQLException , NotAcceptableException , NotFoundException {
-        Message message = null;
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM messages WHERE id = ?");
-        statement.setString(1, messageId);
-        ResultSet resultSet = statement.executeQuery();
-        return resultSet.next();
+    public synchronized static boolean messageExists(String messageId) throws SQLException, NotAcceptableException, NotFoundException {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM messages WHERE id = ?")) {
+            statement.setString(1, messageId);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next();
+        }
     }
 
     public synchronized static Message getMessageById(String messageId) throws SQLException, NotFoundException {
@@ -70,8 +72,8 @@ public class MessageAccessor {
 
     }
 
-    public synchronized static ArrayList<Message> getLastMessagesBetween(String user1 , String user2) throws SQLException, NotAcceptableException {
-        ArrayList <Message> acceptedConnects ;
+    public synchronized static ArrayList<Message> getLastMessagesBetween(String user1, String user2) throws SQLException, NotAcceptableException {
+        ArrayList<Message> acceptedConnects;
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM messages WHERE (senderId = ? AND receiverId = ?) OR (receiverId = ? AND senderId = ?) ORDER BY createDate DESC LIMIT 100");
         statement.setString(1, user1);
         statement.setString(2, user2);
@@ -93,13 +95,14 @@ public class MessageAccessor {
         resultSet.close();
         return messages;
     }
+
     private static Message getMessageFromResultSet(ResultSet resultSet) throws SQLException, NotFoundException {
         JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
         resultSet.close();
         if (jsonObject == null) {
             throw new NotFoundException("Message not Found");
         } else {
-            Message message ;
+            Message message;
             try {
                 message = new Message(jsonObject);
             } catch (NotAcceptableException e) {

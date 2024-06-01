@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
-public class Message implements JsonSerializable , MediaLinked {
+public class Message implements JsonSerializable, MediaLinked {
     private final String id;//UUID
     private final String senderId;
     private final String receiverId;
@@ -56,6 +56,7 @@ public class Message implements JsonSerializable , MediaLinked {
     public Date getCreateDate() {
         return createDate;
     }
+
     @Override
     public String getMediaId() {
         return id;
@@ -78,7 +79,7 @@ public class Message implements JsonSerializable , MediaLinked {
     }
 
     public static void validateFields(String senderId, String receiverId, String text) throws NotAcceptableException {
-        if (senderId == null || senderId.isEmpty() || receiverId == null || receiverId.isEmpty() || text == null) {
+        if (senderId == null || senderId.isEmpty() || receiverId == null || receiverId.isEmpty() || text == null || text.length() > 1900) {
             throw new NotAcceptableException("invalid argument");
         }
     }

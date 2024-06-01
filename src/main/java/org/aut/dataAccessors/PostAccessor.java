@@ -71,7 +71,7 @@ public class PostAccessor {
         statement.close();
     }
 
-    private static Post getPostFromResultSet(String input, PreparedStatement statement) throws SQLException, NotFoundException {
+    private static synchronized Post getPostFromResultSet(String input, PreparedStatement statement) throws SQLException, NotFoundException {
         statement.setString(1, input);
         ResultSet resultSet = statement.executeQuery();
         JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
