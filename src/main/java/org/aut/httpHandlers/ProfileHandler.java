@@ -33,7 +33,7 @@ public class ProfileHandler implements HttpHandler {
                 case "PUT": {
                     InputStream inputStream = exchange.getRequestBody();
 
-                    Profile profile = new Profile(MultipartHandler.readJson(inputStream, Profile.class));
+                    Profile profile = MultipartHandler.readJson(inputStream, Profile.class);
                     if (!profile.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
                     if (method.equals("POST")) ProfileAccessor.addProfile(profile);

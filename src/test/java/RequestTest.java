@@ -15,8 +15,11 @@ import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
@@ -64,7 +67,7 @@ public class RequestTest {
             InputStream inputStream = response.body();
 //            System.out.println(new String(inputStream.readAllBytes()));
 
-            Post seeked = new Post(MultipartHandler.readJson(inputStream, Post.class));
+            Post seeked = MultipartHandler.readJson(inputStream, Post.class);
             System.out.println(seeked);
 
             MultipartHandler.readToFile(inputStream, media);
@@ -121,31 +124,37 @@ public class RequestTest {
         con.disconnect();
 
 //         ##### GET
+        ArrayList<Path> paths = new ArrayList<>();
+        Path media = Path.of("./out/prof1");
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/messages/" +message.getSenderId() + "&" + message.getReceiverId()))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc")
+                .GET()
+                .build();
 
-//        Path media = Path.of("./out/prof1");
-//        HttpClient client = HttpClient.newHttpClient();
-//        HttpRequest request = HttpRequest.newBuilder()
-//                .uri(URI.create("http://localhost:8080/messages/" +message.getSenderId() + "&" + message.getReceiverId()))
-//                .timeout(Duration.ofSeconds(10))
-//                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc")
-//                .GET()
-//                .build();
-//
-//        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-//        if (response.statusCode() / 100 == 2) {
-//            InputStream inputStream = response.body();
-////            System.out.println(new String(inputStream.readAllBytes()));
-//
-//            Message seeked = new Message(MultipartHandler.readJson(inputStream, Message.class));
-//            System.out.println(seeked);
-//
-//            MultipartHandler.readToFile(inputStream, media);
-//            inputStream.close();
-//            System.out.println("test result: " + response.statusCode());
-//        } else {
-//            System.out.println("Server returned HTTP code " + response.statusCode());
-//        }
-//        client.close();
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() / 100 == 2) {
+            InputStream inputStream = response.body();
+            HashMap <Message , File > fullMessages = new HashMap<>();
+            for(int i = 1; i <= Integer.parseInt(String.valueOf(response.headers().firstValue("X-Total-Count"))) ; i ++){
+                Message seeked = MultipartHandler.readJson(inputStream, Message.class);
+                File seekedFile = MultipartHandler.readToFile(inputStream, media);
+                fullMessages.put(seeked , seekedFile);
+                System.out.println("\n"+seeked + "\n");
+                System.out.println(seekedFile);
+
+            }
+//            System.out.println(new String(inputStream.readAllBytes()));
+//            MultipartHandler.readMap(inputStream , )
+
+            inputStream.close();
+            System.out.println("test result: " + response.statusCode());
+        } else {
+            System.out.println("Server returned HTTP code " + response.statusCode());
+        }
+        client.close();
 
         // #### DELETE
         HttpClient client2 = HttpClient.newHttpClient();
@@ -184,7 +193,7 @@ public class RequestTest {
             InputStream inputStream = response.body();
 //            System.out.println(new String(inputStream.readAllBytes()));
 
-            User user = new User(MultipartHandler.readJson(inputStream, User.class));
+            User user = MultipartHandler.readJson(inputStream, User.class);
             System.out.println(user);
 
             MultipartHandler.readToFile(inputStream, pic);
@@ -272,7 +281,7 @@ public class RequestTest {
             InputStream inputStream = response.body();
 //            System.out.println(new String(inputStream.readAllBytes()));
 
-            Profile profile = new Profile(MultipartHandler.readJson(inputStream, Profile.class));
+            Profile profile = MultipartHandler.readJson(inputStream, Profile.class);
             System.out.println(profile);
 
             MultipartHandler.readToFile(inputStream, pic);

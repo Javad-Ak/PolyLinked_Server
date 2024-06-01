@@ -34,7 +34,7 @@ public class MessageHandler implements HttpHandler {
             switch (method) {
                 case "POST": {
                     InputStream inputStream = exchange.getRequestBody();
-                    Message message = new Message(MultipartHandler.readJson(inputStream, Message.class));
+                    Message message = MultipartHandler.readJson(inputStream, Message.class);
                     if (!message.getSenderId().equals(user.getUserId())) {
                         throw new UnauthorizedException("Unauthorized user");
                     }
