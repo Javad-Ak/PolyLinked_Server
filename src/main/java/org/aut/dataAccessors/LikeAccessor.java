@@ -66,7 +66,7 @@ public class LikeAccessor {
         return like;
     }
 
-    public synchronized static ArrayList<User> getLikersOfPost(String postId, String userId) throws SQLException {
+    public synchronized static ArrayList<User> getLikersOfPost(String postId) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM posts WHERE postId = ?;");
         statement.setString(1, postId);
         ArrayList<JSONObject> jsonArray = JsonHandler.getArrayFromResultSet(statement.executeQuery());
