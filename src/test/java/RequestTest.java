@@ -1,3 +1,4 @@
+import org.aut.models.Message;
 import org.aut.models.Post;
 import org.aut.models.Profile;
 import org.aut.utils.MultipartHandler;
@@ -23,7 +24,7 @@ import org.aut.utils.JsonHandler;
 @DisplayName("------ Testing requests...")
 public class RequestTest {
     @Test
-    @DisplayName("---- get a user")
+    @DisplayName("---- post")
     public void PostTest() throws Exception {
         // ##### POST
         Post post = new Post("user75930fcf-4bc1-9675", "ddd");
@@ -85,9 +86,81 @@ public class RequestTest {
 
         HttpResponse<String> response2 = client2.send(request2, HttpResponse.BodyHandlers.ofString());
         if (response2.statusCode() / 100 == 2) {
-            System.out.println("test result: " + response.statusCode());
+            System.out.println("test result: " + response2.statusCode());
         } else {
-            System.out.println("Server returned HTTP code " + response.statusCode());
+            System.out.println("Server returned HTTP code " + response2.statusCode());
+        }
+        client2.close();
+
+    }
+
+
+    @Test
+    @DisplayName("---- message")
+    public void MessageTest() throws Exception {
+        // ##### POST
+        Message message = new Message("user32734239-4c34-9d2f" , "user33374acb-40de-b57b", "ddd");
+        File pic = new File("./in/message1.jpg");
+
+        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/messages" ).toURL().openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "multipart/form-data");
+        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc");
+
+        con.setDoOutput(true);
+        OutputStream out = con.getOutputStream();
+        MultipartHandler.writeJson(out, message);
+        MultipartHandler.writeFromFile(out, pic);
+        out.close();
+
+        if (con.getResponseCode() / 100 == 2) {
+            System.out.println("POST test result: " + con.getResponseCode());
+        } else {
+            System.out.println("POST: Server returned HTTP code " + con.getResponseCode());
+        }
+        con.disconnect();
+
+//         ##### GET
+
+//        Path media = Path.of("./out/prof1");
+//        HttpClient client = HttpClient.newHttpClient();
+//        HttpRequest request = HttpRequest.newBuilder()
+//                .uri(URI.create("http://localhost:8080/messages/" +message.getSenderId() + "&" + message.getReceiverId()))
+//                .timeout(Duration.ofSeconds(10))
+//                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc")
+//                .GET()
+//                .build();
+//
+//        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+//        if (response.statusCode() / 100 == 2) {
+//            InputStream inputStream = response.body();
+////            System.out.println(new String(inputStream.readAllBytes()));
+//
+//            Message seeked = new Message(MultipartHandler.readJson(inputStream, Message.class));
+//            System.out.println(seeked);
+//
+//            MultipartHandler.readToFile(inputStream, media);
+//            inputStream.close();
+//            System.out.println("test result: " + response.statusCode());
+//        } else {
+//            System.out.println("Server returned HTTP code " + response.statusCode());
+//        }
+//        client.close();
+
+        // #### DELETE
+        HttpClient client2 = HttpClient.newHttpClient();
+        HttpRequest request2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/messages/" + message.getId()))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc")
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response2 = client2.send(request2, HttpResponse.BodyHandlers.ofString());
+        if (response2.statusCode() / 100 == 2) {
+            System.out.println("DELETE test result: " + response2.statusCode());
+        } else {
+            System.out.println("DELETE: Server returned HTTP code " + response2.statusCode());
         }
         client2.close();
 

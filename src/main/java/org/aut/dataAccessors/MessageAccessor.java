@@ -70,9 +70,9 @@ public class MessageAccessor {
 
     }
 
-    public synchronized static ArrayList<Message> getMessagesBetween(String user1 , String user2) throws SQLException, NotAcceptableException {
+    public synchronized static ArrayList<Message> getLastMessagesBetween(String user1 , String user2) throws SQLException, NotAcceptableException {
         ArrayList <Message> acceptedConnects ;
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM messages WHERE (senderId = ? AND receiverId = ?) OR (receiverId = ? AND senderId = ?) ORDER BY createDate DESC");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM messages WHERE (senderId = ? AND receiverId = ?) OR (receiverId = ? AND senderId = ?) ORDER BY createDate DESC LIMIT 100");
         statement.setString(1, user1);
         statement.setString(2, user2);
         statement.setString(3, user1);
@@ -97,13 +97,13 @@ public class MessageAccessor {
         JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
         resultSet.close();
         if (jsonObject == null) {
-            throw new NotFoundException("User not Found");
+            throw new NotFoundException("Message not Found");
         } else {
             Message message ;
             try {
-               message = new Message(jsonObject);
+                message = new Message(jsonObject);
             } catch (NotAcceptableException e) {
-                throw new NotFoundException("User not Found");
+                throw new NotFoundException("Message not Found");
             }
             return message;
         }

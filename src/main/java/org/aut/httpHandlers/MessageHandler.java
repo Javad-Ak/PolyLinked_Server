@@ -15,9 +15,11 @@ import org.aut.utils.exceptions.UnauthorizedException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 public class MessageHandler implements HttpHandler {
 
@@ -32,16 +34,16 @@ public class MessageHandler implements HttpHandler {
             switch (method) {
                 case "POST": {
                     InputStream inputStream = exchange.getRequestBody();
-
                     Message message = new Message(MultipartHandler.readJson(inputStream, Message.class));
-                    if (!message.getSenderId().equals(user.getUserId()))
+                    if (!message.getSenderId().equals(user.getUserId())) {
                         throw new UnauthorizedException("Unauthorized user");
-
+                    }
 
                     File media = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.MESSAGES.value() + "/" + message.getId()));
 
                     if (message.getText().trim().isEmpty() && media.length() < 1)
                         throw new NotAcceptableException("Not acceptable");
+
 
                     MessageController.addMessage(message);
 
@@ -54,31 +56,45 @@ public class MessageHandler implements HttpHandler {
                     String path = exchange.getRequestURI().getPath().split("/")[2];
                     Message message = MessageAccessor.getMessageById(path);
 
+                    if (!message.getSenderId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized user");
+
                     File media = MediaAccessor.getMedia(message.getId(), MediaAccessor.MediaPath.MESSAGES);
                     Files.deleteIfExists(media.toPath());
                     MessageController.deleteMessage(message.getId());
-
                     exchange.sendResponseHeaders(200, 0);
                 }
                 break;
 
+                case "GET":
+
+                    String path = exchange.getRequestURI().getPath().split("/")[2];
+                    String senderId = path.split("&")[0];
+                    String receiverId = path.split("&")[1];
+
+                    if (!senderId.equals(user.getUserId()) && !receiverId.equals(user.getUserId()))
+                        throw new UnauthorizedException("Unauthorized user");
+
+                    HashMap<Message, File> messages = MessageController.getLastMessages(senderId, receiverId);
+                    exchange.getResponseHeaders().set("X-Total-Count", "" + messages.size());
+                    exchange.sendResponseHeaders(200, 0);
+                    OutputStream outputStream = exchange.getResponseBody();
+                    MultipartHandler.writeMap(outputStream, messages);
+                    break;
+
+
                 default:
                     exchange.sendResponseHeaders(405, 0);
-                    break;
 
             }
 
 
         } catch (UnauthorizedException e) {
             exchange.sendResponseHeaders(401, 0);
-        } catch (
-                SQLException e) {
+        } catch (SQLException e) {
             exchange.sendResponseHeaders(500, 0);
-        } catch (
-                NotAcceptableException e) {
+        } catch (NotAcceptableException e) {
             exchange.sendResponseHeaders(406, 0);
-        } catch (
-                NotFoundException e) {
+        } catch (NotFoundException e) {
             exchange.sendResponseHeaders(404, 0);
         }
         exchange.close();
