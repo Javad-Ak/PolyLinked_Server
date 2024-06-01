@@ -1,8 +1,10 @@
-import org.aut.models.Message;
-import org.aut.models.Post;
-import org.aut.models.Profile;
+import org.aut.dataAccessors.DataBaseAccessor;
+import org.aut.dataAccessors.LikeAccessor;
+import org.aut.dataAccessors.PostAccessor;
+import org.aut.models.*;
 import org.aut.utils.MultipartHandler;
 import org.aut.dataAccessors.UserAccessor;
+import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
@@ -15,17 +17,70 @@ import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 
 @DisplayName("------ Testing requests...")
 public class RequestTest {
+    @Test
+    @DisplayName("---- Like test")
+    public void LikeTest() throws Exception {
+        // #### initial adding
+        DataBaseAccessor.create();
+        User user1 = new User("ali@gmail.com", "ali1222345", "Ali", "akbari", "ll");
+        User user2 = new User("javad@gmail.com", "ali1222345", "Ali", "akbari", "ll");
+        User user3 = new User("kasra@gmail.com", "ali1222345", "Ali", "akbari", "ll");
+        User[] users = {user1, user2, user3};
+
+        Post post = new Post(user1.getUserId(), "hey");
+        for (User user : users) {
+            try {
+                UserAccessor.addUser(user);
+            } catch (SQLException ignored) {
+            }
+        }
+        try {
+            PostAccessor.addPost(post);
+        } catch (NotAcceptableException ignored) {
+        }
+        Like like1 = new Like(post.getPostId(), user1.getUserId());
+        Like like2 = new Like(post.getPostId(), user2.getUserId());
+        try {
+            LikeAccessor.addLike(like1);
+            LikeAccessor.addLike(like2);
+        } catch (NotAcceptableException ignored) {
+        }
+
+        // ##### GET
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/likes/" + post.getPostId()))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMjY0NTg0ODUtNDVkMi1iYjkxIiwiaWF0IjoxNzE3MjY2ODI3LCJleHAiOjE3MTc4NjY4Mjd9.gmzugyupr_J5xoJx5vjxAjaKhJzIKyycRFr68LM4zB8")
+                .GET()
+                .build();
+
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() / 100 == 2) {
+            InputStream inputStream = response.body();
+            int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
+
+            HashMap<User, File> map = MultipartHandler.readMap(inputStream, Path.of("./out"), User.class, count);
+            inputStream.close();
+
+            System.out.println(map);
+            System.out.println("test result: " + response.statusCode());
+        } else {
+            System.out.println("Server returned HTTP code " + response.statusCode());
+        }
+        client.close();
+    }
+
     @Test
     @DisplayName("---- post")
     public void PostTest() throws Exception {
@@ -102,10 +157,10 @@ public class RequestTest {
     @DisplayName("---- message")
     public void MessageTest() throws Exception {
         // ##### POST
-        Message message = new Message("user32734239-4c34-9d2f" , "user33374acb-40de-b57b", "ddd");
+        Message message = new Message("user32734239-4c34-9d2f", "user33374acb-40de-b57b", "ddd");
         File pic = new File("./in/message1.jpg");
 
-        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/messages" ).toURL().openConnection();
+        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/messages").toURL().openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "multipart/form-data");
         con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc");
@@ -128,7 +183,7 @@ public class RequestTest {
         Path media = Path.of("./out/prof1");
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/messages/" +message.getSenderId() + "&" + message.getReceiverId()))
+                .uri(URI.create("http://localhost:8080/messages/" + message.getSenderId() + "&" + message.getReceiverId()))
                 .timeout(Duration.ofSeconds(10))
                 .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc")
                 .GET()
@@ -137,12 +192,12 @@ public class RequestTest {
         HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
         if (response.statusCode() / 100 == 2) {
             InputStream inputStream = response.body();
-            HashMap <Message , File > fullMessages = new HashMap<>();
-            for(int i = 1; i <= Integer.parseInt(String.valueOf(response.headers().firstValue("X-Total-Count"))) ; i ++){
+            HashMap<Message, File> fullMessages = new HashMap<>();
+            for (int i = 1; i <= Integer.parseInt(String.valueOf(response.headers().firstValue("X-Total-Count"))); i++) {
                 Message seeked = MultipartHandler.readJson(inputStream, Message.class);
                 File seekedFile = MultipartHandler.readToFile(inputStream, media);
-                fullMessages.put(seeked , seekedFile);
-                System.out.println("\n"+seeked + "\n");
+                fullMessages.put(seeked, seekedFile);
+                System.out.println("\n" + seeked + "\n");
                 System.out.println(seekedFile);
 
             }

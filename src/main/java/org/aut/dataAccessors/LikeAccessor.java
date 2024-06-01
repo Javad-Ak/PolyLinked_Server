@@ -73,7 +73,6 @@ public class LikeAccessor {
         statement.setString(1, postId);
         ArrayList<JSONObject> jsonArray = JsonHandler.getArrayFromResultSet(statement.executeQuery());
         statement.close();
-        System.out.println("***" + jsonArray);
 
         ArrayList<User> users = new ArrayList<>();
         for (JSONObject obj : jsonArray) {

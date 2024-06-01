@@ -2,6 +2,8 @@ package org.aut.httpHandlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.aut.controllers.PostController;
+import org.aut.controllers.UserController;
 import org.aut.dataAccessors.LikeAccessor;
 import org.aut.dataAccessors.MediaAccessor;
 import org.aut.models.Like;
@@ -44,19 +46,14 @@ public class LikeHandler implements HttpHandler {
                     String[] path = exchange.getRequestURI().getPath().split("/");
                     if (path.length < 3) throw new NotAcceptableException("Invalid path");
                     String postId = path[2];
-                    System.out.println(postId);
 
-                    ArrayList<User> users = LikeAccessor.getLikersOfPost(postId);
-                    System.out.println(users);
-                    HashMap<User, File> map = new HashMap<>();
-                    for (User person : users) {
-                        map.put(person, MediaAccessor.getMedia(person.getUserId(), MediaAccessor.MediaPath.PROFILES));
-                    }
-
-                    if (map.isEmpty()) throw new NotFoundException("Not found");
+                    HashMap<User, File> map = PostController.getLikersOfPost(postId);
+                    if (map.isEmpty())
+                        throw new NotFoundException("Not found");
                     else {
+                        exchange.getResponseHeaders().add("X-Total-Count", String.valueOf(map.size()));
                         exchange.sendResponseHeaders(200, 0);
-                        exchange.getResponseHeaders().add("X-Total-Count", String.valueOf(LikeAccessor.getLikersOfPost(postId).size()));
+
                         OutputStream outputStream = exchange.getResponseBody();
                         MultipartHandler.writeMap(outputStream, map);
                         outputStream.close();
