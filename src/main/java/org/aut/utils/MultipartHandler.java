@@ -1,11 +1,13 @@
 package org.aut.utils;
 
 import org.aut.models.JsonSerializable;
+import org.aut.models.MediaLinked;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.HashMap;
 
 public class MultipartHandler {
     private MultipartHandler() {
@@ -37,7 +39,14 @@ public class MultipartHandler {
         inputStream.close();
     }
 
-    private static void writeHeaders(OutputStream outputStream, String type, int length) throws IOException, NotAcceptableException {
+    public static <T extends JsonSerializable & MediaLinked> void writeMap(OutputStream outputStream, HashMap<T, File> map) throws NotAcceptableException, IOException {
+        for (T obj : map.keySet()) {
+            writeJson(outputStream, obj);
+            writeFromFile(outputStream, map.get(obj));
+        }
+    }
+
+    private static void writeHeaders(OutputStream outputStream, String type, int length) throws IOException {
         JSONObject headers = new JSONObject();
         headers.put("Content-Type", type);
         headers.put("Content-Length", length);
@@ -47,7 +56,6 @@ public class MultipartHandler {
     }
 
     public static File readToFile(InputStream inputStream, Path path) throws IOException, NotAcceptableException {
-        // path = directory + name without type
         JSONObject headers = getJson(inputStream);
         String[] type = headers.getString("Content-Type").split("/");
         int length = headers.getInt("Content-Length");
@@ -80,13 +88,22 @@ public class MultipartHandler {
         return file;
     }
 
-    public static <T extends JsonSerializable> JSONObject readJson(InputStream inputStream, Class<T> cls) throws IOException, NotAcceptableException {
+    public static <T extends JsonSerializable> T readJson(InputStream inputStream, Class<T> cls) throws IOException, NotAcceptableException {
         JSONObject headers = getJson(inputStream);
         String[] type = headers.getString("Content-Type").split("/");
         if (type.length < 1 || (!type[1].equals("json") || !cls.getSimpleName().equals(type[0])))
             throw new NotAcceptableException("Invalid Content-Type");
 
-        return getJson(inputStream);
+        return JsonSerializable.fromJson(getJson(inputStream), cls);
+    }
+
+    public static <T extends JsonSerializable & MediaLinked > HashMap<T, File> readMap(InputStream inputStream, Path dir, Class<T> cls, int count) throws NotAcceptableException, IOException{
+        HashMap<T, File> map = new HashMap<>();
+        for (int i = 1; i <= count; i++) {
+            T obj = readJson(inputStream, cls);
+            map.put(obj, readToFile(inputStream, Path.of(dir + "/" + obj.getMediaId()))); //may need change
+        }
+        return map;
     }
 
     private static JSONObject getJson(InputStream inputStream) throws IOException, NotAcceptableException {
@@ -97,6 +114,7 @@ public class MultipartHandler {
             if ((char) ch == '}') break;
         }
         if (res.isEmpty() || res.charAt(0) != '{' || res.charAt(res.length() - 1) != '}') {
+            System.out.println(res);
             throw new NotAcceptableException("Invalid headers");
         }
 

@@ -2,9 +2,10 @@ package org.aut.httpHandlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.aut.controllers.MessageController;
 import org.aut.dataAccessors.MediaAccessor;
-import org.aut.dataAccessors.PostAccessor;
-import org.aut.models.Post;
+import org.aut.dataAccessors.MessageAccessor;
+import org.aut.models.Message;
 import org.aut.models.User;
 import org.aut.utils.MultipartHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
@@ -18,8 +19,10 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.util.HashMap;
 
-public class PostHandler implements HttpHandler {
+public class MessageHandler implements HttpHandler {
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
@@ -27,62 +30,66 @@ public class PostHandler implements HttpHandler {
 
         try {
             User user = LoginHandler.getUserByToken(jwt);
+
             switch (method) {
-                case "PUT":
                 case "POST": {
                     InputStream inputStream = exchange.getRequestBody();
+                    Message message = MultipartHandler.readJson(inputStream, Message.class);
+                    if (!message.getSenderId().equals(user.getUserId())) {
+                        throw new UnauthorizedException("Unauthorized user");
+                    }
 
-                    Post post = MultipartHandler.readJson(inputStream, Post.class);
-                    if (!post.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
+                    File media = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.MESSAGES.value() + "/" + message.getId()));
 
-                    File newMedia = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.POSTS.value() + "/" + post.getPostId()));
-
-                    if (post.getText().trim().isEmpty() && newMedia.length() < 1)
+                    if (message.getText().trim().isEmpty() && media.length() < 1)
                         throw new NotAcceptableException("Not acceptable");
 
-                    if (method.equals("POST")) PostAccessor.addPost(post);
-                    else {
-                        PostAccessor.updatePost(post);
-                        File oldMedia = MediaAccessor.getMedia(post.getUserId(), MediaAccessor.MediaPath.POSTS);
-                        if (newMedia.length() > 0 && oldMedia.length() > 0)
-                            Files.delete(oldMedia.toPath());
-                    }
+
+                    MessageController.addMessage(message);
 
                     inputStream.close();
                     exchange.sendResponseHeaders(200, 0);
                 }
                 break;
-                case "GET": {
-                    String path = exchange.getRequestURI().getPath().split("/")[2];
-                    Post post = PostAccessor.getPostById(path);
 
-                    File media = MediaAccessor.getMedia(post.getPostId(), MediaAccessor.MediaPath.POSTS);
-
-                    exchange.sendResponseHeaders(200, 0);
-                    OutputStream outputStream = exchange.getResponseBody();
-                    MultipartHandler.writeJson(outputStream, post);
-                    MultipartHandler.writeFromFile(outputStream, media);
-
-                    outputStream.close();
-                }
-                break;
                 case "DELETE": {
                     String path = exchange.getRequestURI().getPath().split("/")[2];
-                    Post post = PostAccessor.getPostById(path);
+                    Message message = MessageAccessor.getMessageById(path);
 
-                    if (!post.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
+                    if (!message.getSenderId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized user");
 
-                    File media = MediaAccessor.getMedia(post.getPostId(), MediaAccessor.MediaPath.POSTS);
+                    File media = MediaAccessor.getMedia(message.getId(), MediaAccessor.MediaPath.MESSAGES);
                     Files.deleteIfExists(media.toPath());
-                    PostAccessor.deletePost(post.getPostId());
-
+                    MessageController.deleteMessage(message.getId());
                     exchange.sendResponseHeaders(200, 0);
                 }
                 break;
+
+                case "GET":
+
+                    String path = exchange.getRequestURI().getPath().split("/")[2];
+                    String senderId = path.split("&")[0];
+                    String receiverId = path.split("&")[1];
+
+                    if (!senderId.equals(user.getUserId()) && !receiverId.equals(user.getUserId()))
+                        throw new UnauthorizedException("Unauthorized user");
+
+                    HashMap<Message, File> messages = MessageController.getLastMessages(senderId, receiverId);
+
+                    exchange.getResponseHeaders().set("X-Total-Count", "" + messages.size());
+                    exchange.sendResponseHeaders(200, 0);
+                    OutputStream outputStream = exchange.getResponseBody();
+                    MultipartHandler.writeMap(outputStream, messages);
+                    outputStream.close();
+                    break;
+
+
                 default:
                     exchange.sendResponseHeaders(405, 0);
-                    break;
+
             }
+
+
         } catch (UnauthorizedException e) {
             exchange.sendResponseHeaders(401, 0);
         } catch (SQLException e) {

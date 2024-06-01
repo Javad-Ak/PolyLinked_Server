@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class JsonHandler {
     private JsonHandler() {
@@ -36,5 +37,18 @@ public class JsonHandler {
                 jsonObject.put(set.getMetaData().getColumnName(i), set.getObject(i));
         }
         return jsonObject.isEmpty() ? null : jsonObject;
+    }
+
+    public static ArrayList<JSONObject> getArrayFromResultSet(ResultSet set) throws SQLException {
+        ArrayList<JSONObject> jsonArray = new ArrayList<>();
+        while (set.next()) {
+            JSONObject obj = new JSONObject();
+            for (int i = 1; i <= set.getMetaData().getColumnCount(); i++) {
+                obj.put(set.getMetaData().getColumnName(i), set.getObject(i));
+            }
+            jsonArray.add(obj);
+        }
+        set.close();
+        return jsonArray;
     }
 }

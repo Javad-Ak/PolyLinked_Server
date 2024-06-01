@@ -1,5 +1,6 @@
 package org.aut.dataAccessors;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.nio.file.*;
@@ -32,7 +33,9 @@ public class DataBaseAccessor extends Thread {
         EducationAccessor.createTable();
         SkillsAccessor.createTable();
         CallInfoAccessor.createUserTable();
+        MessageAccessor.createMessageTable();
         PostAccessor.createTable();
+        LikeAccessor.createTable();
     }
 
     public static Connection getConnection() {

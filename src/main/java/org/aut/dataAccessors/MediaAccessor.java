@@ -28,7 +28,8 @@ public class MediaAccessor {
     public enum MediaPath {
         PROFILES(Path.of("./src/main/resources/profiles")),
         BACKGROUNDS(Path.of("./src/main/resources/backgrounds")),
-        POSTS(Path.of("./src/main/resources/posts"));
+        POSTS(Path.of("./src/main/resources/posts")),
+        MESSAGES(Path.of("./src/main/resources/messages"));
 
         private final Path value;
 

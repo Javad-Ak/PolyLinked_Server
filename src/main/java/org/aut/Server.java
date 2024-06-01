@@ -24,10 +24,12 @@ public class Server {
 
             server.createContext("/users", new UserHandler());
             server.createContext("/users/login", new LoginHandler());
-            server.createContext("/follows", new FollowHandler());
             server.createContext("/profiles", new ProfileHandler());
+            server.createContext("/follows", new FollowHandler());
             server.createContext("/connections", new ConnectHandler());
             server.createContext("/posts", new PostHandler());
+            server.createContext("/likes", new LikeHandler());
+            server.createContext("/messages" , new MessageHandler());
 
             server.setExecutor(Executors.newFixedThreadPool(8));
             server.start();

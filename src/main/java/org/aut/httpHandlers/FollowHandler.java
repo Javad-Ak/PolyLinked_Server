@@ -42,7 +42,7 @@ public class FollowHandler implements HttpHandler {
                 case "DELETE":
                     Follow follow = new Follow(jsonObject);
                     if (!jsonObject.isEmpty()) {
-                        FollowAccessor.deleteFollow(follow);
+                        FollowController.deleteFollow(follow);
                         code = 200;
 
                     } else if (!FollowAccessor.followExists(follow)) {

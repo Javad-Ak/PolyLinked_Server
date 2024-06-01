@@ -33,15 +33,20 @@ public class PostAccessor {
         }
     }
 
-    public synchronized static void addPost(Post post) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO posts (postId, userId, text, date) " +
-                "VALUES (?,?,?,?);");
-        statement.setString(1, post.getPostId());
-        statement.setString(2, post.getUserId());
-        statement.setString(3, post.getText());
-        statement.setLong(4, post.getDate());
-        statement.executeUpdate();
-        statement.close();
+    public synchronized static void addPost(Post post) throws SQLException, NotAcceptableException {
+        try {
+            getPostById(post.getPostId());
+            throw new NotAcceptableException("Already Exists.");
+        } catch (NotFoundException e) {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO posts (postId, userId, text, date) " +
+                    "VALUES (?,?,?,?);");
+            statement.setString(1, post.getPostId());
+            statement.setString(2, post.getUserId());
+            statement.setString(3, post.getText());
+            statement.setLong(4, post.getDate());
+            statement.executeUpdate();
+            statement.close();
+        }
     }
 
     public synchronized static void deletePost(String postId) throws SQLException {
