@@ -114,6 +114,7 @@ public class MultipartHandler {
             if ((char) ch == '}') break;
         }
         if (res.isEmpty() || res.charAt(0) != '{' || res.charAt(res.length() - 1) != '}') {
+            System.out.println(res);
             throw new NotAcceptableException("Invalid headers");
         }
 

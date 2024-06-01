@@ -1,3 +1,4 @@
+import org.aut.dataAccessors.MediaAccessor;
 import org.aut.models.Message;
 import org.aut.models.Post;
 import org.aut.models.Profile;
@@ -102,8 +103,8 @@ public class RequestTest {
     @DisplayName("---- message")
     public void MessageTest() throws Exception {
         // ##### POST
-        Message message = new Message("user32734239-4c34-9d2f" , "user33374acb-40de-b57b", "ddd");
-        File pic = new File("./in/message1.jpg");
+        Message message = new Message("user32734239-4c34-9d2f" , "user33374acb-40de-b57b", "jjj");
+        File pic = new File("./in/prof2.png");
 
         HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/messages" ).toURL().openConnection();
         con.setRequestMethod("POST");
@@ -125,10 +126,9 @@ public class RequestTest {
 
 //         ##### GET
         ArrayList<Path> paths = new ArrayList<>();
-        Path media = Path.of("./out/prof1");
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/messages/" +message.getSenderId() + "&" + message.getReceiverId()))
+                .uri(URI.create("http://localhost:8080/messages/" + "user32734239-4c34-9d2f" + "&" + "user33374acb-40de-b57b"))
                 .timeout(Duration.ofSeconds(10))
                 .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc")
                 .GET()
@@ -137,22 +137,21 @@ public class RequestTest {
         HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
         if (response.statusCode() / 100 == 2) {
             InputStream inputStream = response.body();
-            HashMap <Message , File > fullMessages = new HashMap<>();
-            for(int i = 1; i <= Integer.parseInt(String.valueOf(response.headers().firstValue("X-Total-Count"))) ; i ++){
-                Message seeked = MultipartHandler.readJson(inputStream, Message.class);
-                File seekedFile = MultipartHandler.readToFile(inputStream, media);
-                fullMessages.put(seeked , seekedFile);
-                System.out.println("\n"+seeked + "\n");
-                System.out.println(seekedFile);
+            HashMap <Message , File > fullMessages ;
+            int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
+            System.out.println(count);
+            fullMessages = MultipartHandler.readMap(inputStream , Path.of("./out") , Message.class , count );
+            System.out.println(fullMessages);
+//            System.out.println(new String(inputStream.readAllBytes()));
 
-            }
+
+            inputStream.close();
 //            System.out.println(new String(inputStream.readAllBytes()));
 //            MultipartHandler.readMap(inputStream , )
 
-            inputStream.close();
-            System.out.println("test result: " + response.statusCode());
+            System.out.println("GET test result: " + response.statusCode());
         } else {
-            System.out.println("Server returned HTTP code " + response.statusCode());
+            System.out.println("GET: Server returned HTTP code " + response.statusCode());
         }
         client.close();
 

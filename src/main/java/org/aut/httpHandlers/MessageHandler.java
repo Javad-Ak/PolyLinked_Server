@@ -75,10 +75,12 @@ public class MessageHandler implements HttpHandler {
                         throw new UnauthorizedException("Unauthorized user");
 
                     HashMap<Message, File> messages = MessageController.getLastMessages(senderId, receiverId);
+
                     exchange.getResponseHeaders().set("X-Total-Count", "" + messages.size());
                     exchange.sendResponseHeaders(200, 0);
                     OutputStream outputStream = exchange.getResponseBody();
                     MultipartHandler.writeMap(outputStream, messages);
+                    outputStream.close();
                     break;
 
 
