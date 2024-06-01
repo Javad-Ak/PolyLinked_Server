@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MultipartHandler {
@@ -56,6 +57,7 @@ public class MultipartHandler {
     }
 
     public static File readToFile(InputStream inputStream, Path path) throws IOException, NotAcceptableException {
+        // path = directory + name without type
         JSONObject headers = getJson(inputStream);
         String[] type = headers.getString("Content-Type").split("/");
         int length = headers.getInt("Content-Length");

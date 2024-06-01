@@ -1,15 +1,11 @@
 import org.aut.controllers.ConnectController;
 import org.aut.controllers.FollowController;
 import org.aut.controllers.UserController;
-import org.aut.dataAccessors.ProfileAccessor;
-import org.aut.dataAccessors.DataBaseAccessor;
-import org.aut.dataAccessors.UserAccessor;
-import org.aut.models.Connect;
-import org.aut.models.Follow;
-import org.aut.models.Profile;
-import org.aut.models.User;
+import org.aut.dataAccessors.*;
+import org.aut.models.*;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +14,37 @@ import java.sql.SQLException;
 
 @DisplayName("------ testing DataBase...")
 public class DBTest {
+    @Test
+    @DisplayName("---- testing users table")
+    public void LikeTest() throws Exception {
+        DataBaseAccessor.create();
+        User user1 = new User("ali@gmail.com", "ali1222345", "Ali", "akbari", "ll");
+        User user2 = new User("javad@gmail.com", "ali1222345", "Ali", "akbari", "ll");
+        User user3 = new User("kasra@gmail.com", "ali1222345", "Ali", "akbari", "ll");
+        User[] users = {user1, user2, user3};
+
+        Post post = new Post(user1.getUserId(), "hey");
+        for (User user : users) {
+            try {
+                UserAccessor.addUser(user);
+            } catch (SQLException ignored) {
+            }
+        }
+        try {
+            PostAccessor.addPost(post);
+        } catch (NotAcceptableException ignored) {
+        }
+        Like like1 = new Like(post.getPostId(), user1.getUserId());
+        Like like2 = new Like(post.getPostId(), user2.getUserId());
+        try {
+            LikeAccessor.addLike(like1);
+            LikeAccessor.addLike(like2);
+            LikeAccessor.deleteLike(like1.getPostId(), user1.getUserId());
+            System.out.println(LikeAccessor.getLike(like2.getPostId(), user2.getUserId()));
+        } catch (Exception ignored) {
+        }
+    }
+
     @Test
     @DisplayName("---- testing users table")
     public void UserTest() throws Exception {

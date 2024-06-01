@@ -21,13 +21,9 @@ public class LikeAccessor {
     static void createTable() throws IOException {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS likes (" +
-                    "postId TEXT NOT NULL" +
-                    ", userId TEXT NOT NULL" +
+                    "postId TEXT NOT NULL REFERENCES posts (postId) ON UPDATE CASCADE ON DELETE CASCADE" +
+                    ", userId TEXT NOT NULL REFERENCES posts (postId) ON UPDATE CASCADE ON DELETE CASCADE" +
                     ", date BIGINT NOT NULL" +
-                    ", FOREIGN KEY (postId, userId)" +
-                    " REFERENCES posts (postId, userId)" +
-                    " ON UPDATE CASCADE" +
-                    " ON DELETE CASCADE" +
                     ");");
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
@@ -58,7 +54,7 @@ public class LikeAccessor {
     }
 
     public synchronized static Like getLike(String postId, String userId) throws SQLException, NotFoundException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM posts WHERE postId = ? AND userId = ?;");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM likes WHERE postId = ? AND userId = ?;");
         statement.setString(1, postId);
         statement.setString(2, userId);
         Like like = getLikeFromResultSet(statement.executeQuery());
@@ -66,8 +62,8 @@ public class LikeAccessor {
         return like;
     }
 
-    public synchronized static ArrayList<User> getLikersOfPost(String postId, String userId) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM posts WHERE postId = ?;");
+    public synchronized static ArrayList<User> getLikersOfPost(String postId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE userId = (SELECT likes.userId FROM likes where postId = ?);");
         statement.setString(1, postId);
         ArrayList<JSONObject> jsonArray = JsonHandler.getArrayFromResultSet(statement.executeQuery());
         statement.close();
@@ -75,8 +71,8 @@ public class LikeAccessor {
         ArrayList<User> users = new ArrayList<>();
         for (JSONObject obj : jsonArray) {
             try {
-                users.add(UserAccessor.getUserById(obj.getString("UserId")));
-            } catch (NotFoundException ignored) {
+                users.add(new User(obj));
+            } catch (NotAcceptableException ignored) {
             }
         }
         return users;

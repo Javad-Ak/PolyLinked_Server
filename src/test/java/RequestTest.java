@@ -2,6 +2,10 @@ import org.aut.dataAccessors.MediaAccessor;
 import org.aut.models.Message;
 import org.aut.models.Post;
 import org.aut.models.Profile;
+import org.aut.dataAccessors.DataBaseAccessor;
+import org.aut.dataAccessors.LikeAccessor;
+import org.aut.dataAccessors.PostAccessor;
+import org.aut.models.*;
 import org.aut.utils.MultipartHandler;
 import org.aut.dataAccessors.UserAccessor;
 import org.aut.utils.exceptions.NotFoundException;
@@ -16,17 +20,44 @@ import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 
 @DisplayName("------ Testing requests...")
 public class RequestTest {
+    @Test
+    @DisplayName("---- Like test")
+    public void LikeTest() throws Exception {
+
+        // ##### GET
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/likes/" + "post34030bd0-42ba-88c8"))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMTgwMDQ3NmYtNDVhZS04NzMyIiwiaWF0IjoxNzE3MjcwNTc5LCJleHAiOjE3MTc4NzA1Nzl9.sx6P0kKps9Y4pdO4-NS4oFBtFN1zOQqy29RqBV0p5zI")
+                .GET()
+                .build();
+
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() / 100 == 2) {
+            InputStream inputStream = response.body();
+            int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
+
+            HashMap<User, File> map = MultipartHandler.readMap(inputStream, Path.of("./out"), User.class, count);
+            inputStream.close();
+
+            System.out.println(map);
+            System.out.println("test result: " + response.statusCode());
+        } else {
+            System.out.println("Server returned HTTP code " + response.statusCode());
+        }
+        client.close();
+    }
+
     @Test
     @DisplayName("---- post")
     public void PostTest() throws Exception {
@@ -103,10 +134,10 @@ public class RequestTest {
     @DisplayName("---- message")
     public void MessageTest() throws Exception {
         // ##### POST
-        Message message = new Message("user32734239-4c34-9d2f" , "user33374acb-40de-b57b", "jjj");
-        File pic = new File("./in/prof2.png");
+        Message message = new Message("user32734239-4c34-9d2f", "user33374acb-40de-b57b", "ddd");
+        File pic = new File("./in/message1.jpg");
 
-        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/messages" ).toURL().openConnection();
+        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/messages").toURL().openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "multipart/form-data");
         con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc");

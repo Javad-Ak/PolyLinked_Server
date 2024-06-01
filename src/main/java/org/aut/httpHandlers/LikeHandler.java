@@ -2,17 +2,25 @@ package org.aut.httpHandlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.aut.controllers.PostController;
+import org.aut.controllers.UserController;
 import org.aut.dataAccessors.LikeAccessor;
+import org.aut.dataAccessors.MediaAccessor;
 import org.aut.models.Like;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
+import org.aut.utils.MultipartHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
 import org.aut.utils.exceptions.UnauthorizedException;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class LikeHandler implements HttpHandler {
     @Override
@@ -35,12 +43,29 @@ public class LikeHandler implements HttpHandler {
                 }
                 break;
                 case "GET": {
+                    String[] path = exchange.getRequestURI().getPath().split("/");
+                    if (path.length < 3) throw new NotAcceptableException("Invalid path");
+                    String postId = path[2];
 
+                    HashMap<User, File> map = PostController.getLikersOfPost(postId);
+                    if (map.isEmpty())
+                        throw new NotFoundException("Not found");
+                    else {
+                        exchange.getResponseHeaders().add("X-Total-Count", String.valueOf(map.size()));
+                        exchange.sendResponseHeaders(200, 0);
+
+                        OutputStream outputStream = exchange.getResponseBody();
+                        MultipartHandler.writeMap(outputStream, map);
+                        outputStream.close();
+                    }
                 }
                 break;
                 case "DELETE": {
-                    String path = exchange.getRequestURI().getPath().split("/")[2];
-                    Like like = LikeAccessor.getLike(path.split("&")[0], path.split("&")[1]);
+                    String[] path = exchange.getRequestURI().getPath().split("/");
+                    if (path.length < 3 || path[2].split("&").length < 2)
+                        throw new NotAcceptableException("Invalid path");
+
+                    Like like = LikeAccessor.getLike(path[2].split("&")[0], path[2].split("&")[1]);
                     if (!like.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
                     LikeAccessor.deleteLike(like.getPostId(), like.getUserId());
