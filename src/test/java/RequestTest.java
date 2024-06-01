@@ -1,13 +1,17 @@
+import org.aut.dataAccessors.*;
+import org.aut.models.Like;
 import org.aut.models.Post;
 import org.aut.models.Profile;
+import org.aut.utils.JwtHandler;
 import org.aut.utils.MultipartHandler;
-import org.aut.dataAccessors.UserAccessor;
+import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.*;
@@ -15,7 +19,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.time.Duration;
+import java.util.ArrayList;
 
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
@@ -23,7 +29,64 @@ import org.aut.utils.JsonHandler;
 @DisplayName("------ Testing requests...")
 public class RequestTest {
     @Test
-    @DisplayName("---- get a user")
+    @DisplayName("---- Post test")
+    public void LikeTest() throws Exception {
+        // #### initial adding
+        DataBaseAccessor.create();
+        User user1 = new User("ali@gmail.com", "ali1222345", "Ali", "akbari", "ll");
+        User user2 = new User("javad@gmail.com", "ali1222345", "Ali", "akbari", "ll");
+        User user3 = new User("kasra@gmail.com", "ali1222345", "Ali", "akbari", "ll");
+        User[] users = {user1, user2, user3};
+
+        Post post = new Post(user1.getUserId(), "hey");
+        for (User user : users) {
+            try {
+                UserAccessor.addUser(user);
+            } catch (SQLException ignored) {
+            }
+        }
+        try {
+            PostAccessor.addPost(post);
+        } catch (NotAcceptableException ignored) {
+        }
+        Like like1 = new Like(post.getPostId(), user1.getUserId());
+        Like like2 = new Like(post.getPostId(), user2.getUserId());
+        try {
+            LikeAccessor.addLike(like1);
+            LikeAccessor.addLike(like2);
+        } catch (NotAcceptableException ignored) {
+        }
+
+        // ##### GET
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/likes/" + post.getPostId()))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzM3MTgxOWUtNDhkZC04NGE2IiwiaWF0IjoxNzE3MjQwMDgyLCJleHAiOjE3MTc4NDAwODJ9.dLa2qBp2irLr0J7LZyf4YHPnDQWmsgrRdz5ZYXrpaP4")
+                .GET()
+                .build();
+
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() / 100 == 2) {
+            InputStream inputStream = response.body();
+            System.out.println(response.headers());
+
+            ArrayList<Path> paths = new ArrayList<>();
+            paths.add(Path.of("./out/file1"));
+            paths.add(Path.of("./out/file2"));
+//            MultipartHandler.readMap(inputStream, paths, User.class);
+
+            inputStream.close();
+            System.out.println("test result: " + response.statusCode());
+        } else {
+            System.out.println("Server returned HTTP code " + response.statusCode());
+        }
+        client.close();
+    }
+
+    @Test
+    @DisplayName("---- Post test")
     public void PostTest() throws Exception {
         // ##### POST
         Post post = new Post("user75930fcf-4bc1-9675", "ddd");

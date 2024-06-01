@@ -102,6 +102,7 @@ public class MultipartHandler {
         HashMap<JSONObject, File> map = new HashMap<>();
         for (Path path : paths) {
             map.put(readJson(inputStream, cls), readToFile(inputStream, path));
+            cls.
         }
         return map;
     }

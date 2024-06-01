@@ -12,9 +12,9 @@ public class Like implements JsonSerializable {
     private final Date date;
 
 
-    public Like(String userId, String postId) {
-        this.userId = userId;
+    public Like(String postId, String userId) {
         this.postId = postId;
+        this.userId = userId;
         date = new Date(System.currentTimeMillis());
     }
 

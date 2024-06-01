@@ -43,20 +43,24 @@ public class LikeHandler implements HttpHandler {
                 case "GET": {
                     String[] path = exchange.getRequestURI().getPath().split("/");
                     if (path.length < 3) throw new NotAcceptableException("Invalid path");
-
                     String postId = path[2];
+                    System.out.println(postId);
+
                     ArrayList<User> users = LikeAccessor.getLikersOfPost(postId);
-
-                    exchange.sendResponseHeaders(200, 0);
-                    OutputStream outputStream = exchange.getResponseBody();
-
+                    System.out.println(users);
                     HashMap<User, File> map = new HashMap<>();
                     for (User person : users) {
                         map.put(person, MediaAccessor.getMedia(person.getUserId(), MediaAccessor.MediaPath.PROFILES));
                     }
 
-                    MultipartHandler.writeMap(outputStream, map);
-                    outputStream.close();
+                    if (map.isEmpty()) throw new NotFoundException("Not found");
+                    else {
+                        exchange.sendResponseHeaders(200, 0);
+                        exchange.getResponseHeaders().add("X-Total-Count", String.valueOf(LikeAccessor.getLikersOfPost(postId).size()));
+                        OutputStream outputStream = exchange.getResponseBody();
+                        MultipartHandler.writeMap(outputStream, map);
+                        outputStream.close();
+                    }
                 }
                 break;
                 case "DELETE": {
