@@ -53,9 +53,10 @@ public class PostHandler implements HttpHandler {
                 }
                 break;
                 case "GET": {
-                    String path = exchange.getRequestURI().getPath().split("/")[2];
-                    Post post = PostAccessor.getPostById(path);
+                    String[] path = exchange.getRequestURI().getPath().split("/");
+                    if (path.length < 3) throw new NotAcceptableException("Invalid path");
 
+                    Post post = PostAccessor.getPostById(path[2]);
                     File media = MediaAccessor.getMedia(post.getPostId(), MediaAccessor.MediaPath.POSTS);
 
                     exchange.sendResponseHeaders(200, 0);
@@ -67,8 +68,10 @@ public class PostHandler implements HttpHandler {
                 }
                 break;
                 case "DELETE": {
-                    String path = exchange.getRequestURI().getPath().split("/")[2];
-                    Post post = PostAccessor.getPostById(path);
+                    String[] path = exchange.getRequestURI().getPath().split("/");
+                    if (path.length < 3) throw new NotAcceptableException("Invalid path");
+
+                    Post post = PostAccessor.getPostById(path[2]);
 
                     if (!post.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 

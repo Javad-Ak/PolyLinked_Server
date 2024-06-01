@@ -41,7 +41,10 @@ public class LikeHandler implements HttpHandler {
                 }
                 break;
                 case "GET": {
-                    String postId = exchange.getRequestURI().getPath().split("/")[2];
+                    String[] path = exchange.getRequestURI().getPath().split("/");
+                    if (path.length < 3) throw new NotAcceptableException("Invalid path");
+
+                    String postId = path[2];
                     ArrayList<User> users = LikeAccessor.getLikersOfPost(postId);
 
                     exchange.sendResponseHeaders(200, 0);
@@ -49,7 +52,7 @@ public class LikeHandler implements HttpHandler {
 
                     HashMap<User, File> map = new HashMap<>();
                     for (User person : users) {
-                        map.put(person, MediaAccessor.getMedia(person.getUserId(), MediaAccessor.MediaPath.POSTS));
+                        map.put(person, MediaAccessor.getMedia(person.getUserId(), MediaAccessor.MediaPath.PROFILES));
                     }
 
                     MultipartHandler.writeMap(outputStream, map);
@@ -57,8 +60,11 @@ public class LikeHandler implements HttpHandler {
                 }
                 break;
                 case "DELETE": {
-                    String path = exchange.getRequestURI().getPath().split("/")[2];
-                    Like like = LikeAccessor.getLike(path.split("&")[0], path.split("&")[1]);
+                    String[] path = exchange.getRequestURI().getPath().split("/");
+                    if (path.length < 3 || path[2].split("&").length < 2)
+                        throw new NotAcceptableException("Invalid path");
+
+                    Like like = LikeAccessor.getLike(path[2].split("&")[0], path[2].split("&")[1]);
                     if (!like.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
                     LikeAccessor.deleteLike(like.getPostId(), like.getUserId());
