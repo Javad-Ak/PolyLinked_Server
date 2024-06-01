@@ -76,11 +76,10 @@ public class CommentAccessor {
     }
 
     public synchronized static int countPostComments(String postId) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM comments WHERE postId = ?;");
+        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM comments WHERE postId = ?;");
         statement.setString(1, postId);
         ResultSet resultSet = statement.executeQuery();
-        resultSet.last();
-        int count = resultSet.getRow();
+        int count = resultSet.getInt(1);
 
         statement.close();
         resultSet.close();

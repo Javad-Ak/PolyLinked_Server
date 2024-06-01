@@ -63,11 +63,10 @@ public class LikeAccessor {
     }
 
     public synchronized static int countPostLikes(String postId) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM likes WHERE postId = ?;");
+        PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM likes WHERE postId = ?;");
         statement.setString(1, postId);
         ResultSet resultSet = statement.executeQuery();
-        resultSet.last();
-        int count = resultSet.getRow();
+        int count = resultSet.getInt(1);
 
         statement.close();
         resultSet.close();
