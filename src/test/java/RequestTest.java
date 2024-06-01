@@ -18,7 +18,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,39 +28,14 @@ public class RequestTest {
     @Test
     @DisplayName("---- Like test")
     public void LikeTest() throws Exception {
-        // #### initial adding
-        DataBaseAccessor.create();
-        User user1 = new User("ali@gmail.com", "ali1222345", "Ali", "akbari", "ll");
-        User user2 = new User("javad@gmail.com", "ali1222345", "Ali", "akbari", "ll");
-        User user3 = new User("kasra@gmail.com", "ali1222345", "Ali", "akbari", "ll");
-        User[] users = {user1, user2, user3};
-
-        Post post = new Post(user1.getUserId(), "hey");
-        for (User user : users) {
-            try {
-                UserAccessor.addUser(user);
-            } catch (SQLException ignored) {
-            }
-        }
-        try {
-            PostAccessor.addPost(post);
-        } catch (NotAcceptableException ignored) {
-        }
-        Like like1 = new Like(post.getPostId(), user1.getUserId());
-        Like like2 = new Like(post.getPostId(), user2.getUserId());
-        try {
-            LikeAccessor.addLike(like1);
-            LikeAccessor.addLike(like2);
-        } catch (NotAcceptableException ignored) {
-        }
 
         // ##### GET
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/likes/" + post.getPostId()))
+                .uri(URI.create("http://localhost:8080/likes/" + "post34030bd0-42ba-88c8"))
                 .timeout(Duration.ofSeconds(10))
-                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMjY0NTg0ODUtNDVkMi1iYjkxIiwiaWF0IjoxNzE3MjY2ODI3LCJleHAiOjE3MTc4NjY4Mjd9.gmzugyupr_J5xoJx5vjxAjaKhJzIKyycRFr68LM4zB8")
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMTgwMDQ3NmYtNDVhZS04NzMyIiwiaWF0IjoxNzE3MjcwNTc5LCJleHAiOjE3MTc4NzA1Nzl9.sx6P0kKps9Y4pdO4-NS4oFBtFN1zOQqy29RqBV0p5zI")
                 .GET()
                 .build();
 

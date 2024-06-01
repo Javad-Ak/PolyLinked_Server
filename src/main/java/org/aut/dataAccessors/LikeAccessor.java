@@ -21,15 +21,9 @@ public class LikeAccessor {
     static void createTable() throws IOException {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS likes (" +
-                    "postId TEXT NOT NULL" +
-                    ", userId TEXT NOT NULL" +
+                    "postId TEXT NOT NULL REFERENCES posts (postId) ON UPDATE CASCADE ON DELETE CASCADE" +
+                    ", userId TEXT NOT NULL REFERENCES posts (postId) ON UPDATE CASCADE ON DELETE CASCADE" +
                     ", date BIGINT NOT NULL" +
-                    ", FOREIGN KEY (postId)" +
-                    " REFERENCES posts (postId)" +
-                    ", FOREIGN KEY (userId)" +
-                    " REFERENCES users (userId)" +
-                    " ON UPDATE CASCADE" +
-                    " ON DELETE CASCADE" +
                     ");");
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
@@ -69,7 +63,7 @@ public class LikeAccessor {
     }
 
     public synchronized static ArrayList<User> getLikersOfPost(String postId) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE userId = (SELECT likes.userId FROM likes WHERE postId = ?);");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE userId = (SELECT likes.userId FROM likes where postId = ?);");
         statement.setString(1, postId);
         ArrayList<JSONObject> jsonArray = JsonHandler.getArrayFromResultSet(statement.executeQuery());
         statement.close();
