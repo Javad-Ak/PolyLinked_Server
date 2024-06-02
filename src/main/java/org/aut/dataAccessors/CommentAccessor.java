@@ -1,8 +1,10 @@
 package org.aut.dataAccessors;
 
 import org.aut.models.Comment;
+import org.aut.models.Post;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
+import org.aut.utils.exceptions.NotFoundException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -49,14 +51,6 @@ public class CommentAccessor {
         statement.close();
     }
 
-    public synchronized static boolean commentExists(String id) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM comments WHERE id = ?")) {
-            statement.setString(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            return resultSet.next();
-        }
-    }
-
     public synchronized static ArrayList<Comment> getCommentsOfPost(String postId) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM comments WHERE postId = ?");
         statement.setString(1, postId);
@@ -84,5 +78,29 @@ public class CommentAccessor {
         statement.close();
         resultSet.close();
         return count;
+    }
+
+    public synchronized static Comment getCommentById(String id) throws SQLException, NotFoundException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM comments WHERE id = ?;");
+        return getCommentFromResultSet(id, statement);
+    }
+
+    private static synchronized Comment getCommentFromResultSet(String input, PreparedStatement statement) throws SQLException, NotFoundException {
+        statement.setString(1, input);
+        ResultSet resultSet = statement.executeQuery();
+        JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
+        resultSet.close();
+        statement.close();
+        if (jsonObject == null) {
+            throw new NotFoundException("User not Found");
+        } else {
+            Comment comment;
+            try {
+                comment = new Comment(jsonObject);
+            } catch (NotAcceptableException e) {
+                throw new NotFoundException("User not Found");
+            }
+            return comment;
+        }
     }
 }

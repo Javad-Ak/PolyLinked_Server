@@ -7,15 +7,14 @@ import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 
-public interface  JsonSerializable  {
+public interface JsonSerializable {
     JSONObject toJson();
-    static<T extends JsonSerializable> T fromJson(JSONObject jsonObject , Class<T> cls) throws NotAcceptableException {
+
+    static <T extends JsonSerializable> T fromJson(JSONObject jsonObject, Class<T> cls) throws NotAcceptableException {
         try {
             return Classes.getConstructor(cls, JSONObject.class).newInstance(jsonObject);
-        } catch (Exception e){
-            throw new NotAcceptableException("Json parse failure");
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new NotAcceptableException("Json constructor Not Found.");
         }
     }
-
-
 }

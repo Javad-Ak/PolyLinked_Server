@@ -1,8 +1,10 @@
 package org.aut;
 
 import com.sun.net.httpserver.HttpServer;
+
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
+
 import org.aut.dataAccessors.DataBaseAccessor;
 import org.aut.httpHandlers.FollowHandler;
 import org.aut.httpHandlers.LoginHandler;
@@ -29,7 +31,8 @@ public class Server {
             server.createContext("/connections", new ConnectHandler());
             server.createContext("/posts", new PostHandler());
             server.createContext("/likes", new LikeHandler());
-            server.createContext("/messages" , new MessageHandler());
+            server.createContext("/messages", new MessageHandler());
+            server.createContext("/comments", new CommentHandler());
 
             server.setExecutor(Executors.newFixedThreadPool(8));
             server.start();
