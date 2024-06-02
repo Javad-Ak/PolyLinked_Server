@@ -1,11 +1,16 @@
 package org.aut.controllers;
 
 import org.aut.dataAccessors.FollowAccessor;
+import org.aut.dataAccessors.MediaAccessor;
 import org.aut.models.Follow;
+import org.aut.models.User;
 import org.aut.utils.exceptions.NotFoundException;
 import org.aut.utils.exceptions.NotAcceptableException;
 
+import java.io.File;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class FollowController {
     public static void addFollow(Follow follow) throws SQLException, NotFoundException, NotAcceptableException {
@@ -32,4 +37,12 @@ public class FollowController {
         FollowAccessor.deleteFollow(follow);
     }
 
+    public static HashMap <User, File> getFollowersOf(String userId) throws SQLException , NotAcceptableException {
+        HashMap <User, File> fullFollowers = new HashMap <>();
+        ArrayList<User> followers = FollowAccessor.getFollowers(userId);
+        for (User user : followers) {
+            fullFollowers.put(user, MediaAccessor.getMedia(user.getUserId() , MediaAccessor.MediaPath.PROFILES));
+        }
+        return fullFollowers;
+    }
 }
