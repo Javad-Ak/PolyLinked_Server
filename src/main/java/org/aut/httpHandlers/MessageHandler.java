@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 public class MessageHandler implements HttpHandler {
 
@@ -75,7 +76,7 @@ public class MessageHandler implements HttpHandler {
                     if (!senderId.equals(user.getUserId()) && !receiverId.equals(user.getUserId()))
                         throw new UnauthorizedException("Unauthorized user");
 
-                    HashMap<Message, File> messages = MessageController.getLastMessages(senderId, receiverId);
+                    TreeMap<Message, File> messages = MessageController.getLastMessages(senderId, receiverId);
 
                     exchange.getResponseHeaders().set("X-Total-Count", "" + messages.size());
                     exchange.sendResponseHeaders(200, 0);

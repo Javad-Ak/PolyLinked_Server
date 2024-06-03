@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 public class CommentHandler implements HttpHandler {
     @Override
@@ -66,7 +67,7 @@ public class CommentHandler implements HttpHandler {
                     String[] path = exchange.getRequestURI().getPath().split("/");
                     if (path.length < 3) throw new NotAcceptableException("Invalid path");
 
-                    HashMap<Comment, File> comments = PostController.getCommentsOfPost(path[2]);
+                    TreeMap<Comment, File> comments = PostController.getCommentsOfPost(path[2]);
 
                     exchange.getResponseHeaders().set("X-Total-Count", "" + comments.size());
                     exchange.sendResponseHeaders(200, 0);

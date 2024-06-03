@@ -11,7 +11,7 @@ public class MediaHolder {
     private final File MediFile;
 
     public MediaHolder(User user, File profile, MediaLinked mediaLinked, File mediFile) throws NotAcceptableException {
-        if (user == null || (mediaLinked == null && mediFile == null)) throw new NotAcceptableException("Illegal args");
+        if (user == null || mediaLinked == null) throw new NotAcceptableException("Illegal args");
 
         this.user = user;
         this.profile = profile;

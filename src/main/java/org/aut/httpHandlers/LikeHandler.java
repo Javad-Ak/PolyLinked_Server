@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 public class LikeHandler implements HttpHandler {
     @Override
@@ -44,7 +45,7 @@ public class LikeHandler implements HttpHandler {
                     if (path.length < 3) throw new NotAcceptableException("Invalid path");
                     String postId = path[2];
 
-                    HashMap<User, File> map = PostController.getLikersOfPost(postId);
+                    TreeMap<User, File> map = PostController.getLikersOfPost(postId);
                     if (map.isEmpty())
                         throw new NotFoundException("Not found");
                     else {

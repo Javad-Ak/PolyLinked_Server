@@ -11,10 +11,11 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 public class PostController {
-    public static HashMap<User, File> getLikersOfPost(String postId) throws SQLException {
-        HashMap<User, File> map = new HashMap<>();
+    public static TreeMap<User, File> getLikersOfPost(String postId) throws SQLException {
+        TreeMap<User, File> map = new TreeMap<>();
         ArrayList<User> users = LikeAccessor.getLikersOfPost(postId);
         for (User user : users) {
             map.put(user, MediaAccessor.getMedia(user.getUserId(), MediaAccessor.MediaPath.PROFILES));
@@ -22,8 +23,8 @@ public class PostController {
         return map;
     }
 
-    public static HashMap<Comment, File> getCommentsOfPost(String postId) throws SQLException {
-        HashMap<Comment, File> map = new HashMap<>();
+    public static TreeMap<Comment, File> getCommentsOfPost(String postId) throws SQLException {
+        TreeMap<Comment, File> map = new TreeMap<>();
         ArrayList<Comment> comments = CommentAccessor.getCommentsOfPost(postId);
         for (Comment comment : comments) {
             map.put(comment, MediaAccessor.getMedia(comment.getId(), MediaAccessor.MediaPath.COMMENTS));

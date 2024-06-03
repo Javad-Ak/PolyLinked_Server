@@ -1,14 +1,16 @@
 package org.aut.utils;
 
 import org.aut.models.JsonSerializable;
+import org.aut.models.MediaHolder;
 import org.aut.models.MediaLinked;
+import org.aut.models.User;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.TreeMap;
 
 public class MultipartHandler {
     private MultipartHandler() {
@@ -44,10 +46,19 @@ public class MultipartHandler {
         inputStream.close();
     }
 
-    public static <T extends JsonSerializable & MediaLinked> void writeMap(OutputStream outputStream, HashMap<T, File> map) throws NotAcceptableException, IOException {
+    public static <T extends MediaLinked> void writeMap(OutputStream outputStream, TreeMap<T, File> map) throws NotAcceptableException, IOException {
         for (T obj : map.keySet()) {
             writeJson(outputStream, obj);
             writeFromFile(outputStream, map.get(obj));
+        }
+    }
+
+    public static void writeMediaHolders(OutputStream outputStream, ArrayList<MediaHolder> array) throws NotAcceptableException, IOException {
+        for (MediaHolder obj : array) {
+            writeJson(outputStream, obj.getUser());
+            writeFromFile(outputStream, obj.getProfile());
+            writeJson(outputStream, obj.getMediaLinked());
+            writeFromFile(outputStream, obj.getMediFile());
         }
     }
 
@@ -102,13 +113,26 @@ public class MultipartHandler {
         return JsonSerializable.fromJson(getJson(inputStream), cls);
     }
 
-    public static <T extends JsonSerializable & MediaLinked> HashMap<T, File> readMap(InputStream inputStream, Path dir, Class<T> cls, int count) throws NotAcceptableException, IOException {
-        HashMap<T, File> map = new HashMap<>();
+    public static <T extends MediaLinked> TreeMap<T, File> readMap(InputStream inputStream, Path dir, Class<T> cls, int count) throws NotAcceptableException, IOException {
+        TreeMap<T, File> map = new TreeMap<>();
         for (int i = 1; i <= count; i++) {
             T obj = readJson(inputStream, cls);
             map.put(obj, readToFile(inputStream, Path.of(dir + "/" + obj.getMediaId()))); //may need change
         }
         return map;
+    }
+
+    public static <T extends MediaLinked> ArrayList<MediaHolder> readMediaHolders(InputStream inputStream, Path dir, Class<T> cls, int count) throws NotAcceptableException, IOException {
+        ArrayList<MediaHolder> array = new ArrayList<>();
+        for (int i = 1; i <= count; i++) {
+            User user = readJson(inputStream, User.class);
+            File profile = readToFile(inputStream, Path.of(dir + "/" + user.getMediaId()));
+            T mediaLinked = readJson(inputStream, cls);
+            File mediFile = readToFile(inputStream, Path.of(dir + "/" + mediaLinked.getMediaId()));
+
+            array.add(new MediaHolder(user, profile, mediaLinked, mediFile));
+        }
+        return array;
     }
 
     private static JSONObject getJson(InputStream inputStream) throws IOException, NotAcceptableException {
