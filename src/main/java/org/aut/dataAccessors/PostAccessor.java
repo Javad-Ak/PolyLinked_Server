@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class PostAccessor {
     private static final Connection connection = DataBaseAccessor.getConnection();
@@ -69,6 +70,27 @@ public class PostAccessor {
         jsonObject.put("commentsCount", CommentAccessor.countPostComments(postId));
 
         return new Post(jsonObject);
+    }
+
+    public synchronized static ArrayList<Post> getPostsByHashtag(String input) throws SQLException, NotFoundException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM posts WHERE text REGEXP ?;");
+        statement.setString(1, "(?i)\\B#" + input + "\\w*\\b");
+        ResultSet resultSet = statement.executeQuery();
+        ArrayList<JSONObject> jsonArray = JsonHandler.getArrayFromResultSet(resultSet);
+        if (jsonArray.isEmpty()) throw new NotFoundException("Posts not found");
+
+        resultSet.close();
+        statement.close();
+
+        ArrayList<Post> posts = new ArrayList<>();
+        for (JSONObject jsonObject : jsonArray) {
+            try {
+                posts.add(new Post(jsonObject));
+            } catch (NotAcceptableException ignored) {
+            }
+        }
+
+        return posts;
     }
 
     public synchronized static void updatePost(Post post) throws SQLException {
