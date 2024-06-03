@@ -42,9 +42,9 @@ public class MessageHandler implements HttpHandler {
 
                     File media = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.MESSAGES.value() + "/" + message.getId()));
 
-                    if (message.getText().trim().isEmpty() && media != null)
+                    if (message.getText().trim().isEmpty() && media != null){
                         throw new NotAcceptableException("Not acceptable");
-
+                    }
 
                     MessageController.addMessage(message);
 
@@ -54,7 +54,11 @@ public class MessageHandler implements HttpHandler {
                 break;
 
                 case "DELETE": {
-                    String path = exchange.getRequestURI().getPath().split("/")[2];
+                    String [] splitPath = exchange.getRequestURI().getPath().split("/");
+                    if(splitPath.length != 3){
+                        throw new NotAcceptableException("Invalid path");
+                    }
+                    String path =splitPath[2];
                     Message message = MessageAccessor.getMessageById(path);
 
                     if (!message.getSenderId().equals(user.getUserId()))
@@ -69,7 +73,11 @@ public class MessageHandler implements HttpHandler {
 
                 case "GET":
 
-                    String path = exchange.getRequestURI().getPath().split("/")[2];
+                    String [] splitPath = exchange.getRequestURI().getPath().split("/");
+                    if(splitPath.length != 3 || splitPath[2].split("&").length != 2){
+                        throw new NotAcceptableException("Invalid path");
+                    }
+                    String path =splitPath[2];
                     String senderId = path.split("&")[0];
                     String receiverId = path.split("&")[1];
 

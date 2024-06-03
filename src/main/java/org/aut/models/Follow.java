@@ -6,38 +6,38 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class Follow implements JsonSerializable {
-    private final String follower;
-    private final String followed;
+    private final String follower_id;
+    private final String followed_id;
 
-    public Follow(String follower, String followed) throws NotAcceptableException {
-        validateFields(follower, followed);
-        this.follower = follower;
-        this.followed = followed;
+    public Follow(String follower_id, String followed_id) throws NotAcceptableException {
+        validateFields(follower_id, followed_id);
+        this.follower_id = follower_id;
+        this.followed_id = followed_id;
     }
 
     public Follow(JSONObject json) throws NotAcceptableException {
         try {
-            validateFields(json.getString("follower"), json.getString("followed"));
-            follower = json.getString("follower");
-            followed = json.getString("followed");
+            validateFields(json.getString("follower_id"), json.getString("followed_id"));
+            follower_id = json.getString("follower_id");
+            followed_id = json.getString("followed_id");
         } catch (JSONException e) {
             throw new NotAcceptableException("Wrong jsonObject");
         }
     }
 
-    public String getFollowed() {
-        return followed;
+    public String getFollowed_id() {
+        return followed_id;
     }
 
-    public String getFollower() {
-        return follower;
+    public String getFollower_id() {
+        return follower_id;
     }
 
     @Override
     public String toString() {
         return "{" +
-                "follower:" + follower
-                + ", followed:" + followed
+                "follower_id:" + follower_id
+                + ", followed_id:" + followed_id
                 + "}";
     }
 
@@ -52,11 +52,11 @@ public final class Follow implements JsonSerializable {
     }
 
     public String follower() {
-        return follower;
+        return follower_id;
     }
 
     public String followed() {
-        return followed;
+        return followed_id;
     }
 }
 

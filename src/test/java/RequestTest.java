@@ -1,6 +1,10 @@
+import org.aut.dataAccessors.MediaAccessor;
 import org.aut.models.Message;
 import org.aut.models.Post;
 import org.aut.models.Profile;
+import org.aut.dataAccessors.DataBaseAccessor;
+import org.aut.dataAccessors.LikeAccessor;
+import org.aut.dataAccessors.PostAccessor;
 import org.aut.models.*;
 import org.aut.utils.MultipartHandler;
 import org.aut.dataAccessors.UserAccessor;
@@ -19,6 +23,9 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.TreeMap;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.aut.utils.JsonHandler;
 
@@ -130,13 +137,13 @@ public class RequestTest {
     @DisplayName("---- message")
     public void MessageTest() throws Exception {
         // ##### POST
-        Message message = new Message("user32734239-4c34-9d2f", "user33374acb-40de-b57b", "ddd");
+        Message message = new Message("user71323753-4103-9147", "user159453ee-4f29-a71c", "ddd");
         File pic = new File("./in/message1.jpg");
 
         HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/messages").toURL().openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "multipart/form-data");
-        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc");
+        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzEzMjM3NTMtNDEwMy05MTQ3IiwiaWF0IjoxNzE3NDE4Nzg3LCJleHAiOjE3MTgwMTg3ODd9.d0gH5ClGaimpfwcceSsxxcMKIE4fevmf4s9JsQbCB3g");
 
         con.setDoOutput(true);
         OutputStream out = con.getOutputStream();
@@ -154,9 +161,9 @@ public class RequestTest {
 //         ##### GET
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/messages/" + "user32734239-4c34-9d2f" + "&" + "user33374acb-40de-b57b"))
+                .uri(URI.create("http://localhost:8080/messages/" + "user71323753-4103-9147" + "&" + "user159453ee-4f29-a71c"))
                 .timeout(Duration.ofSeconds(10))
-                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc")
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzEzMjM3NTMtNDEwMy05MTQ3IiwiaWF0IjoxNzE3NDE4Nzg3LCJleHAiOjE3MTgwMTg3ODd9.d0gH5ClGaimpfwcceSsxxcMKIE4fevmf4s9JsQbCB3g")
                 .GET()
                 .build();
 
@@ -429,5 +436,33 @@ public class RequestTest {
         } catch (NotFoundException e) {
             System.out.println("User not found.");
         }
+    }
+
+    @Test
+    @DisplayName("---- get followers of someone")
+    public void getFollowers() throws Exception {
+
+        HttpClient client = HttpClient.newHttpClient();
+        User user = UserAccessor.getUserById("user71323753-4103-9147");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/followers/user71323753-4103-9147"))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNjU3NTljMjctNGE0Yi1iZjBjIiwiaWF0IjoxNzE3NDA2NjQ5LCJleHAiOjE3MTgwMDY2NDl9.vzIFwlz04IIl4xoeYN-dbbSUwJbdYfUkIDOmadqTG70")
+                .GET()
+                .build();
+
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() / 100 == 2) {
+            InputStream inputStream = response.body();
+//            System.out.println(new String(inputStream.readAllBytes()));
+            int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
+            HashMap<User, File> fullFollowers = MultipartHandler.readMap(inputStream, Path.of("./out"), User.class, count);
+            inputStream.close();
+            System.out.println(fullFollowers);
+
+        } else {
+            System.out.println("Server returned HTTP code " + response.statusCode());
+        }
+        client.close();
     }
 }

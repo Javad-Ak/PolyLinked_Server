@@ -10,7 +10,7 @@ public class GeneralTests {
     @Test
     @DisplayName("---- JWT test")
     public void jwt() throws Exception {
-        String subject = "user1800476f-45ae-8732";
+        String subject = "user71323753-4103-9147";
         // Generate token
         String token = generateToken(subject);
         System.out.println("Generated Token: " + token);
