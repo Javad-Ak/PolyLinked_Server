@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
-public class Comment implements JsonSerializable, MediaLinked {
+public class Comment implements MediaLinked {
     private final String id;
     private final String userId;
     private final String postId;
@@ -60,6 +60,11 @@ public class Comment implements JsonSerializable, MediaLinked {
     @Override
     public String getMediaId() {
         return id;
+    }
+
+    @Override
+    public String getMediaURL() {
+        return MediaLinked.SERVER_ADDRESS + "comments/" + id;
     }
 
     @Override

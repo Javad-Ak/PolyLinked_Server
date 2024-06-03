@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
-public class Message implements JsonSerializable, MediaLinked {
+public class Message implements MediaLinked {
     private final String id;//UUID
     private final String senderId;
     private final String receiverId;
@@ -60,6 +60,11 @@ public class Message implements JsonSerializable, MediaLinked {
     @Override
     public String getMediaId() {
         return id;
+    }
+
+    @Override
+    public String getMediaURL() {
+        return MediaLinked.SERVER_ADDRESS + "messages/" + id;
     }
 
     @Override

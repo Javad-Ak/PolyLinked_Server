@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
-public class Post implements JsonSerializable, MediaLinked {
+public class Post implements MediaLinked {
     private final String postId;
     private final String userId;
     private final String text;
@@ -95,6 +95,11 @@ public class Post implements JsonSerializable, MediaLinked {
     @Override
     public String getMediaId() {
         return postId;
+    }
+
+    @Override
+    public String getMediaURL() {
+        return MediaLinked.SERVER_ADDRESS + "posts/" + postId;
     }
 
     @Override

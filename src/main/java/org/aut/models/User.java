@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 import java.util.UUID;
 
-public class User implements JsonSerializable , MediaLinked{
+public class User implements MediaLinked{
     private final String userId; // UUID
     private String email; // valid
     private String password; // > 7 ch, int
@@ -96,6 +96,11 @@ public class User implements JsonSerializable , MediaLinked{
     @Override
     public String getMediaId() {
         return userId;
+    }
+
+    @Override
+    public String getMediaURL() {
+        return MediaLinked.SERVER_ADDRESS + "profiles/" + userId;
     }
 
     private static void validateFields(String email, String password, String firstName, String lastName, String additionalName) throws NotAcceptableException {

@@ -4,7 +4,7 @@ import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Profile implements JsonSerializable , MediaLinked {
+public class Profile implements MediaLinked {
     private final String userId; // same as user id -> foreign key
     private final String bio; // 220 ch
     private final String country; // 60 ch
@@ -94,9 +94,15 @@ public class Profile implements JsonSerializable , MediaLinked {
     public int getNotify() {
         return notify;
     }
+
     @Override
     public String getMediaId() {
         return userId;
+    }
+
+    @Override
+    public String getMediaURL() {
+        return MediaLinked.SERVER_ADDRESS + "backgrounds/" + userId;
     }
 
     public enum Status {

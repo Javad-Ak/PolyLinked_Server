@@ -33,6 +33,7 @@ public class Server {
             server.createContext("/likes", new LikeHandler());
             server.createContext("/messages", new MessageHandler());
             server.createContext("/comments", new CommentHandler());
+            server.createContext("/resources", new ResourceHandler());
 
             server.setExecutor(Executors.newFixedThreadPool(8));
             server.start();

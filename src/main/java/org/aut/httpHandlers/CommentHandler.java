@@ -6,6 +6,7 @@ import org.aut.controllers.PostController;
 import org.aut.dataAccessors.CommentAccessor;
 import org.aut.dataAccessors.MediaAccessor;
 import org.aut.models.Comment;
+import org.aut.models.MediaHolder;
 import org.aut.models.User;
 import org.aut.utils.MultipartHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
@@ -19,7 +20,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 public class CommentHandler implements HttpHandler {
@@ -63,18 +64,26 @@ public class CommentHandler implements HttpHandler {
                     exchange.sendResponseHeaders(200, 0);
                 }
                 break;
-                case "GET":
-                    String[] path = exchange.getRequestURI().getPath().split("/");
-                    if (path.length < 3) throw new NotAcceptableException("Invalid path");
-
-                    TreeMap<Comment, File> comments = PostController.getCommentsOfPost(path[2]);
-
-                    exchange.getResponseHeaders().set("X-Total-Count", "" + comments.size());
-                    exchange.sendResponseHeaders(200, 0);
-                    OutputStream outputStream = exchange.getResponseBody();
-                    MultipartHandler.writeMap(outputStream, comments);
-                    outputStream.close();
-                    break;
+                case "GET": {
+//                    String[] path = exchange.getRequestURI().getPath().split("/");
+//                    if (path.length < 3) throw new NotAcceptableException("Invalid path");
+//
+//                    ArrayList<MediaHolder> comments = PostController.getCommentsOfPost(path[2]);
+//
+//                    exchange.getResponseHeaders().set("X-Total-Count", "" + comments.size()); // 10 each loop
+//                    exchange.sendResponseHeaders(200, 0);
+//
+//                    OutputStream outputStream = exchange.getResponseBody();
+//                    for (int i = 0; i < comments.size(); i += 11) {
+//                        MultipartHandler.writeMediaHolders(outputStream, comments.subList(i, i + 10));
+//                        try {
+//                            Thread.sleep(3000);
+//                        } catch (InterruptedException ignored) {
+//                        }
+//                    }
+//                    outputStream.close();
+                }
+                break;
                 default:
                     exchange.sendResponseHeaders(405, 0);
             }

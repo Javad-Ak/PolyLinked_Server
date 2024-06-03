@@ -1,16 +1,13 @@
 package org.aut.controllers;
 
-import org.aut.dataAccessors.CommentAccessor;
-import org.aut.dataAccessors.LikeAccessor;
-import org.aut.dataAccessors.MediaAccessor;
-import org.aut.dataAccessors.PostAccessor;
+import org.aut.dataAccessors.*;
 import org.aut.models.Comment;
 import org.aut.models.User;
+import org.aut.utils.exceptions.NotFoundException;
 
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 public class PostController {
@@ -23,11 +20,14 @@ public class PostController {
         return map;
     }
 
-    public static TreeMap<Comment, File> getCommentsOfPost(String postId) throws SQLException {
-        TreeMap<Comment, File> map = new TreeMap<>();
+    public static TreeMap<User, Comment> getCommentsOfPost(String postId) throws SQLException {
+        TreeMap<User, Comment> map = new TreeMap<>();
         ArrayList<Comment> comments = CommentAccessor.getCommentsOfPost(postId);
         for (Comment comment : comments) {
-            map.put(comment, MediaAccessor.getMedia(comment.getId(), MediaAccessor.MediaPath.COMMENTS));
+            try {
+                map.put(UserAccessor.getUserById(comment.getUserId()), comment);
+            } catch (NotFoundException ignored) {
+            }
         }
         return map;
     }
