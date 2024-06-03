@@ -1,6 +1,7 @@
 package org.aut.models;
 
 import org.aut.utils.exceptions.NotAcceptableException;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 

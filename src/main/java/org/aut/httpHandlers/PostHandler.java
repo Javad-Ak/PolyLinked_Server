@@ -6,6 +6,7 @@ import org.aut.dataAccessors.MediaAccessor;
 import org.aut.dataAccessors.PostAccessor;
 import org.aut.models.Post;
 import org.aut.models.User;
+import org.aut.utils.JsonHandler;
 import org.aut.utils.MultipartHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
@@ -35,7 +36,7 @@ public class PostHandler implements HttpHandler {
                     Post post = MultipartHandler.readObject(inputStream, Post.class);
                     if (!post.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
-                    File newMedia = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.POSTS.value() + "/" + post.getPostId()));
+                    File newMedia = MultipartHandler.readToFile(inputStream, MediaAccessor.MediaPath.POSTS.value(), post.getPostId());
                     if (post.getText().trim().isEmpty() && newMedia == null)
                         throw new NotAcceptableException("Not acceptable");
 
@@ -56,12 +57,9 @@ public class PostHandler implements HttpHandler {
                     if (path.length < 3) throw new NotAcceptableException("Invalid path");
 
                     Post post = PostAccessor.getPostById(path[2]);
-                    File media = MediaAccessor.getMedia(post.getPostId(), MediaAccessor.MediaPath.POSTS);
-
                     exchange.sendResponseHeaders(200, 0);
                     OutputStream outputStream = exchange.getResponseBody();
-                    MultipartHandler.writeObject(outputStream, post);
-                    MultipartHandler.writeFromFile(outputStream, media);
+                    JsonHandler.sendObject(outputStream, post.toJson());
 
                     outputStream.close();
                 }

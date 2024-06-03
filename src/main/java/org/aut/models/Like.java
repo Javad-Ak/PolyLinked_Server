@@ -7,8 +7,8 @@ import org.json.JSONObject;
 import java.util.Date;
 
 public class Like implements JsonSerializable {
-    private final String userId;
     private final String postId;
+    private final String userId;
     private final Date date;
 
 

@@ -56,12 +56,19 @@ public class PostAccessor {
         statement.close();
     }
 
-    public synchronized static Post getPostById(String postId) throws SQLException, NotFoundException {
+    public synchronized static Post getPostById(String postId) throws SQLException, NotFoundException, NotAcceptableException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM posts WHERE postId = ?;");
-        Post post = getPostFromResultSet(postId, statement);
-        post.setCommentsCount(CommentAccessor.countPostComments(postId));
-        post.setLikesCount(LikeAccessor.countPostLikes(postId));
-        return post;
+        statement.setString(1, postId);
+        ResultSet resultSet = statement.executeQuery();
+        JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
+        if (jsonObject == null) throw new NotFoundException("Post not found.");
+        resultSet.close();
+        statement.close();
+
+        jsonObject.put("likesCount", LikeAccessor.countPostLikes(postId));
+        jsonObject.put("commentsCount", CommentAccessor.countPostComments(postId));
+
+        return new Post(jsonObject);
     }
 
     public synchronized static void updatePost(Post post) throws SQLException {
@@ -72,24 +79,5 @@ public class PostAccessor {
         statement.setString(4, post.getPostId());
         statement.executeUpdate();
         statement.close();
-    }
-
-    private static synchronized Post getPostFromResultSet(String input, PreparedStatement statement) throws SQLException, NotFoundException {
-        statement.setString(1, input);
-        ResultSet resultSet = statement.executeQuery();
-        JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
-        resultSet.close();
-        statement.close();
-        if (jsonObject == null) {
-            throw new NotFoundException("User not Found");
-        } else {
-            Post post;
-            try {
-                post = new Post(jsonObject);
-            } catch (NotAcceptableException e) {
-                throw new NotFoundException("User not Found");
-            }
-            return post;
-        }
     }
 }

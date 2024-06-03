@@ -22,7 +22,7 @@ public class LikeAccessor {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS likes (" +
                     "postId TEXT NOT NULL REFERENCES posts (postId) ON UPDATE CASCADE ON DELETE CASCADE" +
-                    ", userId TEXT NOT NULL REFERENCES posts (postId) ON UPDATE CASCADE ON DELETE CASCADE" +
+                    ", userId TEXT NOT NULL REFERENCES users (userId) ON UPDATE CASCADE ON DELETE CASCADE" +
                     ", date BIGINT NOT NULL" +
                     ");");
         } catch (Exception e) {

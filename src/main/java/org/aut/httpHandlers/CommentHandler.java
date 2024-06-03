@@ -34,11 +34,11 @@ public class CommentHandler implements HttpHandler {
                 case "POST": {
                     InputStream inputStream = exchange.getRequestBody();
                     Comment comment = MultipartHandler.readObject(inputStream, Comment.class);
+                    File media = MultipartHandler.readToFile(inputStream, MediaAccessor.MediaPath.COMMENTS.value(), comment.getId());
+
                     if (!comment.getUserId().equals(user.getUserId())) {
                         throw new UnauthorizedException("Unauthorized user");
                     }
-
-                    File media = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.COMMENTS.value() + "/" + comment.getId()));
                     if (comment.getText().trim().isEmpty() && media == null) {
                         throw new NotAcceptableException("Not acceptable");
                     }
@@ -58,6 +58,7 @@ public class CommentHandler implements HttpHandler {
 
                     File media = MediaAccessor.getMedia(comment.getId(), MediaAccessor.MediaPath.COMMENTS);
                     if (media != null) Files.deleteIfExists(media.toPath());
+
                     CommentAccessor.deleteComment(comment.getId());
                     exchange.sendResponseHeaders(200, 0);
                 }
@@ -66,7 +67,8 @@ public class CommentHandler implements HttpHandler {
                     String[] path = exchange.getRequestURI().getPath().split("/");
                     if (path.length < 3) throw new NotAcceptableException("Invalid path");
 
-                    TreeMap<User, Comment> map = PostController.getCommentsOfPost(path[2]);
+                    TreeMap<Comment, User> map = PostController.getCommentsOfPost(path[2]);
+                    if (map.isEmpty()) throw new NotFoundException("Not found");
 
                     exchange.getResponseHeaders().set("X-Total-Count", "" + map.size());
                     exchange.sendResponseHeaders(200, 0);

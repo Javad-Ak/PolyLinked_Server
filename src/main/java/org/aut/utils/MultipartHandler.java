@@ -1,5 +1,6 @@
 package org.aut.utils;
 
+import org.aut.dataAccessors.MediaAccessor;
 import org.aut.models.JsonSerializable;
 import org.aut.models.MediaLinked;
 import org.aut.models.User;
@@ -16,7 +17,7 @@ public class MultipartHandler {
     private MultipartHandler() {
     }
 
-    public static <T extends JsonSerializable> void writeObject(OutputStream outputStream, T obj) throws IOException, NotAcceptableException {
+    public static <T extends JsonSerializable> void writeObject(OutputStream outputStream, T obj) throws IOException {
         writeHeaders(outputStream, obj.getClass().getSimpleName() + "/json", obj.toJson().toString().getBytes().length);
         outputStream.write(obj.toJson().toString().getBytes());
         outputStream.flush();
@@ -29,7 +30,10 @@ public class MultipartHandler {
         }
 
         int length = (int) file.length();
-        writeHeaders(outputStream, file.getName() + "/file", length);
+        if (!file.getName().contains(".") || file.getName().endsWith("."))
+            throw new NotAcceptableException("Invalid Type");
+
+        writeHeaders(outputStream, file.getName().substring(file.getName().lastIndexOf(".") + 1) + "/file", length);
 
         FileInputStream inputStream = new FileInputStream(file);
         int totalWrite = 0;
@@ -46,26 +50,25 @@ public class MultipartHandler {
         inputStream.close();
     }
 
-    public static <T extends MediaLinked> void writeMap(OutputStream outputStream, TreeMap<User, T> map) throws NotAcceptableException, IOException {
-        for (User user : map.keySet()) {
-            writeObject(outputStream, user);
-            writeObject(outputStream, map.get(user));
+    public static <T extends MediaLinked> void writeMap(OutputStream outputStream, TreeMap<T, User> map) throws IOException {
+        for (T obj : map.keySet()) {
+            writeObject(outputStream, obj);
+            writeObject(outputStream, map.get(obj));
         }
     }
 
-    public static <T extends JsonSerializable> void writeObjectArray(OutputStream outputStream, List<T> array) throws IOException, NotAcceptableException {
+    public static <T extends JsonSerializable> void writeObjectArray(OutputStream outputStream, List<T> array) throws IOException {
         for (T obj : array) writeObject(outputStream, obj);
     }
 
-    public static File readToFile(InputStream inputStream, Path path) throws IOException, NotAcceptableException {
-        // path = directory + name without type
+    public static File readToFile(InputStream inputStream, Path dir, String fileName) throws IOException, NotAcceptableException {
         JSONObject headers = readJson(inputStream);
         String[] type = headers.getString("Content-Type").split("/");
         int length = headers.getInt("Content-Length");
         if (length == 0) return null;
         if (!type[1].equals("file")) throw new NotAcceptableException("Invalid Content-Type");
 
-        File file = new File(path + type[0].substring(type[0].lastIndexOf('.')));
+        File file = new File(dir + "/" + fileName + "." + type[0]);
         FileOutputStream outputStream = new FileOutputStream(file);
         int remained = length;
         byte[] buffer = new byte[100000];
@@ -105,11 +108,11 @@ public class MultipartHandler {
         return array;
     }
 
-    public static <T extends MediaLinked> TreeMap<User, T> readMap(InputStream inputStream, Class<T> cls, int count) throws NotAcceptableException, IOException {
-        TreeMap<User, T> map = new TreeMap<>();
+    public static <T extends MediaLinked> TreeMap<T, User> readMap(InputStream inputStream, Class<T> cls, int count) throws NotAcceptableException, IOException {
+        TreeMap<T, User> map = new TreeMap<>();
         for (int i = 1; i <= count; i++) {
-            User user = readObject(inputStream, User.class);
-            map.put(user, readObject(inputStream, cls));
+            T obj = readObject(inputStream, cls);
+            map.put(obj, readObject(inputStream, User.class));
         }
         return map;
     }
@@ -127,11 +130,11 @@ public class MultipartHandler {
         StringBuilder res = new StringBuilder();
         int ch;
         while ((ch = inputStream.read()) != -1) {
-            res.append((char) ch);
-            if ((char) ch == '}') break;
+            char character = (char) ch;
+            res.append(character);
+            if (character == '}') break;
         }
         if (res.isEmpty() || res.charAt(0) != '{' || res.charAt(res.length() - 1) != '}') {
-            System.out.println(res);
             throw new NotAcceptableException("Invalid headers");
         }
 

@@ -23,26 +23,18 @@ public class FollowersHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
-        int code = 405;
-
         String jwt = exchange.getRequestHeaders().getFirst("Authorization");
+
         try {
-            User user = LoginHandler.getUserByToken(jwt);
-            String[] splitURI = exchange.getRequestURI().getPath().split("/");
-            if (splitURI.length != 3) {
-                throw new NotAcceptableException("Invalid request");
-            }
-
-            try {
-                UserAccessor.getUserById(user.getUserId());
-            } catch (NotFoundException e) {
-                throw new UnauthorizedException("User unauthorized");
-            }
-
-            String path = splitURI[2];
-            User seekedUser = UserAccessor.getUserById(path);
-
             if (method.equals("GET")) {
+                LoginHandler.getUserByToken(jwt);
+                String[] splitURI = exchange.getRequestURI().getPath().split("/");
+                if (splitURI.length < 4) {
+                    throw new NotAcceptableException("Invalid request");
+                }
+
+                String path = splitURI[3];
+                User seekedUser = UserAccessor.getUserById(path);
 
                 ArrayList<User> followers = FollowAccessor.getFollowers(seekedUser.getUserId());
                 exchange.getResponseHeaders().set("X-Total-Count", "" + followers.size());
@@ -55,16 +47,14 @@ public class FollowersHandler implements HttpHandler {
                 exchange.sendResponseHeaders(405, 0);
             }
         } catch (UnauthorizedException e) {
-            code = 401;
+            exchange.sendResponseHeaders(401, 0);
         } catch (SQLException e) {
-            code = 500;
+            exchange.sendResponseHeaders(500, 0);
         } catch (NotAcceptableException e) {
-            code = 406;
+            exchange.sendResponseHeaders(406, 0);
         } catch (NotFoundException e) {
-            code = 404;
+            exchange.sendResponseHeaders(404, 0);
         }
-
-        exchange.sendResponseHeaders(code, 0);
         exchange.close();
     }
 }

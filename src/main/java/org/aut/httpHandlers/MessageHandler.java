@@ -20,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.TreeMap;
 
 public class MessageHandler implements HttpHandler {
 
@@ -36,17 +35,16 @@ public class MessageHandler implements HttpHandler {
                 case "POST": {
                     InputStream inputStream = exchange.getRequestBody();
                     Message message = MultipartHandler.readObject(inputStream, Message.class);
+                    File media = MultipartHandler.readToFile(inputStream, MediaAccessor.MediaPath.MESSAGES.value(), message.getId());
+
+                    if (message.getText().trim().isEmpty() && media == null) {
+                        throw new NotAcceptableException("Not acceptable");
+                    }
                     if (!message.getSenderId().equals(user.getUserId())) {
                         throw new UnauthorizedException("Unauthorized user");
                     }
 
-                    File media = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.MESSAGES.value() + "/" + message.getId()));
-                    if (message.getText().trim().isEmpty() && media != null) {
-                        throw new NotAcceptableException("Not acceptable");
-                    }
-
                     MessageController.addMessage(message);
-
                     inputStream.close();
                     exchange.sendResponseHeaders(200, 0);
                 }
@@ -54,24 +52,23 @@ public class MessageHandler implements HttpHandler {
 
                 case "DELETE": {
                     String[] splitPath = exchange.getRequestURI().getPath().split("/");
-                    if (splitPath.length != 3) {
-                        throw new NotAcceptableException("Invalid path");
-                    }
                     String path = splitPath[2];
                     Message message = MessageAccessor.getMessageById(path);
 
+                    if (splitPath.length != 3)
+                        throw new NotAcceptableException("Invalid path");
                     if (!message.getSenderId().equals(user.getUserId()))
                         throw new UnauthorizedException("Unauthorized user");
 
                     File media = MediaAccessor.getMedia(message.getId(), MediaAccessor.MediaPath.MESSAGES);
                     if (media != null) Files.deleteIfExists(media.toPath());
+
                     MessageController.deleteMessage(message.getId());
                     exchange.sendResponseHeaders(200, 0);
                 }
                 break;
 
                 case "GET":
-
                     String[] splitPath = exchange.getRequestURI().getPath().split("/");
                     if (splitPath.length != 3 || splitPath[2].split("&").length != 2) {
                         throw new NotAcceptableException("Invalid path");
@@ -91,7 +88,6 @@ public class MessageHandler implements HttpHandler {
                     MultipartHandler.writeObjectArray(outputStream, messages);
                     outputStream.close();
                     break;
-
 
                 default:
                     exchange.sendResponseHeaders(405, 0);

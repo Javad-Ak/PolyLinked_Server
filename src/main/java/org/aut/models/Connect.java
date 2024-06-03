@@ -22,6 +22,15 @@ public class Connect {
         this.create_date = new Date(System.currentTimeMillis());
     }
 
+    public Connect(String applicant_id, String acceptor_id, String note) throws NotAcceptableException {
+        validateFields(applicant_id, acceptor_id, note);
+        this.applicant_id = applicant_id;
+        this.acceptor_id = acceptor_id;
+        this.note = note;
+        this.accept_state = AcceptState.WAITING;
+        this.create_date = new Date(System.currentTimeMillis());
+    }
+
     public Connect(JSONObject json) throws NotAcceptableException {
         try {
             this.applicant_id = json.getString("applicant_id");

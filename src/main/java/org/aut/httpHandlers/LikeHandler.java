@@ -2,9 +2,8 @@ package org.aut.httpHandlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.aut.controllers.PostController;
+
 import org.aut.dataAccessors.LikeAccessor;
-import org.aut.dataAccessors.UserAccessor;
 import org.aut.models.Like;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
@@ -13,13 +12,12 @@ import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
 import org.aut.utils.exceptions.UnauthorizedException;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.TreeMap;
+
 
 public class LikeHandler implements HttpHandler {
     @Override

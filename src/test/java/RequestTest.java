@@ -19,22 +19,117 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.aut.utils.JsonHandler;
 
 @DisplayName("------ Testing requests...")
 public class RequestTest {
+    private final static String user1Id = "user330e00-4b60-b611";
+    private final static String user2Id = "user795662bb-4b09-bc33";
+    private final static String postId = "post8595866b-4633-9f83";
+    private final static String jwt =
+            "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzMwZTAwLTRiNjAtYjYxMSIsImlhdCI6MTcxNzQ0MDk4NywiZXhwIjoxNzE4MDQwOTg3fQ.UpjaehPHwkAGenmHv0dITywGkSkcw3XDjlWUteTSLvY";
+
     @Test
-    @DisplayName("---- Like test")
-    public void LikeTest() throws Exception {
+    @DisplayName("---- message")
+    public void commentTest() throws Exception {
+        // ##### POST
+        Comment comment = new Comment(user1Id, postId, "ddd");
+        File pic = new File("./in/message1.jpg");
 
-        // ##### GET
+        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/comments").toURL().openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "multipart/form-data");
+        con.setRequestProperty("Authorization", jwt);
 
+        con.setDoOutput(true);
+        OutputStream out = con.getOutputStream();
+        MultipartHandler.writeObject(out, comment);
+        MultipartHandler.writeFromFile(out, pic);
+        out.close();
+
+        if (con.getResponseCode() / 100 == 2) {
+            System.out.println("POST test result: " + con.getResponseCode());
+        } else {
+            System.out.println("POST: Server returned HTTP code " + con.getResponseCode());
+        }
+        con.disconnect();
+
+//         ##### GET
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/likes/" + "post34030bd0-42ba-88c8"))
+                .uri(URI.create("http://localhost:8080/comments/" + postId))
                 .timeout(Duration.ofSeconds(10))
-                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMTgwMDQ3NmYtNDVhZS04NzMyIiwiaWF0IjoxNzE3MjcwNTc5LCJleHAiOjE3MTc4NzA1Nzl9.sx6P0kKps9Y4pdO4-NS4oFBtFN1zOQqy29RqBV0p5zI")
+                .header("Authorization", jwt)
+                .GET()
+                .build();
+
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() / 100 == 2) {
+            InputStream inputStream = response.body();
+            int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
+            TreeMap<Comment, User> comments = MultipartHandler.readMap(inputStream, Comment.class, count);
+
+            inputStream.close();
+            System.out.println("GET test result: " + comments);
+        } else {
+            System.out.println("GET: Server returned HTTP code " + response.statusCode());
+        }
+        client.close();
+
+        // #### DELETE
+        HttpClient client2 = HttpClient.newHttpClient();
+        HttpRequest request2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/comments/" + comment.getId()))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", jwt)
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response2 = client2.send(request2, HttpResponse.BodyHandlers.ofString());
+        if (response2.statusCode() / 100 == 2) {
+            System.out.println("DELETE test result: " + response2.statusCode());
+        } else {
+            System.out.println("DELETE: Server returned HTTP code " + response2.statusCode());
+        }
+        client2.close();
+
+    }
+
+    @Test
+    @DisplayName("---- get followers of someone")
+    public void getFollowers() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/users/followers/" + user2Id))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", jwt)
+                .GET()
+                .build();
+
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() / 100 == 2) {
+            InputStream inputStream = response.body();
+            int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
+            List<User> users = MultipartHandler.readObjectArray(inputStream, User.class, count);
+            inputStream.close();
+            System.out.println(users);
+        } else {
+            System.out.println("Server returned HTTP code " + response.statusCode());
+        }
+        client.close();
+    }
+
+    @Test
+    @DisplayName("---- Like test")
+    public void likeTest() throws Exception {
+        // ##### GET
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/likes/post12692449-4d1b-90e7"))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", jwt)
                 .GET()
                 .build();
 
@@ -56,7 +151,7 @@ public class RequestTest {
 
     @Test
     @DisplayName("---- post")
-    public void PostTest() throws Exception {
+    public void postTest() throws Exception {
         // ##### POST
         Post post = new Post("user75930fcf-4bc1-9675", "ddd");
         File pic = new File("./in/prof1.jpg");
@@ -64,7 +159,7 @@ public class RequestTest {
         HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/posts").toURL().openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "multipart/form-data");
-        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzU5MzBmY2YtNGJjMS05Njc1IiwiaWF0IjoxNzE3MTYzNzYzLCJleHAiOjE3MTc3NjM3NjN9.o58V5oeLY-CDuSm3ZmQMNDNXo8WVVfXyQUL_hiedt7s");
+        con.setRequestProperty("Authorization", jwt);
 
         con.setDoOutput(true);
         OutputStream out = con.getOutputStream();
@@ -81,24 +176,21 @@ public class RequestTest {
 
         // ##### GET
 
-        Path media = Path.of("./out/prof1");
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/posts/" + post.getPostId()))
+                .uri(URI.create("http://localhost:8080/posts/post70227dc5-4ece-9d96"))
                 .timeout(Duration.ofSeconds(10))
-                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzU5MzBmY2YtNGJjMS05Njc1IiwiaWF0IjoxNzE3MTYzNzYzLCJleHAiOjE3MTc3NjM3NjN9.o58V5oeLY-CDuSm3ZmQMNDNXo8WVVfXyQUL_hiedt7s")
+                .header("Authorization", jwt)
                 .GET()
                 .build();
 
         HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
         if (response.statusCode() / 100 == 2) {
             InputStream inputStream = response.body();
-//            System.out.println(new String(inputStream.readAllBytes()));
 
-            Post seeked = MultipartHandler.readObject(inputStream, Post.class);
+            Post seeked = new Post(JsonHandler.getObject(inputStream));
             System.out.println(seeked);
 
-            MultipartHandler.readToFile(inputStream, media);
             inputStream.close();
             System.out.println("test result: " + response.statusCode());
         } else {
@@ -111,7 +203,7 @@ public class RequestTest {
         HttpRequest request2 = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/posts/" + post.getPostId()))
                 .timeout(Duration.ofSeconds(10))
-                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzU5MzBmY2YtNGJjMS05Njc1IiwiaWF0IjoxNzE3MTYzNzYzLCJleHAiOjE3MTc3NjM3NjN9.o58V5oeLY-CDuSm3ZmQMNDNXo8WVVfXyQUL_hiedt7s")
+                .header("Authorization", jwt)
                 .DELETE()
                 .build();
 
@@ -128,15 +220,15 @@ public class RequestTest {
 
     @Test
     @DisplayName("---- message")
-    public void MessageTest() throws Exception {
+    public void messageTest() throws Exception {
         // ##### POST
-        Message message = new Message("user71323753-4103-9147", "user159453ee-4f29-a71c", "ddd");
+        Message message = new Message(user1Id, user2Id, "ddd");
         File pic = new File("./in/message1.jpg");
 
         HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/messages").toURL().openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "multipart/form-data");
-        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzEzMjM3NTMtNDEwMy05MTQ3IiwiaWF0IjoxNzE3NDE4Nzg3LCJleHAiOjE3MTgwMTg3ODd9.d0gH5ClGaimpfwcceSsxxcMKIE4fevmf4s9JsQbCB3g");
+        con.setRequestProperty("Authorization", jwt);
 
         con.setDoOutput(true);
         OutputStream out = con.getOutputStream();
@@ -154,9 +246,9 @@ public class RequestTest {
 //         ##### GET
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/messages/" + "user71323753-4103-9147" + "&" + "user159453ee-4f29-a71c"))
+                .uri(URI.create("http://localhost:8080/messages/" + user1Id + "&" + user2Id))
                 .timeout(Duration.ofSeconds(10))
-                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzEzMjM3NTMtNDEwMy05MTQ3IiwiaWF0IjoxNzE3NDE4Nzg3LCJleHAiOjE3MTgwMTg3ODd9.d0gH5ClGaimpfwcceSsxxcMKIE4fevmf4s9JsQbCB3g")
+                .header("Authorization", jwt)
                 .GET()
                 .build();
 
@@ -169,7 +261,7 @@ public class RequestTest {
             System.out.println(messages);
 
             inputStream.close();
-            System.out.println("GET test result: " + response.statusCode());
+            System.out.println("GET test result: " + messages);
         } else {
             System.out.println("GET: Server returned HTTP code " + response.statusCode());
         }
@@ -180,7 +272,7 @@ public class RequestTest {
         HttpRequest request2 = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/messages/" + message.getId()))
                 .timeout(Duration.ofSeconds(10))
-                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzI3MzQyMzktNGMzNC05ZDJmIiwiaWF0IjoxNzE3MjI3MjAzLCJleHAiOjE3MTc4MjcyMDN9.aaMsioZWmR81nQWLwL3gGBE_bE7e8e2iFgS-5U4PQDc")
+                .header("Authorization", jwt)
                 .DELETE()
                 .build();
 
@@ -197,7 +289,7 @@ public class RequestTest {
     @Test
     @DisplayName("---- get a user")
     public void getUser() throws Exception {
-        Path pic = Path.of("./out/prof1");
+        Path pic = Path.of("./out");
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -215,7 +307,7 @@ public class RequestTest {
             User user = MultipartHandler.readObject(inputStream, User.class);
             System.out.println(user);
 
-            MultipartHandler.readToFile(inputStream, pic);
+            MultipartHandler.readToFile(inputStream, pic, "prof1");
             inputStream.close();
             System.out.println("test result: " + response.statusCode());
         } else {
@@ -281,9 +373,6 @@ public class RequestTest {
     @Test
     @DisplayName("---- posting a profile")
     public void getProfile() throws Exception {
-        Path pic = Path.of("./out/prof1");
-        Path bg = Path.of("./out/prof2");
-
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/users/profiles/user719066ad-4efe-8f14"))
@@ -299,11 +388,8 @@ public class RequestTest {
         if (response.statusCode() / 100 == 2) {
             InputStream inputStream = response.body();
 
-            Profile profile = MultipartHandler.readObject(inputStream, Profile.class);
+            Profile profile = new Profile(JsonHandler.getObject(inputStream));
             System.out.println(profile);
-
-            MultipartHandler.readToFile(inputStream, pic);
-            MultipartHandler.readToFile(inputStream, bg);
             inputStream.close();
 
             System.out.println("test result: " + response.statusCode());
@@ -400,30 +486,5 @@ public class RequestTest {
         } catch (NotFoundException e) {
             System.out.println("User not found.");
         }
-    }
-
-    @Test
-    @DisplayName("---- get followers of someone")
-    public void getFollowers() throws Exception {
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/users/followers/user71323753-4103-9147"))
-                .timeout(Duration.ofSeconds(10))
-                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNjU3NTljMjctNGE0Yi1iZjBjIiwiaWF0IjoxNzE3NDA2NjQ5LCJleHAiOjE3MTgwMDY2NDl9.vzIFwlz04IIl4xoeYN-dbbSUwJbdYfUkIDOmadqTG70")
-                .GET()
-                .build();
-
-        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-        if (response.statusCode() / 100 == 2) {
-            InputStream inputStream = response.body();
-            int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
-            List<User> users = MultipartHandler.readObjectArray(inputStream, User.class, count);
-            inputStream.close();
-            System.out.println(users);
-        } else {
-            System.out.println("Server returned HTTP code " + response.statusCode());
-        }
-        client.close();
     }
 }

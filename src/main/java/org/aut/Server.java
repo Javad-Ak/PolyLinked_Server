@@ -25,7 +25,7 @@ public class Server {
             server.createContext("/users", new UserHandler());
             server.createContext("/users/login", new LoginHandler());
             server.createContext("/users/profiles", new ProfileHandler());
-            server.createContext("/users/followers" , new FollowersHandler());
+            server.createContext("/users/followers", new FollowersHandler());
 
             server.createContext("/follows", new FollowHandler());
             server.createContext("/connections", new ConnectHandler());
@@ -33,7 +33,7 @@ public class Server {
             server.createContext("/posts", new PostHandler());
             server.createContext("/likes", new LikeHandler());
             server.createContext("/comments", new CommentHandler());
-            server.createContext("/messages" , new MessageHandler());
+            server.createContext("/messages", new MessageHandler());
 
             server.createContext("/resources", new ResourceHandler());
 
@@ -41,7 +41,7 @@ public class Server {
             server.start();
             Runtime.getRuntime().addShutdownHook(new DataBaseAccessor("atExit"));
 
-            System.out.println("Server is running (localhost:8080).");
+            System.out.println("Server is running at: " + server.getAddress());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -6,6 +6,7 @@ import org.aut.dataAccessors.MediaAccessor;
 import org.aut.dataAccessors.ProfileAccessor;
 import org.aut.models.Profile;
 import org.aut.models.User;
+import org.aut.utils.JsonHandler;
 import org.aut.utils.MultipartHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
@@ -40,13 +41,13 @@ public class ProfileHandler implements HttpHandler {
                     else ProfileAccessor.updateProfile(profile);
 
                     File oldPic = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.PROFILES);
-                    File newPic = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.PROFILES.value() + "/" + profile.getUserId()));
+                    File newPic = MultipartHandler.readToFile(inputStream, MediaAccessor.MediaPath.PROFILES.value() , profile.getUserId());
                     if (newPic != null && oldPic != null) {
                         Files.delete(oldPic.toPath());
                     }
 
                     File oldBG = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.BACKGROUNDS);
-                    File newBG = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.BACKGROUNDS.value() + "/" + profile.getUserId()));
+                    File newBG = MultipartHandler.readToFile(inputStream, MediaAccessor.MediaPath.BACKGROUNDS.value() , profile.getUserId());
                     if (oldBG != null && newBG != null) {
                         Files.delete(oldBG.toPath());
                     }
@@ -55,17 +56,14 @@ public class ProfileHandler implements HttpHandler {
                 }
                 break;
                 case "GET": {
-                    String path = exchange.getRequestURI().getPath().split("/")[2];
-                    Profile profile = ProfileAccessor.getProfile(path);
+                    String[] path = exchange.getRequestURI().getPath().split("/");
+                    if (path.length != 4) throw new NotAcceptableException("Not acceptable");
 
-                    File profilePicture = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.PROFILES);
-                    File background = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.BACKGROUNDS);
+                    Profile profile = ProfileAccessor.getProfile(path[3]);
 
                     exchange.sendResponseHeaders(200, 0);
                     OutputStream outputStream = exchange.getResponseBody();
-                    MultipartHandler.writeObject(outputStream, profile);
-                    MultipartHandler.writeFromFile(outputStream, profilePicture);
-                    MultipartHandler.writeFromFile(outputStream, background);
+                    JsonHandler.sendObject(outputStream, profile.toJson());
 
                     outputStream.close();
                 }
