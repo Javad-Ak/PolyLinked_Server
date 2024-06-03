@@ -36,15 +36,14 @@ public class PostHandler implements HttpHandler {
                     if (!post.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
                     File newMedia = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.POSTS.value() + "/" + post.getPostId()));
-
-                    if (post.getText().trim().isEmpty() && newMedia.length() < 1)
+                    if (post.getText().trim().isEmpty() && newMedia == null)
                         throw new NotAcceptableException("Not acceptable");
 
                     if (method.equals("POST")) PostAccessor.addPost(post);
                     else {
                         PostAccessor.updatePost(post);
                         File oldMedia = MediaAccessor.getMedia(post.getUserId(), MediaAccessor.MediaPath.POSTS);
-                        if (newMedia.length() > 0 && oldMedia.length() > 0)
+                        if (newMedia != null && oldMedia != null)
                             Files.delete(oldMedia.toPath());
                     }
 
@@ -76,7 +75,7 @@ public class PostHandler implements HttpHandler {
                     if (!post.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
                     File media = MediaAccessor.getMedia(post.getPostId(), MediaAccessor.MediaPath.POSTS);
-                    Files.deleteIfExists(media.toPath());
+                    if (media != null) Files.deleteIfExists(media.toPath());
                     PostAccessor.deletePost(post.getPostId());
 
                     exchange.sendResponseHeaders(200, 0);

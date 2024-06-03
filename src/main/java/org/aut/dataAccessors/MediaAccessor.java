@@ -22,7 +22,7 @@ public class MediaAccessor {
             }
         } catch (IOException ignored) {
         }
-        return new File("null");
+        return null;
     }
 
     public enum MediaPath {

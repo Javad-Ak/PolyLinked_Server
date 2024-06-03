@@ -41,7 +41,7 @@ public class MessageHandler implements HttpHandler {
 
                     File media = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.MESSAGES.value() + "/" + message.getId()));
 
-                    if (message.getText().trim().isEmpty() && media.length() < 1)
+                    if (message.getText().trim().isEmpty() && media != null)
                         throw new NotAcceptableException("Not acceptable");
 
 
@@ -56,10 +56,11 @@ public class MessageHandler implements HttpHandler {
                     String path = exchange.getRequestURI().getPath().split("/")[2];
                     Message message = MessageAccessor.getMessageById(path);
 
-                    if (!message.getSenderId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized user");
+                    if (!message.getSenderId().equals(user.getUserId()))
+                        throw new UnauthorizedException("Unauthorized user");
 
                     File media = MediaAccessor.getMedia(message.getId(), MediaAccessor.MediaPath.MESSAGES);
-                    Files.deleteIfExists(media.toPath());
+                    if (media != null) Files.deleteIfExists(media.toPath());
                     MessageController.deleteMessage(message.getId());
                     exchange.sendResponseHeaders(200, 0);
                 }

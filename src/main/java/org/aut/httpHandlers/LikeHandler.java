@@ -3,9 +3,7 @@ package org.aut.httpHandlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.aut.controllers.PostController;
-import org.aut.controllers.UserController;
 import org.aut.dataAccessors.LikeAccessor;
-import org.aut.dataAccessors.MediaAccessor;
 import org.aut.models.Like;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
@@ -19,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class LikeHandler implements HttpHandler {

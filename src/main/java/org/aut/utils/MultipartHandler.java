@@ -21,14 +21,18 @@ public class MultipartHandler {
     }
 
     public static void writeFromFile(OutputStream outputStream, File file) throws IOException, NotAcceptableException {
+        if (file == null || file.length() < 1) {
+            writeHeaders(outputStream, "null/file", 0);
+            return;
+        }
+
         int length = (int) file.length();
         writeHeaders(outputStream, file.getName() + "/file", length);
-        if (length == 0) return;
 
         FileInputStream inputStream = new FileInputStream(file);
         int totalWrite = 0;
         byte[] buffer = new byte[100000];
-        while (totalWrite < file.length()) {
+        while (totalWrite < length) {
             int read = inputStream.read(buffer);
             if (read == -1) break;
 
@@ -61,12 +65,11 @@ public class MultipartHandler {
         JSONObject headers = getJson(inputStream);
         String[] type = headers.getString("Content-Type").split("/");
         int length = headers.getInt("Content-Length");
-        if (length == 0) return new File("null");
+        if (length == 0) return null;
         if (!type[1].equals("file")) throw new NotAcceptableException("Invalid Content-Type");
 
         File file = new File(path + type[0].substring(type[0].lastIndexOf('.')));
         FileOutputStream outputStream = new FileOutputStream(file);
-
         int remained = length;
         byte[] buffer = new byte[100000];
         while (remained > 0) {
@@ -99,7 +102,7 @@ public class MultipartHandler {
         return JsonSerializable.fromJson(getJson(inputStream), cls);
     }
 
-    public static <T extends JsonSerializable & MediaLinked > HashMap<T, File> readMap(InputStream inputStream, Path dir, Class<T> cls, int count) throws NotAcceptableException, IOException{
+    public static <T extends JsonSerializable & MediaLinked> HashMap<T, File> readMap(InputStream inputStream, Path dir, Class<T> cls, int count) throws NotAcceptableException, IOException {
         HashMap<T, File> map = new HashMap<>();
         for (int i = 1; i <= count; i++) {
             T obj = readJson(inputStream, cls);

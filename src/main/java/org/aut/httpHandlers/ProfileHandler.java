@@ -41,13 +41,13 @@ public class ProfileHandler implements HttpHandler {
 
                     File oldPic = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.PROFILES);
                     File newPic = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.PROFILES.value() + "/" + profile.getUserId()));
-                    if (newPic.length() > 0 && oldPic.length() > 0) {
+                    if (newPic != null && oldPic != null) {
                         Files.delete(oldPic.toPath());
                     }
 
                     File oldBG = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.BACKGROUNDS);
                     File newBG = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.BACKGROUNDS.value() + "/" + profile.getUserId()));
-                    if (oldBG.length() > 0 && newBG.length() > 0) {
+                    if (oldBG != null && newBG != null) {
                         Files.delete(oldBG.toPath());
                     }
                     inputStream.close();

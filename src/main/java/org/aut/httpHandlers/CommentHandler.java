@@ -57,7 +57,7 @@ public class CommentHandler implements HttpHandler {
                         throw new UnauthorizedException("Unauthorized user");
 
                     File media = MediaAccessor.getMedia(comment.getId(), MediaAccessor.MediaPath.COMMENTS);
-                    Files.deleteIfExists(media.toPath());
+                    if (media != null) Files.deleteIfExists(media.toPath());
                     CommentAccessor.deleteComment(comment.getId());
                     exchange.sendResponseHeaders(200, 0);
                 }
