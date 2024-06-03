@@ -40,7 +40,7 @@ public class CommentHandler implements HttpHandler {
                     }
 
                     File media = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.COMMENTS.value() + "/" + comment.getId()));
-                    if (comment.getText().trim().isEmpty() && media.length() < 1) {
+                    if (comment.getText().trim().isEmpty() && media == null) {
                         throw new NotAcceptableException("Not acceptable");
                     }
 

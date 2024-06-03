@@ -1,10 +1,6 @@
-import org.aut.dataAccessors.MediaAccessor;
 import org.aut.models.Message;
 import org.aut.models.Post;
 import org.aut.models.Profile;
-import org.aut.dataAccessors.DataBaseAccessor;
-import org.aut.dataAccessors.LikeAccessor;
-import org.aut.dataAccessors.PostAccessor;
 import org.aut.models.*;
 import org.aut.utils.MultipartHandler;
 import org.aut.dataAccessors.UserAccessor;
@@ -22,8 +18,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.TreeMap;
+
 import org.aut.utils.JsonHandler;
 
 @DisplayName("------ Testing requests...")
@@ -47,7 +43,7 @@ public class RequestTest {
             InputStream inputStream = response.body();
             int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
 
-            HashMap<User, File> map = MultipartHandler.readMap(inputStream, Path.of("./out"), User.class, count);
+            TreeMap<User, File> map = MultipartHandler.readMap(inputStream, Path.of("./out"), User.class, count);
             inputStream.close();
 
             System.out.println(map);
@@ -156,7 +152,6 @@ public class RequestTest {
         con.disconnect();
 
 //         ##### GET
-        ArrayList<Path> paths = new ArrayList<>();
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/messages/" + "user32734239-4c34-9d2f" + "&" + "user33374acb-40de-b57b"))
@@ -168,7 +163,7 @@ public class RequestTest {
         HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
         if (response.statusCode() / 100 == 2) {
             InputStream inputStream = response.body();
-            HashMap <Message , File > fullMessages ;
+            TreeMap <Message , File > fullMessages ;
             int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
             System.out.println(count);
             fullMessages = MultipartHandler.readMap(inputStream , Path.of("./out") , Message.class , count );
