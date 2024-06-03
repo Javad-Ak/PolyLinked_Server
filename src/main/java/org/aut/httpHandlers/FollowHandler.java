@@ -27,7 +27,6 @@ public class FollowHandler implements HttpHandler {
         try {
             User user = LoginHandler.getUserByToken(jwt);
             Follow newFollow = new Follow(jsonObject);
-            System.out.println(newFollow);
             if (!user.getUserId().equals(newFollow.getFollower_id()))
                 throw new UnauthorizedException("User unauthorized");
 

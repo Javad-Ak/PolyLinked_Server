@@ -19,7 +19,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 public class MessageHandler implements HttpHandler {
@@ -35,14 +35,13 @@ public class MessageHandler implements HttpHandler {
             switch (method) {
                 case "POST": {
                     InputStream inputStream = exchange.getRequestBody();
-                    Message message = MultipartHandler.readJson(inputStream, Message.class);
+                    Message message = MultipartHandler.readObject(inputStream, Message.class);
                     if (!message.getSenderId().equals(user.getUserId())) {
                         throw new UnauthorizedException("Unauthorized user");
                     }
 
                     File media = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.MESSAGES.value() + "/" + message.getId()));
-
-                    if (message.getText().trim().isEmpty() && media != null){
+                    if (message.getText().trim().isEmpty() && media != null) {
                         throw new NotAcceptableException("Not acceptable");
                     }
 
@@ -54,11 +53,11 @@ public class MessageHandler implements HttpHandler {
                 break;
 
                 case "DELETE": {
-                    String [] splitPath = exchange.getRequestURI().getPath().split("/");
-                    if(splitPath.length != 3){
+                    String[] splitPath = exchange.getRequestURI().getPath().split("/");
+                    if (splitPath.length != 3) {
                         throw new NotAcceptableException("Invalid path");
                     }
-                    String path =splitPath[2];
+                    String path = splitPath[2];
                     Message message = MessageAccessor.getMessageById(path);
 
                     if (!message.getSenderId().equals(user.getUserId()))
@@ -73,23 +72,23 @@ public class MessageHandler implements HttpHandler {
 
                 case "GET":
 
-                    String [] splitPath = exchange.getRequestURI().getPath().split("/");
-                    if(splitPath.length != 3 || splitPath[2].split("&").length != 2){
+                    String[] splitPath = exchange.getRequestURI().getPath().split("/");
+                    if (splitPath.length != 3 || splitPath[2].split("&").length != 2) {
                         throw new NotAcceptableException("Invalid path");
                     }
-                    String path =splitPath[2];
+                    String path = splitPath[2];
                     String senderId = path.split("&")[0];
                     String receiverId = path.split("&")[1];
 
                     if (!senderId.equals(user.getUserId()) && !receiverId.equals(user.getUserId()))
                         throw new UnauthorizedException("Unauthorized user");
 
-                    TreeMap<Message, File> messages = MessageController.getLastMessages(senderId, receiverId);
+                    ArrayList<Message> messages = MessageAccessor.getLastMessagesBetween(senderId, receiverId);
 
                     exchange.getResponseHeaders().set("X-Total-Count", "" + messages.size());
                     exchange.sendResponseHeaders(200, 0);
                     OutputStream outputStream = exchange.getResponseBody();
-                    MultipartHandler.writeMap(outputStream, messages);
+                    MultipartHandler.writeObjectArray(outputStream, messages);
                     outputStream.close();
                     break;
 

@@ -24,14 +24,17 @@ public class Server {
 
             server.createContext("/users", new UserHandler());
             server.createContext("/users/login", new LoginHandler());
-            server.createContext("/profiles", new ProfileHandler());
+            server.createContext("/users/profiles", new ProfileHandler());
+            server.createContext("/users/followers" , new FollowersHandler());
+
             server.createContext("/follows", new FollowHandler());
-            server.createContext("/followers" , new FollowersHandler());
             server.createContext("/connections", new ConnectHandler());
+
             server.createContext("/posts", new PostHandler());
             server.createContext("/likes", new LikeHandler());
             server.createContext("/comments", new CommentHandler());
             server.createContext("/messages" , new MessageHandler());
+
             server.createContext("/resources", new ResourceHandler());
 
             server.setExecutor(Executors.newFixedThreadPool(8));

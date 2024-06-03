@@ -13,7 +13,6 @@ public class ResourceHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String[] path = exchange.getRequestURI().getPath().split("/");
-        System.out.println(Arrays.toString(path));
         if (!exchange.getRequestMethod().equals("GET") || path.length < 4) {
             exchange.sendResponseHeaders(405, 0);
             return;
@@ -21,11 +20,21 @@ public class ResourceHandler implements HttpHandler {
 
         try {
             File file = MediaAccessor.getMedia(path[3], MediaAccessor.MediaPath.valueOf(path[2].toUpperCase()));
-            if (file == null) throw new NotFoundException("media not found");
+            if (file == null) throw new NotFoundException("Media not found");
 
 
             int length = (int) file.length();
-            exchange.getResponseHeaders().add("Content-Type", file.getName().substring(file.getName().lastIndexOf(".") + 1));
+            String type = file.getName().substring(file.getName().lastIndexOf(".") + 1);
+            if (type.trim().isEmpty()) throw new NotFoundException("File corruption");
+
+            if (MediaAccessor.VIDEO_EXTENSIONS.contains(type)) {
+                exchange.getResponseHeaders().add("Content-Type", "Video/" + type);
+            } else if (MediaAccessor.AUDIO_EXTENSIONS.contains(type)) {
+                exchange.getResponseHeaders().add("Content-Type", "Audio/" + type);
+            } else if (MediaAccessor.IMAGE_EXTENSIONS.contains(type)) {
+                exchange.getResponseHeaders().add("Content-Type", "Image/" + type);
+            } else throw new NotFoundException("File corruption");
+
             exchange.sendResponseHeaders(200, length);
 
             try (OutputStream outputStream = exchange.getResponseBody();

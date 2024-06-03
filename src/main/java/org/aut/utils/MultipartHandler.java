@@ -16,7 +16,7 @@ public class MultipartHandler {
     private MultipartHandler() {
     }
 
-    public static <T extends JsonSerializable> void writeJson(OutputStream outputStream, T obj) throws IOException, NotAcceptableException {
+    public static <T extends JsonSerializable> void writeObject(OutputStream outputStream, T obj) throws IOException, NotAcceptableException {
         writeHeaders(outputStream, obj.getClass().getSimpleName() + "/json", obj.toJson().toString().getBytes().length);
         outputStream.write(obj.toJson().toString().getBytes());
         outputStream.flush();
@@ -46,36 +46,20 @@ public class MultipartHandler {
         inputStream.close();
     }
 
-    public static <T extends MediaLinked> void writeMap(OutputStream outputStream, TreeMap<T, File> map) throws NotAcceptableException, IOException {
-        for (T obj : map.keySet()) {
-            writeJson(outputStream, obj);
-            writeFromFile(outputStream, map.get(obj));
-        }
-    }
-
-    public static <T extends MediaLinked> void writeObjectMap(OutputStream outputStream, TreeMap<User, T> map) throws NotAcceptableException, IOException {
+    public static <T extends MediaLinked> void writeMap(OutputStream outputStream, TreeMap<User, T> map) throws NotAcceptableException, IOException {
         for (User user : map.keySet()) {
-            writeJson(outputStream, user);
-            writeJson(outputStream, map.get(user));
+            writeObject(outputStream, user);
+            writeObject(outputStream, map.get(user));
         }
     }
 
-    public static <T extends JsonSerializable> void writeJsonArray(OutputStream outputStream, List<T> array) throws IOException, NotAcceptableException {
-        for (T obj : array) writeJson(outputStream, obj);
-    }
-
-    private static void writeHeaders(OutputStream outputStream, String type, int length) throws IOException {
-        JSONObject headers = new JSONObject();
-        headers.put("Content-Type", type);
-        headers.put("Content-Length", length);
-
-        outputStream.write(headers.toString().getBytes());
-        outputStream.flush();
+    public static <T extends JsonSerializable> void writeObjectArray(OutputStream outputStream, List<T> array) throws IOException, NotAcceptableException {
+        for (T obj : array) writeObject(outputStream, obj);
     }
 
     public static File readToFile(InputStream inputStream, Path path) throws IOException, NotAcceptableException {
         // path = directory + name without type
-        JSONObject headers = getJson(inputStream);
+        JSONObject headers = readJson(inputStream);
         String[] type = headers.getString("Content-Type").split("/");
         int length = headers.getInt("Content-Length");
         if (length == 0) return null;
@@ -106,40 +90,40 @@ public class MultipartHandler {
         return file;
     }
 
-    public static <T extends JsonSerializable> T readJson(InputStream inputStream, Class<T> cls) throws IOException, NotAcceptableException {
-        JSONObject headers = getJson(inputStream);
+    public static <T extends JsonSerializable> T readObject(InputStream inputStream, Class<T> cls) throws IOException, NotAcceptableException {
+        JSONObject headers = readJson(inputStream);
         String[] type = headers.getString("Content-Type").split("/");
         if (type.length < 1 || (!type[1].equals("json") || !cls.getSimpleName().equals(type[0])))
             throw new NotAcceptableException("Invalid Content-Type");
 
-        return JsonSerializable.fromJson(getJson(inputStream), cls);
+        return JsonSerializable.fromJson(readJson(inputStream), cls);
     }
 
-    public static <T extends JsonSerializable> List<T> readJsonArray(InputStream inputStream, Class<T> cls, int count) throws IOException, NotAcceptableException {
+    public static <T extends JsonSerializable> List<T> readObjectArray(InputStream inputStream, Class<T> cls, int count) throws IOException, NotAcceptableException {
         ArrayList<T> array = new ArrayList<>();
-        for (int i = 1; i <= count; i++) array.add(readJson(inputStream, cls));
+        for (int i = 1; i <= count; i++) array.add(readObject(inputStream, cls));
         return array;
     }
 
-    public static <T extends MediaLinked> TreeMap<T, File> readMap(InputStream inputStream, Path dir, Class<T> cls, int count) throws NotAcceptableException, IOException {
-        TreeMap<T, File> map = new TreeMap<>();
-        for (int i = 1; i <= count; i++) {
-            T obj = readJson(inputStream, cls);
-            map.put(obj, readToFile(inputStream, Path.of(dir + "/" + obj.getMediaId())));
-        }
-        return map;
-    }
-
-    public static <T extends MediaLinked> TreeMap<User, T> readObjectMap(InputStream inputStream, Path dir, Class<T> cls, int count) throws NotAcceptableException, IOException {
+    public static <T extends MediaLinked> TreeMap<User, T> readMap(InputStream inputStream, Class<T> cls, int count) throws NotAcceptableException, IOException {
         TreeMap<User, T> map = new TreeMap<>();
         for (int i = 1; i <= count; i++) {
-            User user = readJson(inputStream, User.class);
-            map.put(user, readJson(inputStream, cls));
+            User user = readObject(inputStream, User.class);
+            map.put(user, readObject(inputStream, cls));
         }
         return map;
     }
 
-    private static JSONObject getJson(InputStream inputStream) throws IOException, NotAcceptableException {
+    private static void writeHeaders(OutputStream outputStream, String type, int length) throws IOException {
+        JSONObject headers = new JSONObject();
+        headers.put("Content-Type", type);
+        headers.put("Content-Length", length);
+
+        outputStream.write(headers.toString().getBytes());
+        outputStream.flush();
+    }
+
+    private static JSONObject readJson(InputStream inputStream) throws IOException, NotAcceptableException {
         StringBuilder res = new StringBuilder();
         int ch;
         while ((ch = inputStream.read()) != -1) {

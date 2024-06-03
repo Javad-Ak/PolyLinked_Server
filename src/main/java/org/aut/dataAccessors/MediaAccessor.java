@@ -4,9 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 public class MediaAccessor {
+    public static final String VIDEO_EXTENSIONS = "mp4, m4v";
+    public static final String AUDIO_EXTENSIONS = "mp3, aac, wav, aiff, m4a";
+    public static final String IMAGE_EXTENSIONS = "jpg, jpeg, png, gif, bmp";
+
     private MediaAccessor() {
     }
 

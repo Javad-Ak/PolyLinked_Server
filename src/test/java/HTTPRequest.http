@@ -1,4 +1,4 @@
-# @name LikeTest
+# @name DeleteLike
 
 DELETE http://localhost:8080/likes/post34030bd0-42ba-88c8&user1800476f-45ae-8732 HTTP/1.1
 Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMTgwMDQ3NmYtNDVhZS04NzMyIiwiaWF0IjoxNzE3MjcwNTc5LCJleHAiOjE3MTc4NzA1Nzl9.sx6P0kKps9Y4pdO4-NS4oFBtFN1zOQqy29RqBV0p5zI
@@ -8,7 +8,7 @@ Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMTgwMDQ3NmYtNDVhZS04NzMyIiwi
 
 ###
 
-# @name LikeTest
+# @name PostLike
 
 POST http://localhost:8080/likes HTTP/1.1
 Content-Type: application/json
@@ -24,7 +24,7 @@ Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMTgwMDQ3NmYtNDVhZS04NzMyIiwi
 ###
 
 
-# @name followPostTest
+# @name Postfollow
 
 POST http://localhost:8080/follows HTTP/1.1
 Content-Type: application/json
@@ -39,7 +39,7 @@ Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyODcyNjc4NTgtNDlmNy04NjQ4Iiwi
 ###
 
 
-# @name deleteUserTest
+# @name deleteUser
 
 DELETE http://localhost:8080/users HTTP/1.1
 Content-Type: application/json

@@ -4,7 +4,6 @@ import org.aut.dataAccessors.ConnectAccessor;
 import org.aut.models.Connect;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
-
 import java.sql.SQLException;
 
 public class ConnectController {

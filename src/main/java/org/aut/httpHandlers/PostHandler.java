@@ -32,7 +32,7 @@ public class PostHandler implements HttpHandler {
                 case "POST": {
                     InputStream inputStream = exchange.getRequestBody();
 
-                    Post post = MultipartHandler.readJson(inputStream, Post.class);
+                    Post post = MultipartHandler.readObject(inputStream, Post.class);
                     if (!post.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
                     File newMedia = MultipartHandler.readToFile(inputStream, Path.of(MediaAccessor.MediaPath.POSTS.value() + "/" + post.getPostId()));
@@ -60,7 +60,7 @@ public class PostHandler implements HttpHandler {
 
                     exchange.sendResponseHeaders(200, 0);
                     OutputStream outputStream = exchange.getResponseBody();
-                    MultipartHandler.writeJson(outputStream, post);
+                    MultipartHandler.writeObject(outputStream, post);
                     MultipartHandler.writeFromFile(outputStream, media);
 
                     outputStream.close();

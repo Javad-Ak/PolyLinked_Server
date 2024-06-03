@@ -3,6 +3,7 @@ package org.aut.httpHandlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.aut.controllers.FollowController;
+import org.aut.dataAccessors.FollowAccessor;
 import org.aut.dataAccessors.UserAccessor;
 import org.aut.models.User;
 import org.aut.utils.MultipartHandler;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FollowersHandler implements HttpHandler {
@@ -26,7 +28,7 @@ public class FollowersHandler implements HttpHandler {
         String jwt = exchange.getRequestHeaders().getFirst("Authorization");
         try {
             User user = LoginHandler.getUserByToken(jwt);
-            String [] splitURI = exchange.getRequestURI().getPath().split("/");
+            String[] splitURI = exchange.getRequestURI().getPath().split("/");
             if (splitURI.length != 3) {
                 throw new NotAcceptableException("Invalid request");
             }
@@ -42,20 +44,16 @@ public class FollowersHandler implements HttpHandler {
 
             if (method.equals("GET")) {
 
-                HashMap<User, File> fullFollowers = FollowController.getFollowersOf(seekedUser.getUserId());
-                exchange.getResponseHeaders().set("X-Total-Count", "" + fullFollowers.size() );
+                ArrayList<User> followers = FollowAccessor.getFollowers(seekedUser.getUserId());
+                exchange.getResponseHeaders().set("X-Total-Count", "" + followers.size());
                 exchange.sendResponseHeaders(200, 0);
                 OutputStream outputStream = exchange.getResponseBody();
 
-                MultipartHandler.writeMap(outputStream, fullFollowers);
+                MultipartHandler.writeObjectArray(outputStream, followers);
                 outputStream.close();
-
-
             } else {
                 exchange.sendResponseHeaders(405, 0);
             }
-
-
         } catch (UnauthorizedException e) {
             code = 401;
         } catch (SQLException e) {

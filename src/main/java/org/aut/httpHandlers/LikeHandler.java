@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.aut.controllers.PostController;
 import org.aut.dataAccessors.LikeAccessor;
+import org.aut.dataAccessors.UserAccessor;
 import org.aut.models.Like;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
@@ -17,7 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 public class LikeHandler implements HttpHandler {
@@ -45,15 +46,15 @@ public class LikeHandler implements HttpHandler {
                     if (path.length < 3) throw new NotAcceptableException("Invalid path");
                     String postId = path[2];
 
-                    TreeMap<User, File> map = PostController.getLikersOfPost(postId);
-                    if (map.isEmpty())
+                    ArrayList<User> users = LikeAccessor.getLikersOfPost(postId);
+                    if (users.isEmpty())
                         throw new NotFoundException("Not found");
                     else {
-                        exchange.getResponseHeaders().add("X-Total-Count", String.valueOf(map.size()));
+                        exchange.getResponseHeaders().add("X-Total-Count", String.valueOf(users.size()));
                         exchange.sendResponseHeaders(200, 0);
 
                         OutputStream outputStream = exchange.getResponseBody();
-                        MultipartHandler.writeMap(outputStream, map);
+                        MultipartHandler.writeObjectArray(outputStream, users);
                         outputStream.close();
                     }
                 }

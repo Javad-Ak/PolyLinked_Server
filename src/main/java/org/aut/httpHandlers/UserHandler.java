@@ -67,7 +67,7 @@ public class UserHandler implements HttpHandler {
                     exchange.sendResponseHeaders(200, 0);
                     OutputStream outputStream = exchange.getResponseBody();
 
-                    MultipartHandler.writeJson(outputStream, seekedUser);
+                    MultipartHandler.writeObject(outputStream, seekedUser);
                     File profilePicture = MediaAccessor.getMedia(seekedUser.getUserId(), MediaAccessor.MediaPath.PROFILES);
                     MultipartHandler.writeFromFile(outputStream, profilePicture);
 

@@ -1,15 +1,12 @@
 package org.aut.controllers;
 
-import org.aut.dataAccessors.MediaAccessor;
+
 import org.aut.dataAccessors.MessageAccessor;
 import org.aut.models.Message;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
-
-import java.io.File;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.TreeMap;
+
 
 public class MessageController {
     public static void addMessage(Message message) throws SQLException, NotFoundException, NotAcceptableException {
@@ -28,14 +25,5 @@ public class MessageController {
             throw new NotFoundException("Message not found");
         }
         MessageAccessor.deleteMessage(messageId);
-    }
-
-    public static TreeMap<Message, File> getLastMessages(String user1Id, String user2Id) throws SQLException, NotFoundException, NotAcceptableException {
-        TreeMap<Message, File> fullMessages = new TreeMap<>();
-        ArrayList<Message> messages = MessageAccessor.getLastMessagesBetween(user1Id, user2Id);
-        for (Message message : messages) {
-            fullMessages.put(message, MediaAccessor.getMedia(message.getId(), MediaAccessor.MediaPath.MESSAGES));
-        }
-        return fullMessages;
     }
 }

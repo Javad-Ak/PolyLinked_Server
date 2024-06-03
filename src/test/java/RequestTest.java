@@ -1,10 +1,6 @@
-import org.aut.dataAccessors.MediaAccessor;
 import org.aut.models.Message;
 import org.aut.models.Post;
 import org.aut.models.Profile;
-import org.aut.dataAccessors.DataBaseAccessor;
-import org.aut.dataAccessors.LikeAccessor;
-import org.aut.dataAccessors.PostAccessor;
 import org.aut.models.*;
 import org.aut.utils.MultipartHandler;
 import org.aut.dataAccessors.UserAccessor;
@@ -22,10 +18,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.TreeMap;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 import org.aut.utils.JsonHandler;
 
@@ -50,10 +43,10 @@ public class RequestTest {
             InputStream inputStream = response.body();
             int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
 
-            TreeMap<User, File> map = MultipartHandler.readMap(inputStream, Path.of("./out"), User.class, count);
+            List<User> users = MultipartHandler.readObjectArray(inputStream, User.class, count);
             inputStream.close();
 
-            System.out.println(map);
+            System.out.println(users);
             System.out.println("test result: " + response.statusCode());
         } else {
             System.out.println("Server returned HTTP code " + response.statusCode());
@@ -75,7 +68,7 @@ public class RequestTest {
 
         con.setDoOutput(true);
         OutputStream out = con.getOutputStream();
-        MultipartHandler.writeJson(out, post);
+        MultipartHandler.writeObject(out, post);
         MultipartHandler.writeFromFile(out, pic);
         out.close();
 
@@ -102,7 +95,7 @@ public class RequestTest {
             InputStream inputStream = response.body();
 //            System.out.println(new String(inputStream.readAllBytes()));
 
-            Post seeked = MultipartHandler.readJson(inputStream, Post.class);
+            Post seeked = MultipartHandler.readObject(inputStream, Post.class);
             System.out.println(seeked);
 
             MultipartHandler.readToFile(inputStream, media);
@@ -147,7 +140,7 @@ public class RequestTest {
 
         con.setDoOutput(true);
         OutputStream out = con.getOutputStream();
-        MultipartHandler.writeJson(out, message);
+        MultipartHandler.writeObject(out, message);
         MultipartHandler.writeFromFile(out, pic);
         out.close();
 
@@ -170,18 +163,12 @@ public class RequestTest {
         HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
         if (response.statusCode() / 100 == 2) {
             InputStream inputStream = response.body();
-            TreeMap <Message , File > fullMessages ;
             int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
             System.out.println(count);
-            fullMessages = MultipartHandler.readMap(inputStream , Path.of("./out") , Message.class , count );
-            System.out.println(fullMessages);
-//            System.out.println(new String(inputStream.readAllBytes()));
-
+            List<Message> messages = MultipartHandler.readObjectArray(inputStream, Message.class, count);
+            System.out.println(messages);
 
             inputStream.close();
-//            System.out.println(new String(inputStream.readAllBytes()));
-//            MultipartHandler.readMap(inputStream , )
-
             System.out.println("GET test result: " + response.statusCode());
         } else {
             System.out.println("GET: Server returned HTTP code " + response.statusCode());
@@ -225,7 +212,7 @@ public class RequestTest {
             InputStream inputStream = response.body();
 //            System.out.println(new String(inputStream.readAllBytes()));
 
-            User user = MultipartHandler.readJson(inputStream, User.class);
+            User user = MultipartHandler.readObject(inputStream, User.class);
             System.out.println(user);
 
             MultipartHandler.readToFile(inputStream, pic);
@@ -244,14 +231,14 @@ public class RequestTest {
         File pic = new File("./in/prof1.jpg");
         File bg = new File("./in/prof2.png");
 
-        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/profiles").toURL().openConnection();
+        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/users/profiles").toURL().openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "multipart/form-data");
         con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzU5MzBmY2YtNGJjMS05Njc1IiwiaWF0IjoxNzE3MTU1MDYzLCJleHAiOjE3MTc3NTUwNjN9.0RT8KOkyiSx99dVcMXO5K0cmqzfFua8wwYLIyVM67p8");
 
         con.setDoOutput(true);
         OutputStream out = con.getOutputStream();
-        MultipartHandler.writeJson(out, profile);
+        MultipartHandler.writeObject(out, profile);
         MultipartHandler.writeFromFile(out, pic);
         MultipartHandler.writeFromFile(out, bg);
         out.close();
@@ -271,14 +258,14 @@ public class RequestTest {
         File bg = new File("./in/prof1.jpg");
         File pic = new File("./in/prof2.png");
 
-        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/profiles").toURL().openConnection();
+        HttpURLConnection con = (HttpURLConnection) URI.create("http://localhost:8080/users/profiles").toURL().openConnection();
         con.setRequestMethod("PUT");
         con.setRequestProperty("Content-Type", "multipart/form-data");
         con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY");
 
         con.setDoOutput(true);
         OutputStream out = con.getOutputStream();
-        MultipartHandler.writeJson(out, profile);
+        MultipartHandler.writeObject(out, profile);
         MultipartHandler.writeFromFile(out, pic);
         MultipartHandler.writeFromFile(out, bg);
         out.close();
@@ -299,7 +286,7 @@ public class RequestTest {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/profiles/user719066ad-4efe-8f14"))
+                .uri(URI.create("http://localhost:8080/users/profiles/user719066ad-4efe-8f14"))
                 .timeout(Duration.ofSeconds(10))
                 .header("Content-Type", "multipart/form-data")
                 .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY")
@@ -311,9 +298,8 @@ public class RequestTest {
 
         if (response.statusCode() / 100 == 2) {
             InputStream inputStream = response.body();
-//            System.out.println(new String(inputStream.readAllBytes()));
 
-            Profile profile = MultipartHandler.readJson(inputStream, Profile.class);
+            Profile profile = MultipartHandler.readObject(inputStream, Profile.class);
             System.out.println(profile);
 
             MultipartHandler.readToFile(inputStream, pic);
@@ -325,28 +311,6 @@ public class RequestTest {
             System.out.println("Server returned HTTP code " + response.statusCode());
         }
         client.close();
-
-//        HttpURLConnection con = getPostConnection(URI.create("http://localhost:8080/profiles/user719066ad-4efe-8f14").toURL());
-//        con.setRequestMethod("GET");
-//        con.setRequestProperty("Content-Type", "multipart/form-data");
-//        con.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY");
-//
-//        InputStream inputStream = con.getInputStream();
-//        if (con.getResponseCode() / 100 == 2) {
-//            System.out.println(new String(inputStream.readAllBytes()));
-//
-////            Profile profile = new Profile(MultipartHandler.readJson(inputStream, Profile.class));
-////            System.out.println(profile);
-////
-////            MultipartHandler.readToFile(inputStream, pic);
-////            MultipartHandler.readToFile(inputStream, bg);
-//            inputStream.close();
-//
-//            System.out.println("test result: " + con.getResponseCode());
-//        } else {
-//            System.out.println("Server returned HTTP code " + con.getResponseCode());
-//        }
-//        con.disconnect();
     }
 
     @Test
@@ -443,9 +407,8 @@ public class RequestTest {
     public void getFollowers() throws Exception {
 
         HttpClient client = HttpClient.newHttpClient();
-        User user = UserAccessor.getUserById("user71323753-4103-9147");
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/followers/user71323753-4103-9147"))
+                .uri(URI.create("http://localhost:8080/users/followers/user71323753-4103-9147"))
                 .timeout(Duration.ofSeconds(10))
                 .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNjU3NTljMjctNGE0Yi1iZjBjIiwiaWF0IjoxNzE3NDA2NjQ5LCJleHAiOjE3MTgwMDY2NDl9.vzIFwlz04IIl4xoeYN-dbbSUwJbdYfUkIDOmadqTG70")
                 .GET()
@@ -454,12 +417,10 @@ public class RequestTest {
         HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
         if (response.statusCode() / 100 == 2) {
             InputStream inputStream = response.body();
-//            System.out.println(new String(inputStream.readAllBytes()));
             int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
-            HashMap<User, File> fullFollowers = MultipartHandler.readMap(inputStream, Path.of("./out"), User.class, count);
+            List<User> users = MultipartHandler.readObjectArray(inputStream, User.class, count);
             inputStream.close();
-            System.out.println(fullFollowers);
-
+            System.out.println(users);
         } else {
             System.out.println("Server returned HTTP code " + response.statusCode());
         }
