@@ -26,8 +26,10 @@ public class FollowersHandler implements HttpHandler {
         String jwt = exchange.getRequestHeaders().getFirst("Authorization");
         try {
             User user = LoginHandler.getUserByToken(jwt);
-            String path = exchange.getRequestURI().getPath().split("/")[2];
-            User seekedUser = UserAccessor.getUserById(path);
+            String [] splitURI = exchange.getRequestURI().getPath().split("/");
+            if (splitURI.length != 3) {
+                throw new NotAcceptableException("Invalid request");
+            }
 
             try {
                 UserAccessor.getUserById(user.getUserId());
@@ -35,12 +37,16 @@ public class FollowersHandler implements HttpHandler {
                 throw new UnauthorizedException("User unauthorized");
             }
 
+            String path = splitURI[2];
+            User seekedUser = UserAccessor.getUserById(path);
+
             if (method.equals("GET")) {
 
+                HashMap<User, File> fullFollowers = FollowController.getFollowersOf(seekedUser.getUserId());
+                exchange.getResponseHeaders().set("X-Total-Count", "" + fullFollowers.size() );
                 exchange.sendResponseHeaders(200, 0);
                 OutputStream outputStream = exchange.getResponseBody();
 
-                HashMap<User, File> fullFollowers = FollowController.getFollowersOf(seekedUser.getUserId());
                 MultipartHandler.writeMap(outputStream, fullFollowers);
                 outputStream.close();
 

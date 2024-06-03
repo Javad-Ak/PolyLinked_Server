@@ -54,7 +54,7 @@ public class LoginHandler implements HttpHandler {
         exchange.close();
     }
 
-    public static User getUserByToken(String token) throws SQLException, UnauthorizedException {
+    public static User getUserByToken(String token) throws SQLException ,UnauthorizedException {
         try {
             Claims claims = JwtHandler.verifyToken(token);
             User user;

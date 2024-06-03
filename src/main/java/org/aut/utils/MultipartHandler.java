@@ -94,13 +94,14 @@ public class MultipartHandler {
     public static <T extends JsonSerializable> T readJson(InputStream inputStream, Class<T> cls) throws IOException, NotAcceptableException {
         JSONObject headers = getJson(inputStream);
         String[] type = headers.getString("Content-Type").split("/");
-        if (type.length < 1 || (!type[1].equals("json") || !cls.getSimpleName().equals(type[0])))
+        if (type.length < 1 || (!type[1].equals("json") || !cls.getSimpleName().equals(type[0]))) {
             throw new NotAcceptableException("Invalid Content-Type");
+        }
 
         return JsonSerializable.fromJson(getJson(inputStream), cls);
     }
 
-    public static <T extends JsonSerializable & MediaLinked > HashMap<T, File> readMap(InputStream inputStream, Path dir, Class<T> cls, int count) throws NotAcceptableException, IOException{
+    public static <T extends JsonSerializable & MediaLinked> HashMap<T, File> readMap(InputStream inputStream, Path dir, Class<T> cls, int count) throws NotAcceptableException, IOException {
         HashMap<T, File> map = new HashMap<>();
         for (int i = 1; i <= count; i++) {
             T obj = readJson(inputStream, cls);
@@ -117,7 +118,6 @@ public class MultipartHandler {
             if ((char) ch == '}') break;
         }
         if (res.isEmpty() || res.charAt(0) != '{' || res.charAt(res.length() - 1) != '}') {
-            System.out.println(res);
             throw new NotAcceptableException("Invalid headers");
         }
 

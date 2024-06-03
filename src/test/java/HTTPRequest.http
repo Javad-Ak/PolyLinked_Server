@@ -22,22 +22,18 @@ Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMTgwMDQ3NmYtNDVhZS04NzMyIiwi
 }
 
 ###
-# @name followTest
 
-GET http://localhost:8080/users/user75930fcf-4bc1-9675 HTTP/1.1
-Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNzE5MDY2YWQtNGVmZS04ZjE0IiwiaWF0IjoxNzE3MDc5MzI3LCJleHAiOjE3MTc2NzkzMjd9.Wf5S2mrgrofUvs8GZeXRH31X8WcKq0ozvfzi1_mTeEY
 
-###
-# @name followTest
+# @name followPostTest
 
 POST http://localhost:8080/follows HTTP/1.1
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMjM3NTBkMTQtNDdjMC1iMjIwIiwiaWF0IjoxNzE2OTg1NjA2LCJleHAiOjE3MTc1ODU2MDZ9.ej7LwjDK9sO_9XXPJk5HxH6tSrw_2enANFDosy6yOr8
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyODcyNjc4NTgtNDlmNy04NjQ4IiwiaWF0IjoxNzE3MzIyMjMzLCJleHAiOjE3MTc5MjIyMzN9.yRSfpcTmkzlPoFWZPZJKdNbq_OfwAOL4JaYarCgpzac
 
 # body
 {
-  "follower": "user23750d14-47c0-b220",
-  "followed": "user31766fbd-430a-baf1"
+  "follower": "user87267858-49f7-8648",
+  "followed": "user71323753-4103-9147"
 }
 
 ###
