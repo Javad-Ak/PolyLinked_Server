@@ -52,13 +52,17 @@ public class MessageHandler implements HttpHandler {
 
                 case "DELETE": {
                     String[] splitPath = exchange.getRequestURI().getPath().split("/");
+
+                    if (splitPath.length != 3) {
+                        throw new NotAcceptableException("Invalid path");
+                    }
+
                     String path = splitPath[2];
                     Message message = MessageAccessor.getMessageById(path);
 
-                    if (splitPath.length != 3)
-                        throw new NotAcceptableException("Invalid path");
-                    if (!message.getSenderId().equals(user.getUserId()))
+                    if (!message.getSenderId().equals(user.getUserId())) {
                         throw new UnauthorizedException("Unauthorized user");
+                    }
 
                     File media = MediaAccessor.getMedia(message.getId(), MediaAccessor.MediaPath.MESSAGES);
                     if (media != null) Files.deleteIfExists(media.toPath());

@@ -50,7 +50,7 @@ public class CommentHandler implements HttpHandler {
                 break;
                 case "DELETE": {
                     String[] path = exchange.getRequestURI().getPath().split("/");
-                    if (path.length < 3) throw new NotAcceptableException("Invalid path");
+                    if (path.length != 3) throw new NotAcceptableException("Invalid path");
                     Comment comment = CommentAccessor.getCommentById(path[2]);
 
                     if (!comment.getUserId().equals(user.getUserId()))
@@ -65,7 +65,7 @@ public class CommentHandler implements HttpHandler {
                 break;
                 case "GET": {
                     String[] path = exchange.getRequestURI().getPath().split("/");
-                    if (path.length < 3) throw new NotAcceptableException("Invalid path");
+                    if (path.length != 3) throw new NotAcceptableException("Invalid path");
 
                     TreeMap<Comment, User> map = PostController.getCommentsOfPost(path[2]);
                     if (map.isEmpty()) throw new NotFoundException("Not found");

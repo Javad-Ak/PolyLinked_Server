@@ -14,7 +14,7 @@ public class ResourceHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         String[] path = exchange.getRequestURI().getPath().split("/");
         String method = exchange.getRequestMethod();
-        if (!(method.equals("GET") || method.equals("HEAD")) || path.length < 4) {
+        if (!(method.equals("GET") || method.equals("HEAD")) || path.length != 4) {
             exchange.sendResponseHeaders(405, 0);
             return;
         }

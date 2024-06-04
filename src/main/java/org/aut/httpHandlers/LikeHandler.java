@@ -41,7 +41,7 @@ public class LikeHandler implements HttpHandler {
                 break;
                 case "GET": {
                     String[] path = exchange.getRequestURI().getPath().split("/");
-                    if (path.length < 3) throw new NotAcceptableException("Invalid path");
+                    if (path.length != 3) throw new NotAcceptableException("Invalid path");
                     String postId = path[2];
 
                     ArrayList<User> users = LikeAccessor.getLikersOfPost(postId);
