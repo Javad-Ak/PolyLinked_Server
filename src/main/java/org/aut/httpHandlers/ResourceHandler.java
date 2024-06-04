@@ -13,7 +13,8 @@ public class ResourceHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String[] path = exchange.getRequestURI().getPath().split("/");
-        if (!exchange.getRequestMethod().equals("GET") || path.length < 4) {
+        String method = exchange.getRequestMethod();
+        if (!(method.equals("GET") || method.equals("HEAD")) || path.length < 4) {
             exchange.sendResponseHeaders(405, 0);
             return;
         }
@@ -36,6 +37,7 @@ public class ResourceHandler implements HttpHandler {
             } else throw new NotFoundException("File corruption");
 
             exchange.sendResponseHeaders(200, length);
+            if (method.equals("HEAD")) return;
 
             try (OutputStream outputStream = exchange.getResponseBody();
                  FileInputStream inputStream = new FileInputStream(file)) {
