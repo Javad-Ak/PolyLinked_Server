@@ -43,7 +43,10 @@ public final class Follow implements JsonSerializable {
 
     @Override
     public JSONObject toJson() {
-        return new JSONObject(toString());
+        JSONObject json = new JSONObject();
+        json.put("follower_id", follower_id);
+        json.put("followed_id", followed_id);
+        return json;
     }
 
     private static void validateFields(String follower, String followed) throws NotAcceptableException {

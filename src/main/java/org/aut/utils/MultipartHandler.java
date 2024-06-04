@@ -1,6 +1,5 @@
 package org.aut.utils;
 
-import org.aut.dataAccessors.MediaAccessor;
 import org.aut.models.JsonSerializable;
 import org.aut.models.MediaLinked;
 import org.aut.models.User;
@@ -55,6 +54,7 @@ public class MultipartHandler {
             writeObject(outputStream, obj);
             writeObject(outputStream, map.get(obj));
         }
+        outputStream.flush();
     }
 
     public static <T extends JsonSerializable> void writeObjectArray(OutputStream outputStream, List<T> array) throws IOException {
@@ -110,7 +110,7 @@ public class MultipartHandler {
 
     public static <T extends MediaLinked> TreeMap<T, User> readMap(InputStream inputStream, Class<T> cls, int count) throws NotAcceptableException, IOException {
         TreeMap<T, User> map = new TreeMap<>();
-        for (int i = 1; i <= count; i++) {
+        for (int i = 0; i < count; i++) {
             T obj = readObject(inputStream, cls);
             map.put(obj, readObject(inputStream, User.class));
         }

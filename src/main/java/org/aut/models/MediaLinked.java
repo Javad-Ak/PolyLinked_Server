@@ -4,13 +4,12 @@ import org.jetbrains.annotations.NotNull;
 
 
 public interface MediaLinked extends JsonSerializable, Comparable<MediaLinked> {
-    String SERVER_ADDRESS = "https://localhost:8080/resources/";
-
-    String getMediaId();
+    String SERVER_PREFIX = "https://localhost:8080/resources/";
 
     String getMediaURL();
 
-    default int compareTo(@NotNull MediaLinked mediaLinked) {
+    @Override
+    default int compareTo(@NotNull MediaLinked o) {
         return 0;
     }
 }

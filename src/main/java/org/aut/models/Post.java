@@ -4,7 +4,6 @@ import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.print.attribute.standard.Media;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
@@ -27,9 +26,8 @@ public class Post implements MediaLinked {
         this.userId = userId;
         this.text = text.trim();
         date = new Date(System.currentTimeMillis());
-
-        likesCount = -1;
-        commentsCount = -1;
+        likesCount = 0;
+        commentsCount = 0;
     }
 
     public Post(JSONObject json) throws NotAcceptableException {
@@ -38,8 +36,13 @@ public class Post implements MediaLinked {
             userId = json.getString("userId");
             text = json.getString("text").trim();
             date = new Date(json.getLong("date"));
-            likesCount = json.getInt("likesCount");
-            commentsCount = json.getInt("commentsCount");
+            try {
+                likesCount = json.getInt("likesCount");
+                commentsCount = json.getInt("commentsCount");
+            } catch (JSONException ignored) {
+                likesCount = 0;
+                commentsCount = 0;
+            }
         } catch (JSONException e) {
             throw new NotAcceptableException("invalid arguments");
         }
@@ -93,17 +96,19 @@ public class Post implements MediaLinked {
     }
 
     @Override
-    public String getMediaId() {
-        return postId;
-    }
-
-    @Override
     public String getMediaURL() {
-        return MediaLinked.SERVER_ADDRESS + "posts/" + postId;
+        return MediaLinked.SERVER_PREFIX + "posts/" + postId;
     }
 
     @Override
     public JSONObject toJson() {
-        return new JSONObject(toString());
+        JSONObject json = new JSONObject();
+        json.put("postId", postId);
+        json.put("userId", userId);
+        json.put("text", text);
+        json.put("date", date.getTime());
+        json.put("likesCount", likesCount);
+        json.put("commentsCount", commentsCount);
+        return json;
     }
 }

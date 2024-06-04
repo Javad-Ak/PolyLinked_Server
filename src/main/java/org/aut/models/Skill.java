@@ -58,6 +58,11 @@ public class Skill implements JsonSerializable {
 
     @Override
     public JSONObject toJson() {
-        return new JSONObject(toString());
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("skillId", skillId);
+        jsonObject.put("profileId", userId);
+        jsonObject.put("educationId", educationId);
+        jsonObject.put("name", text);
+        return jsonObject;
     }
 }

@@ -29,10 +29,36 @@ public class RequestTest {
     private final static String user2Id = "user795662bb-4b09-bc33";
     private final static String postId = "post8595866b-4633-9f83";
     private final static String jwt =
-            "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzMwZTAwLTRiNjAtYjYxMSIsImlhdCI6MTcxNzQ0MDk4NywiZXhwIjoxNzE4MDQwOTg3fQ.UpjaehPHwkAGenmHv0dITywGkSkcw3XDjlWUteTSLvY";
+            "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzMwZTAwLTRiNjAtYjYxMSIsImlhdCI6MTcxNzQ5MjE3MiwiZXhwIjoxNzE4MDkyMTcyfQ.8PF5XydPTbCdH89DBJxkyRBLXU7Q2m18nCbmiirpt0I";
 
     @Test
-    @DisplayName("---- message")
+    @DisplayName("---- hashtag")
+    public void HashtagTest() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/hashtags/" + "wow"))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", jwt)
+                .GET()
+                .build();
+
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() / 100 == 2) {
+            InputStream inputStream = response.body();
+            int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
+            TreeMap<Post, User> map = MultipartHandler.readMap(inputStream, Post.class, count);
+
+            inputStream.close();
+            System.out.println("GET test result: " + map);
+        } else {
+            System.out.println("GET: Server returned HTTP code " + response.statusCode());
+        }
+        client.close();
+    }
+
+
+    @Test
+    @DisplayName("---- comment")
     public void commentTest() throws Exception {
         // ##### POST
         Comment comment = new Comment(user1Id, postId, "ddd");

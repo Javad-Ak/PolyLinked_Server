@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class PostAccessor {
     private static final Connection connection = DataBaseAccessor.getConnection();
@@ -69,6 +70,29 @@ public class PostAccessor {
         jsonObject.put("commentsCount", CommentAccessor.countPostComments(postId));
 
         return new Post(jsonObject);
+    }
+
+    public synchronized static ArrayList<Post> getPostsWithHashtag() throws SQLException, NotFoundException {
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM posts WHERE text like '%#_%';");
+        ArrayList<JSONObject> jsonArray = JsonHandler.getArrayFromResultSet(resultSet);
+        if (jsonArray.isEmpty()) throw new NotFoundException("Posts not found");
+
+        resultSet.close();
+        statement.close();
+
+        ArrayList<Post> posts = new ArrayList<>();
+        for (JSONObject jsonObject : jsonArray) {
+            jsonObject.put("likesCount", LikeAccessor.countPostLikes(jsonObject.getString("postId")));
+            jsonObject.put("commentsCount", CommentAccessor.countPostComments(jsonObject.getString("postId")));
+
+            try {
+                posts.add(new Post(jsonObject));
+            } catch (NotAcceptableException ignored) {
+            }
+        }
+
+        return posts;
     }
 
     public synchronized static void updatePost(Post post) throws SQLException {

@@ -1,5 +1,6 @@
 import org.aut.controllers.ConnectController;
 import org.aut.controllers.FollowController;
+import org.aut.controllers.HashtagController;
 import org.aut.controllers.UserController;
 import org.aut.dataAccessors.*;
 import org.aut.models.*;
@@ -23,7 +24,8 @@ public class DBTest {
         User user3 = new User("kasra@gmail.com", "ali1222345", "Ali", "akbari", "ll");
         User[] users = {user1, user2, user3};
 
-        Post post = new Post(user1.getUserId(), "hey");
+        Post post = new Post(user1.getUserId(), "hey #Woww .");
+        Post post2 = new Post(user1.getUserId(), "#good luck boy");
         for (User user : users) {
             try {
                 UserAccessor.addUser(user);
@@ -32,6 +34,7 @@ public class DBTest {
         }
         try {
             PostAccessor.addPost(post);
+            PostAccessor.addPost(post2);
         } catch (NotAcceptableException ignored) {
         }
         Like like1 = new Like(post.getPostId(), user1.getUserId());
@@ -77,6 +80,13 @@ public class DBTest {
             System.out.println("2 follows and a connect added.");
         } catch (SQLException ignored) {
         }
+    }
+
+    @Test
+    @DisplayName("---- testing comments table")
+    public void HashtagTest() throws Exception {
+        DataBaseAccessor.create();
+        System.out.println(HashtagController.hashtagDetector("wow"));
     }
 
     @Test

@@ -58,13 +58,8 @@ public class Message implements MediaLinked {
     }
 
     @Override
-    public String getMediaId() {
-        return id;
-    }
-
-    @Override
     public String getMediaURL() {
-        return MediaLinked.SERVER_ADDRESS + "messages/" + id;
+        return MediaLinked.SERVER_PREFIX + "messages/" + id;
     }
 
     @Override
@@ -80,7 +75,13 @@ public class Message implements MediaLinked {
 
     @Override
     public JSONObject toJson() {
-        return new JSONObject(toString());
+        JSONObject json = new JSONObject();
+        json.put("id", id);
+        json.put("senderId", senderId);
+        json.put("receiverId", receiverId);
+        json.put("text", text);
+        json.put("createDate", createDate.getTime());
+        return json;
     }
 
     public static void validateFields(String senderId, String receiverId, String text) throws NotAcceptableException {
