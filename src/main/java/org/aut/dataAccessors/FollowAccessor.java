@@ -73,10 +73,10 @@ public class FollowAccessor {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM follows WHERE follower_id = ? ");
         statement.setString(1, id);
         follows = getFollowsListFromStatement(statement);
-        statement.close();
         for (Follow follow : follows) {
             followings.add(UserAccessor.getUserById(follow.getFollowed_id()));
         }
+        statement.close();
         followings.sort(Comparator.comparing(User::getFirstName));
         return followings;
     }
