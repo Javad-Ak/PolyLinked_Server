@@ -1,5 +1,6 @@
 import org.aut.controllers.ConnectController;
 import org.aut.controllers.FollowController;
+import org.aut.controllers.HashtagController;
 import org.aut.controllers.UserController;
 import org.aut.dataAccessors.*;
 import org.aut.models.*;
@@ -79,6 +80,13 @@ public class DBTest {
             System.out.println("2 follows and a connect added.");
         } catch (SQLException ignored) {
         }
+    }
+
+    @Test
+    @DisplayName("---- testing comments table")
+    public void HashtagTest() throws Exception {
+        DataBaseAccessor.create();
+        System.out.println(HashtagController.hashtagDetector("wow"));
     }
 
     @Test

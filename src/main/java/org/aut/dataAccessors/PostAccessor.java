@@ -72,10 +72,9 @@ public class PostAccessor {
         return new Post(jsonObject);
     }
 
-    public synchronized static ArrayList<Post> getPostsByHashtag(String input) throws SQLException, NotFoundException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM posts WHERE text REGEXP ?;");
-        statement.setString(1, "(?i)\\B#" + input + "\\w*\\b");
-        ResultSet resultSet = statement.executeQuery();
+    public synchronized static ArrayList<Post> getPostsWithHashtag() throws SQLException, NotFoundException {
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM posts WHERE text like '%#_%';");
         ArrayList<JSONObject> jsonArray = JsonHandler.getArrayFromResultSet(resultSet);
         if (jsonArray.isEmpty()) throw new NotFoundException("Posts not found");
 
@@ -84,6 +83,9 @@ public class PostAccessor {
 
         ArrayList<Post> posts = new ArrayList<>();
         for (JSONObject jsonObject : jsonArray) {
+            jsonObject.put("likesCount", LikeAccessor.countPostLikes(jsonObject.getString("postId")));
+            jsonObject.put("commentsCount", CommentAccessor.countPostComments(jsonObject.getString("postId")));
+
             try {
                 posts.add(new Post(jsonObject));
             } catch (NotAcceptableException ignored) {

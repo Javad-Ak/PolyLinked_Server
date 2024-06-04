@@ -102,7 +102,17 @@ public class CallInfo implements JsonSerializable {
 
     @Override
     public JSONObject toJson() {
-        return new JSONObject(toString());
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("userId", userId);
+        jsonObject.put("emailAddress", email);
+        jsonObject.put("mobileNumber", mobileNumber);
+        jsonObject.put("homeNumber", homeNumber);
+        jsonObject.put("workNumber", workNumber);
+        jsonObject.put("Address", address);
+        jsonObject.put("birthDay", birthDay.getTime());
+        jsonObject.put("privacyPolitics", privacyPolitics);
+        jsonObject.put("socialMedia", socialMedia);
+        return jsonObject;
     }
 
     private void validateFields(String userId, String email, String mobileNumber, String homeNumber, String workNumber, String address, String socialMedia) throws NotAcceptableException {

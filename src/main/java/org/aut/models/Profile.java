@@ -1,5 +1,6 @@
 package org.aut.models;
 
+import org.aut.utils.JsonHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,7 +57,15 @@ public class Profile implements MediaLinked {
 
     @Override
     public JSONObject toJson() {
-        return new JSONObject(toString());
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("userId", userId);
+        jsonObject.put("bio", bio);
+        jsonObject.put("country", country);
+        jsonObject.put("city", city);
+        jsonObject.put("status", status.toString());
+        jsonObject.put("profession", profession.toString());
+        jsonObject.put("notify", notify);
+        return jsonObject;
     }
 
     private void validateFields(String bio, String country, String city) throws NotAcceptableException {
@@ -95,14 +104,10 @@ public class Profile implements MediaLinked {
         return notify;
     }
 
-    @Override
-    public String getMediaId() {
-        return userId;
-    }
 
     @Override
     public String getMediaURL() {
-        return MediaLinked.SERVER_ADDRESS + "backgrounds/" + userId;
+        return MediaLinked.SERVER_PREFIX + "backgrounds/" + userId;
     }
 
     public enum Status {

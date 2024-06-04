@@ -4,9 +4,10 @@ import org.aut.utils.exceptions.NotAcceptableException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Connect {
+public class Connect implements JsonSerializable {
     private final String applicant_id;
     private final String acceptor_id;
     private final String note;
@@ -75,14 +76,23 @@ public class Connect {
                 "}";
     }
 
-    public JSONObject toJSON() {
-        return new JSONObject(toString());
-    }
+
 
     public static void validateFields(String applicantId, String acceptorId, String note) throws NotAcceptableException {
         if (applicantId == null || acceptorId == null || note == null || note.length() >= 500) {
             throw new NotAcceptableException("invalid argument");
         }
+    }
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("applicant_id", applicant_id);
+        jsonObject.put("acceptor_id", acceptor_id);
+        jsonObject.put("accept_state", accept_state.value);
+        jsonObject.put("note", note);
+        jsonObject.put("create_date", create_date.getTime());
+        return jsonObject;
     }
 
     public enum AcceptState {

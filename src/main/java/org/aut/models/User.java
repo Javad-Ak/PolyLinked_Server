@@ -62,7 +62,15 @@ public class User implements MediaLinked{
 
     @Override
     public JSONObject toJson() {
-        return new JSONObject(toString());
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("userId", userId);
+        jsonObject.put("email", email);
+        jsonObject.put("password", password);
+        jsonObject.put("firstName", firstName);
+        jsonObject.put("lastName", lastName);
+        jsonObject.put("additionalName", additionalName);
+        jsonObject.put("createDate", createDate.getTime());
+        return jsonObject;
     }
 
     public String getFirstName() {
@@ -94,13 +102,8 @@ public class User implements MediaLinked{
     }
 
     @Override
-    public String getMediaId() {
-        return userId;
-    }
-
-    @Override
     public String getMediaURL() {
-        return MediaLinked.SERVER_ADDRESS + "profiles/" + userId;
+        return MediaLinked.SERVER_PREFIX + "profiles/" + userId;
     }
 
     private static void validateFields(String email, String password, String firstName, String lastName, String additionalName) throws NotAcceptableException {

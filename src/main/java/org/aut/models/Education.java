@@ -67,7 +67,17 @@ public class Education implements JsonSerializable {
 
     @Override
     public JSONObject toJson() {
-        return new JSONObject(toString());
+       JSONObject jsonObject = new JSONObject();
+       jsonObject.put("educationId", educationId);
+       jsonObject.put("user_id", userId);
+       jsonObject.put("institute", institute);
+       jsonObject.put("field", field);
+       jsonObject.put("start", start.getTime());
+       jsonObject.put("end", end.getTime());
+       jsonObject.put("grade", grade);
+       jsonObject.put("activities", activities);
+       jsonObject.put("about", about);
+       return jsonObject;
     }
 
     private void validateFields(String institute, String field, Date start, Date end, int grade, String activities, String about) throws NotAcceptableException {

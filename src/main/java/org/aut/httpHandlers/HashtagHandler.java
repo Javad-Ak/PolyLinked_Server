@@ -2,8 +2,9 @@ package org.aut.httpHandlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.aut.dataAccessors.PostAccessor;
+import org.aut.controllers.HashtagController;
 import org.aut.models.Post;
+import org.aut.models.User;
 import org.aut.utils.MultipartHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
@@ -12,7 +13,7 @@ import org.aut.utils.exceptions.UnauthorizedException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.TreeMap;
 
 public class HashtagHandler implements HttpHandler {
     @Override
@@ -25,16 +26,17 @@ public class HashtagHandler implements HttpHandler {
                 LoginHandler.getUserByToken(jwt);
 
                 String[] path = exchange.getRequestURI().getPath().split("/");
-                if (path.length < 3) throw new NotAcceptableException("Invalid path");
+                if (path.length != 3) throw new NotAcceptableException("Invalid path");
                 String input = path[2];
 
-                ArrayList<Post> posts = PostAccessor.getPostsByHashtag(input);
+                TreeMap<Post, User> posts = HashtagController.hashtagDetector(input);
                 if (!posts.isEmpty()) {
                     exchange.getResponseHeaders().add("X-Total-Count", String.valueOf(posts.size()));
                     exchange.sendResponseHeaders(200, 0);
-
                     OutputStream outputStream = exchange.getResponseBody();
-                    MultipartHandler.writeObjectArray(outputStream, posts);
+
+                    System.out.println(posts);
+                    MultipartHandler.writeMap(outputStream, posts);
                     outputStream.close();
                 } else {
                     throw new NotFoundException("Not found");
@@ -42,7 +44,7 @@ public class HashtagHandler implements HttpHandler {
             } else {
                 exchange.sendResponseHeaders(405, 0);
             }
-        } catch (UnauthorizedException e) {
+        } catch (UnauthorizedException e){
             exchange.sendResponseHeaders(401, 0);
         } catch (SQLException e) {
             exchange.sendResponseHeaders(500, 0);

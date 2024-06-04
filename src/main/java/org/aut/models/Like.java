@@ -36,7 +36,11 @@ public class Like implements JsonSerializable {
 
     @Override
     public JSONObject toJson() {
-        return null;
+        JSONObject json = new JSONObject();
+        json.put("userId", userId);
+        json.put("postId", postId);
+        json.put("date", date);
+        return json;
     }
 
     public String getUserId() {

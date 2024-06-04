@@ -1,7 +1,6 @@
 package org.aut.models;
 
 import org.aut.utils.exceptions.NotAcceptableException;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -59,13 +58,8 @@ public class Comment implements MediaLinked {
     }
 
     @Override
-    public String getMediaId() {
-        return id;
-    }
-
-    @Override
     public String getMediaURL() {
-        return MediaLinked.SERVER_ADDRESS + "comments/" + id;
+        return MediaLinked.SERVER_PREFIX + "comments/" + id;
     }
 
     @Override
@@ -81,7 +75,13 @@ public class Comment implements MediaLinked {
 
     @Override
     public JSONObject toJson() {
-        return new JSONObject(toString());
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", id);
+        jsonObject.put("userId", userId);
+        jsonObject.put("postId", postId);
+        jsonObject.put("text", text);
+        jsonObject.put("createDate", createDate.getTime());
+        return jsonObject;
     }
 
     public static void validateFields(String userId, String postId, String text) throws NotAcceptableException {

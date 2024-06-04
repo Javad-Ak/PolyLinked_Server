@@ -1,3 +1,10 @@
+# @name hashtag
+
+GET http://localhost:8080/hashtags/wow HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzMwZTAwLTRiNjAtYjYxMSIsImlhdCI6MTcxNzQ5MjE3MiwiZXhwIjoxNzE4MDkyMTcyfQ.8PF5XydPTbCdH89DBJxkyRBLXU7Q2m18nCbmiirpt0I
+
+###
+
 # @name PostLike
 
 POST http://localhost:8080/likes HTTP/1.1
