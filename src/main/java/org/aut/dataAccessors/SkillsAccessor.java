@@ -57,9 +57,9 @@ public class SkillsAccessor {
         statement.close();
     }
 
-    public synchronized static void deleteSkill(Skill skill) throws SQLException {
+    public synchronized static void deleteSkill(String id) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("DELETE FROM skills WHERE skillId = ?;");
-        statement.setString(1, skill.getSkillId());
+        statement.setString(1, id);
 
         statement.executeUpdate();
         statement.close();
@@ -74,6 +74,18 @@ public class SkillsAccessor {
         set.close();
         statement.close();
         return bool;
+    }
+
+    public synchronized static Skill getSkill(String id) throws SQLException, NotFoundException, NotAcceptableException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM skills WHERE skillId = ?;");
+        statement.setString(1, id);
+
+        ResultSet set = statement.executeQuery();
+        JSONObject obj = JsonHandler.getFromResultSet(set);
+        statement.close();
+
+        if (obj == null || obj.isEmpty()) throw new NotFoundException("Not Found");
+        return new Skill(obj);
     }
 
     public synchronized static ArrayList<Skill> getSkillsOfEducation(String eduId) throws SQLException {

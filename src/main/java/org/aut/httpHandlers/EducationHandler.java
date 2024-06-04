@@ -56,7 +56,6 @@ public class EducationHandler implements HttpHandler {
                     ArrayList<Education> educations = EducationAccessor.getEducationsOf(path[3]);
                     if (educations.isEmpty()) throw new NotFoundException("Not Found");
 
-                    System.out.println(educations);
                     exchange.getResponseHeaders().add("X-Total-Count", Integer.toString(educations.size()));
                     exchange.sendResponseHeaders(200, 0);
 
