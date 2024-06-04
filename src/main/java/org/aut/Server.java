@@ -14,7 +14,7 @@ import org.aut.httpHandlers.*;
  * Server of PolyLinked - A simulation of LinkedIn
  *
  * @author AliReza Atharifard, MohammadJavad Akbari
- * @version 1.0
+ * @version 2.0
  */
 public class Server {
     public static void main(String[] args) {
@@ -26,7 +26,7 @@ public class Server {
             server.createContext("/users/login", new LoginHandler());
             server.createContext("/users/profiles", new ProfileHandler());
             server.createContext("/users/educations", new EducationHandler());
-            server.createContext("/users/skills", new EducationHandler());
+            server.createContext("/users/skills", new SkillHandler());
             server.createContext("/users/followers", new FollowersHandler());
             server.createContext("/users/followings" , new FollowingsHandler());
             server.createContext("/users/posts", new PostHandler());

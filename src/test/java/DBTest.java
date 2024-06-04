@@ -92,6 +92,28 @@ public class DBTest {
         } catch (Exception ignored) {
         }
 
+        Skill skill1 = new Skill(edu1.getUserId(), edu1.getEducationId(), "1");
+        Skill skill2 = new Skill(edu1.getUserId(), edu1.getEducationId(), "2");
+        Skill skill3 = new Skill(edu1.getUserId(), edu1.getEducationId(), "3");
+        try {
+            SkillsAccessor.addSkill(skill1);
+            SkillsAccessor.addSkill(skill2);
+            SkillsAccessor.addSkill(skill3);
+            SkillsAccessor.deleteSkill(skill1.getSkillId());
+            System.out.println("3 Skills added and 1 deleted.");
+        } catch (Exception ignored) {
+        }
+
+        CallInfo callInfo1 = new CallInfo(user1.getUserId(), user1.getEmail(), "222", "333", "444", "555", new Date(555555), CallInfo.PrivacyPolitics.EVERYONE, "tel");
+        CallInfo callInfo12 = new CallInfo(user2.getUserId(), user2.getEmail(), "222", "333", "444", "555", new Date(555555), CallInfo.PrivacyPolitics.EVERYONE, "tel");
+        try {
+            CallInfoAccessor.addCallInfo(callInfo1);
+            CallInfoAccessor.addCallInfo(callInfo12);
+            CallInfoAccessor.deleteCallInfo(callInfo1.getUserId());
+            System.out.println("2 CallInfos added and 1 deleted.");
+        } catch (Exception ignored) {
+        }
+
         System.out.println("---- user1 Feed: \n" + NewsFeedController.fetchFeed(user1.getUserId()));
     }
 

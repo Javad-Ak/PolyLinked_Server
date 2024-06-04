@@ -1,7 +1,7 @@
-# @name education
+# @name skill
 
-DELETE http://localhost:8080/users/educations/edu8416371f-4737-8827 HTTP/1.1
-Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNTcyNTk2MzQtNDE0My04MjM3IiwiaWF0IjoxNzE3NTI3MzI5LCJleHAiOjE3MTgxMjczMjl9.KbEUOS-k0OfyK6oLlx4onHwLk6PNnZNfo97cE4iE5fE
+GET http://localhost:8080/users/skills/edu32706abb-4abf-ae52 HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNDEzMDJiMWQtNGUyYy1hZjg5IiwiaWF0IjoxNzE3NTMzMTkzLCJleHAiOjE3MTgxMzMxOTN9.5YGnn3xuQjVUOgHOKOicOw7v4vip65m8JSGn2sNYICY
 
 ###
 
