@@ -1,7 +1,7 @@
 # @name hashtag
 
-GET http://localhost:8080/newsfeed/user87538303-4aed-90b8 HTTP/1.1
-Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzMwZTAwLTRiNjAtYjYxMSIsImlhdCI6MTcxNzQ5MjE3MiwiZXhwIjoxNzE4MDkyMTcyfQ.8PF5XydPTbCdH89DBJxkyRBLXU7Q2m18nCbmiirpt0I
+GET http://localhost:8080/newsfeed HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyODc1MzgzMDMtNGFlZC05MGI4IiwiaWF0IjoxNzE3NTE2OTEyLCJleHAiOjE3MTgxMTY5MTJ9.t-hDKUlCkWx0a-PRq0uPUpWXdqFBf3EAB_bQjL0qeKU
 
 ###
 

@@ -7,6 +7,7 @@ import org.aut.models.Post;
 import org.aut.models.User;
 import org.aut.utils.MultipartHandler;
 import org.aut.utils.exceptions.NotFoundException;
+import org.aut.utils.exceptions.UnauthorizedException;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,14 +18,16 @@ public class NewsFeedHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
-        String[] path = exchange.getRequestURI().getPath().split("/");
-        if (!method.equals("GET") || path.length != 3) {
+        if (!method.equals("GET")) {
             exchange.sendResponseHeaders(405, 0);
             return;
         }
 
+        String jwt = exchange.getRequestHeaders().getFirst("Authorization");
         try {
-            TreeMap<Post, User> map = NewsFeedController.fetchFeed(path[2]);
+            User user = LoginHandler.getUserByToken(jwt);
+
+            TreeMap<Post, User> map = NewsFeedController.fetchFeed(user.getUserId());
             if (map.isEmpty()) throw new NotFoundException("Empty feed");
 
             exchange.getResponseHeaders().add("X-Total-Count", String.valueOf(map.size()));
@@ -37,6 +40,8 @@ public class NewsFeedHandler implements HttpHandler {
             exchange.sendResponseHeaders(404, 0);
         } catch (SQLException e) {
             exchange.sendResponseHeaders(500, 0);
+        } catch (UnauthorizedException e) {
+            exchange.sendResponseHeaders(401, 0);
         }
     }
 }
