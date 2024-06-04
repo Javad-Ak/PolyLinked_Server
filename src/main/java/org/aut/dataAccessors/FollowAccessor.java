@@ -53,28 +53,34 @@ public class FollowAccessor {
         statement.close();
     }
 
-    public synchronized static ArrayList<User> getFollowers(String id) throws SQLException, NotAcceptableException , NotFoundException {
+    public synchronized static ArrayList<User> getFollowers(String id) throws SQLException {
         ArrayList<Follow> follows;
         ArrayList<User> followers = new ArrayList<>();
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM follows WHERE followed_id = ?");
         statement.setString(1, id);
         follows = getFollowsListFromStatement(statement);
         for (Follow follow : follows) {
-            followers.add(UserAccessor.getUserById(follow.getFollower_id()));
+            try {
+                followers.add(UserAccessor.getUserById(follow.getFollower_id()));
+            } catch (NotFoundException ignored) {
+            }
         }
         statement.close();
         followers.sort(Comparator.comparing(User::getFirstName));
         return followers;
     }
 
-    public synchronized static ArrayList<User> getFollowings(String id) throws SQLException, NotAcceptableException , NotFoundException {
+    public synchronized static ArrayList<User> getFollowings(String id) throws SQLException {
         ArrayList<Follow> follows ;
         ArrayList<User> followings = new ArrayList<>();
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM follows WHERE follower_id = ? ");
         statement.setString(1, id);
         follows = getFollowsListFromStatement(statement);
         for (Follow follow : follows) {
-            followings.add(UserAccessor.getUserById(follow.getFollowed_id()));
+            try {
+                followings.add(UserAccessor.getUserById(follow.getFollowed_id()));
+            } catch (Exception ignored) {
+            }
         }
         statement.close();
         followings.sort(Comparator.comparing(User::getFirstName));
@@ -91,13 +97,28 @@ public class FollowAccessor {
         return res;
     }
 
-    public synchronized static ArrayList<Follow> getFollowsListFromStatement(PreparedStatement statement) throws SQLException, NotAcceptableException {
+    public synchronized static ArrayList<User> getNetWork(String id) throws SQLException {
+        ArrayList<User> users = new ArrayList<>();
+        for (User user : getFollowings(id)) {
+            users.add(user);
+            for (User user2 : getFollowings(user.getUserId())) {
+                users.add(user2);
+                users.addAll(getFollowings(user2.getUserId()));
+            }
+        }
+
+        return users;
+    }
+
+    private synchronized static ArrayList<Follow> getFollowsListFromStatement(PreparedStatement statement) throws SQLException {
         ArrayList<Follow> follows = new ArrayList<>();
         ResultSet resultSet = statement.executeQuery();
         JSONObject jsonObject;
         while ((jsonObject = JsonHandler.getFromResultSet(resultSet)) != null) {
-            System.out.println(jsonObject);
-            follows.add(new Follow(jsonObject));
+            try {
+                follows.add(new Follow(jsonObject));
+            } catch (NotAcceptableException ignored) {
+            }
         }
         resultSet.close();
         return follows;

@@ -19,12 +19,18 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class PostHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
         String jwt = exchange.getRequestHeaders().getFirst("Authorization");
+        String[] path = exchange.getRequestURI().getPath().split("/");
+        if (path[1].equals("users") && !method.equals("GET")) {
+            exchange.sendResponseHeaders(405, 0);
+            return;
+        }
 
         try {
             User user = LoginHandler.getUserByToken(jwt);
@@ -53,19 +59,27 @@ public class PostHandler implements HttpHandler {
                 }
                 break;
                 case "GET": {
-                    String[] path = exchange.getRequestURI().getPath().split("/");
-                    if (path.length != 3) throw new NotAcceptableException("Invalid path");
+                    if (path.length == 3) {
+                        Post post = PostAccessor.getPostById(path[2]);
+                        exchange.sendResponseHeaders(200, 0);
+                        OutputStream outputStream = exchange.getResponseBody();
+                        JsonHandler.sendObject(outputStream, post.toJson());
 
-                    Post post = PostAccessor.getPostById(path[2]);
-                    exchange.sendResponseHeaders(200, 0);
-                    OutputStream outputStream = exchange.getResponseBody();
-                    JsonHandler.sendObject(outputStream, post.toJson());
+                        outputStream.close();
+                    } else if (path.length == 4) {
+                        ArrayList<Post> posts = PostAccessor.getPostsOf(user.getUserId());
+                        if (posts.isEmpty()) throw new NotFoundException("Not found");
 
-                    outputStream.close();
+                        exchange.getResponseHeaders().add("X-Total-Count", Integer.toString(posts.size()));
+                        exchange.sendResponseHeaders(200, 0);
+
+                        OutputStream outputStream = exchange.getResponseBody();
+                        MultipartHandler.writeObjectArray(outputStream, posts);
+                        outputStream.close();
+                    } else throw new NotAcceptableException("Invalid path");
                 }
                 break;
                 case "DELETE": {
-                    String[] path = exchange.getRequestURI().getPath().split("/");
                     if (path.length != 3) throw new NotAcceptableException("Invalid path");
 
                     Post post = PostAccessor.getPostById(path[2]);

@@ -1,7 +1,4 @@
-import org.aut.controllers.ConnectController;
-import org.aut.controllers.FollowController;
-import org.aut.controllers.HashtagController;
-import org.aut.controllers.UserController;
+import org.aut.controllers.*;
 import org.aut.dataAccessors.*;
 import org.aut.models.*;
 import org.aut.utils.exceptions.NotAcceptableException;
@@ -26,6 +23,7 @@ public class DBTest {
 
         Post post = new Post(user1.getUserId(), "hey #Woww .");
         Post post2 = new Post(user1.getUserId(), "#good luck boy");
+        Post post3 = new Post(user1.getUserId(), "good luck #boy");
         for (User user : users) {
             try {
                 UserAccessor.addUser(user);
@@ -35,6 +33,7 @@ public class DBTest {
         try {
             PostAccessor.addPost(post);
             PostAccessor.addPost(post2);
+            PostAccessor.addPost(post3);
         } catch (NotAcceptableException ignored) {
         }
         Like like1 = new Like(post.getPostId(), user1.getUserId());
@@ -80,6 +79,8 @@ public class DBTest {
             System.out.println("2 follows and a connect added.");
         } catch (SQLException ignored) {
         }
+
+        System.out.println("---- user1 Feed: \n" + NewsFeedController.fetchFeed(user1.getUserId()));
     }
 
     @Test

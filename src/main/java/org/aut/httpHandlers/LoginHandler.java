@@ -41,7 +41,6 @@ public class LoginHandler implements HttpHandler {
             code = 404;
         } catch (SQLException e) {
             code = 500;
-            System.out.println(e.getMessage());
         }
 
 

@@ -37,6 +37,8 @@ public class FollowersHandler implements HttpHandler {
                 User seekedUser = UserAccessor.getUserById(path);
 
                 ArrayList<User> followers = FollowAccessor.getFollowers(seekedUser.getUserId());
+                if (followers.isEmpty()) throw new NotFoundException("No user not found");
+
                 exchange.getResponseHeaders().set("X-Total-Count", "" + followers.size());
                 exchange.sendResponseHeaders(200, 0);
                 OutputStream outputStream = exchange.getResponseBody();

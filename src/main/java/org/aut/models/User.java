@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 import java.util.UUID;
 
-public class User implements MediaLinked{
+public class User implements MediaLinked {
     private final String userId; // UUID
     private String email; // valid
     private String password; // > 7 ch, int
@@ -71,6 +71,13 @@ public class User implements MediaLinked{
         jsonObject.put("additionalName", additionalName);
         jsonObject.put("createDate", createDate.getTime());
         return jsonObject;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof User user) {
+            return userId.equals(user.userId);
+        } else return false;
     }
 
     public String getFirstName() {

@@ -37,7 +37,6 @@ public class ConnectHandler implements HttpHandler {
 
                 case "PUT":
                     if (!jsonObject.isEmpty() && user.getUserId().equals(connect.getAcceptor_id())) {
-                        System.out.println(connect);
                         ConnectController.updateConnect(connect);
                         code = 200;
                     } else if (!jsonObject.isEmpty()) {

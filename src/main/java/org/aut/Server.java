@@ -27,6 +27,7 @@ public class Server {
             server.createContext("/users/profiles", new ProfileHandler());
             server.createContext("/users/followers", new FollowersHandler());
             server.createContext("/users/followings" , new FollowingsHandler());
+            server.createContext("/users/posts", new PostHandler());
 
             server.createContext("/follows", new FollowHandler());
             server.createContext("/connections", new ConnectHandler());
@@ -35,6 +36,7 @@ public class Server {
             server.createContext("/likes", new LikeHandler());
             server.createContext("/comments", new CommentHandler());
             server.createContext("/messages", new MessageHandler());
+            server.createContext("/newsfeed", new NewsFeedHandler());
             server.createContext("/hashtags", new HashtagHandler());
 
 
