@@ -25,20 +25,19 @@ public class Server {
             server.createContext("/users", new UserHandler());
             server.createContext("/users/login", new LoginHandler());
             server.createContext("/users/profiles", new ProfileHandler());
+            server.createContext("/users/educations", new ProfileHandler());
             server.createContext("/users/followers", new FollowersHandler());
             server.createContext("/users/followings" , new FollowingsHandler());
             server.createContext("/users/posts", new PostHandler());
 
             server.createContext("/follows", new FollowHandler());
             server.createContext("/connections", new ConnectHandler());
-
             server.createContext("/posts", new PostHandler());
             server.createContext("/likes", new LikeHandler());
             server.createContext("/comments", new CommentHandler());
             server.createContext("/messages", new MessageHandler());
             server.createContext("/newsfeed", new NewsFeedHandler());
             server.createContext("/hashtags", new HashtagHandler());
-
 
             server.createContext("/resources", new ResourceHandler());
 
