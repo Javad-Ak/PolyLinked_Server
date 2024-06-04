@@ -117,9 +117,7 @@ public class EducationAccessor {
         ArrayList<Education> educations = new ArrayList<>();
         for (JSONObject obj : objects) {
             try {
-                System.out.println("***"+obj);
                 educations.add(new Education(obj));
-                System.out.println(educations);
             } catch (NotAcceptableException ignored) {
             }
         }

@@ -1,13 +1,16 @@
 package org.aut.dataAccessors;
 
+import org.aut.models.Education;
 import org.aut.models.Skill;
+import org.aut.utils.JsonHandler;
+import org.aut.utils.exceptions.NotAcceptableException;
+import org.aut.utils.exceptions.NotFoundException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
 
 public class SkillsAccessor {
     private static final Connection connection = DataBaseAccessor.getConnection();
@@ -19,14 +22,10 @@ public class SkillsAccessor {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS skills (" +
                     "skillId TEXT NOT NULL " +
-                    ", userId TEXT NOT NULL" +
-                    ", educationId TEXT NOT NULL" +
+                    ", userId TEXT NOT NULL REFERENCES users (userId) ON DELETE CASCADE ON UPDATE CASCADE " +
+                    ", educationId TEXT NOT NULL REFERENCES educations (educationId) ON UPDATE CASCADE ON DELETE CASCADE " +
                     ", text TEXT NOT NULL" +
                     ", PRIMARY KEY (skillId)" +
-                    ", FOREIGN KEY (userId, educationId)" +
-                    " REFERENCES educations (userId, educationId)" +
-                    " ON UPDATE CASCADE" +
-                    " ON DELETE CASCADE" +
                     ");");
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
@@ -64,5 +63,34 @@ public class SkillsAccessor {
 
         statement.executeUpdate();
         statement.close();
+    }
+
+    public synchronized static boolean skillExists(String id) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM skills WHERE skillId = ?;");
+        statement.setString(1, id);
+
+        ResultSet set = statement.executeQuery();
+        boolean bool = set.next();
+        set.close();
+        statement.close();
+        return bool;
+    }
+
+    public synchronized static ArrayList<Skill> getSkillsOfEducation(String eduId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM skills WHERE educationId = ?;");
+        statement.setString(1, eduId);
+
+        ResultSet set = statement.executeQuery();
+        ArrayList<JSONObject> objects = JsonHandler.getArrayFromResultSet(set);
+        statement.close();
+
+        ArrayList<Skill> skills = new ArrayList<>();
+        for (JSONObject obj : objects) {
+            try {
+                skills.add(new Skill(obj));
+            } catch (NotAcceptableException ignored) {
+            }
+        }
+        return skills;
     }
 }
