@@ -10,6 +10,7 @@ import java.util.UUID;
 
 public class Post implements MediaLinked {
     private final String postId;
+    private final String repostFrom;
     private final String userId;
     private final String text;
     private final Date date;
@@ -23,6 +24,21 @@ public class Post implements MediaLinked {
         }
 
         postId = "post" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
+        repostFrom = "null";
+        this.userId = userId;
+        this.text = text.trim();
+        date = new Date(System.currentTimeMillis());
+        likesCount = 0;
+        commentsCount = 0;
+    }
+
+    public Post(String repostFrom, String userId, String text) throws NotAcceptableException {
+        if (text == null || text.trim().length() > 3000) {
+            throw new NotAcceptableException("invalid arguments");
+        }
+
+        postId = "post" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
+        this.repostFrom = repostFrom;
         this.userId = userId;
         this.text = text.trim();
         date = new Date(System.currentTimeMillis());
@@ -33,6 +49,7 @@ public class Post implements MediaLinked {
     public Post(JSONObject json) throws NotAcceptableException {
         try {
             postId = json.getString("postId");
+            repostFrom = json.getString("repostFrom");
             userId = json.getString("userId");
             text = json.getString("text").trim();
             date = new Date(json.getLong("date"));
@@ -55,6 +72,7 @@ public class Post implements MediaLinked {
     public String toString() {
         return "{" +
                 "postId:" + postId +
+                ", repostFrom:" + repostFrom +
                 ", userId:" + userId +
                 ", text:" + text +
                 ", date:" + date.getTime() +
@@ -87,6 +105,14 @@ public class Post implements MediaLinked {
         return likesCount;
     }
 
+    public String getRepostFrom() {
+        return repostFrom;
+    }
+
+    public boolean isReposted(){
+        return repostFrom.equals("null");
+    }
+
     public void setCommentsCount(int commentsCount) {
         this.commentsCount = commentsCount;
     }
@@ -104,6 +130,7 @@ public class Post implements MediaLinked {
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
         json.put("postId", postId);
+        json.put("repostFrom", repostFrom);
         json.put("userId", userId);
         json.put("text", text);
         json.put("date", date.getTime());

@@ -23,6 +23,7 @@ public class PostAccessor {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS posts (" +
                     "postId TEXT NOT NULL" +
+                    ", repostFrom TEXT NOT NULL" +
                     ", userId TEXT NOT NULL" +
                     ", text TEXT NOT NULL" +
                     ", date BIGINT NOT NULL" +
@@ -41,12 +42,13 @@ public class PostAccessor {
             getPostById(post.getPostId());
             throw new NotAcceptableException("Already Exists.");
         } catch (NotFoundException e) {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO posts (postId, userId, text, date) " +
-                    "VALUES (?,?,?,?);");
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO posts (postId, repostFrom, userId, text, date) " +
+                    "VALUES (?,?,?,?,?);");
             statement.setString(1, post.getPostId());
-            statement.setString(2, post.getUserId());
-            statement.setString(3, post.getText());
-            statement.setLong(4, post.getDate());
+            statement.setString(2, post.getRepostFrom());
+            statement.setString(3, post.getUserId());
+            statement.setString(4, post.getText());
+            statement.setLong(5, post.getDate());
             statement.executeUpdate();
             statement.close();
         }
@@ -95,11 +97,12 @@ public class PostAccessor {
     }
 
     public synchronized static void updatePost(Post post) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("UPDATE posts SET userId = ? , text = ? , date = ? WHERE postId = ?;");
-        statement.setString(1, post.getUserId());
-        statement.setString(2, post.getText());
-        statement.setLong(3, post.getDate());
-        statement.setString(4, post.getPostId());
+        PreparedStatement statement = connection.prepareStatement("UPDATE posts SET repostFrom = ?, userId = ? , text = ? , date = ? WHERE postId = ?;");
+        statement.setString(1, post.getRepostFrom());
+        statement.setString(2, post.getUserId());
+        statement.setString(3, post.getText());
+        statement.setLong(4, post.getDate());
+        statement.setString(5, post.getPostId());
         statement.executeUpdate();
         statement.close();
     }
