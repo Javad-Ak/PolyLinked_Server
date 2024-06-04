@@ -91,7 +91,22 @@ public class FollowAccessor {
         return res;
     }
 
-    public synchronized static ArrayList<Follow> getFollowsListFromStatement(PreparedStatement statement) throws SQLException, NotAcceptableException {
+    public synchronized static ArrayList<User> getNetWork(String id) throws SQLException, NotAcceptableException , NotFoundException {
+        ArrayList<User> users = new ArrayList<>();
+        for (User user : getFollowings(id)) {
+            users.addAll(getFollowers(user.getUserId()));
+            for (User user2 : getFollowers(user.getUserId())) {
+                users.addAll(getFollowers(user2.getUserId()));
+                for (User user3 : getFollowers(user2.getUserId())) {
+                    users.addAll(getFollowers(user3.getUserId()));
+                }
+            }
+        }
+
+        return users;
+    }
+
+    private synchronized static ArrayList<Follow> getFollowsListFromStatement(PreparedStatement statement) throws SQLException, NotAcceptableException {
         ArrayList<Follow> follows = new ArrayList<>();
         ResultSet resultSet = statement.executeQuery();
         JSONObject jsonObject;

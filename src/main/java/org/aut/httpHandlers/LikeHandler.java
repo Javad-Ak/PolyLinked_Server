@@ -18,7 +18,6 @@ import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-
 public class LikeHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {

@@ -1,9 +1,11 @@
 package org.aut.dataAccessors;
 
 import org.aut.models.Post;
+import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -75,6 +77,35 @@ public class PostAccessor {
     public synchronized static ArrayList<Post> getPostsWithHashtag() throws SQLException, NotFoundException {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM posts WHERE text like '%#_%';");
+        return getPostsFromSet(statement, resultSet);
+    }
+
+    public synchronized static ArrayList<Post> getPostsLikedBy(String userId) throws SQLException, NotFoundException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM posts WHERE postId = (SELECT likes.postId FROM likes WHERE likes.userId = ?);");
+        statement.setString(1, userId);
+        ResultSet resultSet = statement.executeQuery();
+        return getPostsFromSet(statement, resultSet);
+    }
+
+    public synchronized static ArrayList<Post> getPostsOf(String userId) throws SQLException, NotFoundException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM posts WHERE userId = ?;");
+        statement.setString(1, userId);
+        ResultSet resultSet = statement.executeQuery();
+        return getPostsFromSet(statement, resultSet);
+    }
+
+    public synchronized static void updatePost(Post post) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("UPDATE posts SET userId = ? , text = ? , date = ? WHERE postId = ?;");
+        statement.setString(1, post.getUserId());
+        statement.setString(2, post.getText());
+        statement.setLong(3, post.getDate());
+        statement.setString(4, post.getPostId());
+        statement.executeUpdate();
+        statement.close();
+    }
+
+    @NotNull
+    private static ArrayList<Post> getPostsFromSet(Statement statement, ResultSet resultSet) throws SQLException, NotFoundException {
         ArrayList<JSONObject> jsonArray = JsonHandler.getArrayFromResultSet(resultSet);
         if (jsonArray.isEmpty()) throw new NotFoundException("Posts not found");
 
@@ -93,15 +124,5 @@ public class PostAccessor {
         }
 
         return posts;
-    }
-
-    public synchronized static void updatePost(Post post) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("UPDATE posts SET userId = ? , text = ? , date = ? WHERE postId = ?;");
-        statement.setString(1, post.getUserId());
-        statement.setString(2, post.getText());
-        statement.setLong(3, post.getDate());
-        statement.setString(4, post.getPostId());
-        statement.executeUpdate();
-        statement.close();
     }
 }

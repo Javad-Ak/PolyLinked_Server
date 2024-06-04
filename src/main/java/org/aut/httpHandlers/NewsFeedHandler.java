@@ -1,0 +1,44 @@
+package org.aut.httpHandlers;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.thoughtworks.qdox.model.expression.PostDecrement;
+import org.aut.controllers.NewsFeedController;
+import org.aut.models.Post;
+import org.aut.models.User;
+import org.aut.utils.MultipartHandler;
+import org.aut.utils.exceptions.NotAcceptableException;
+import org.aut.utils.exceptions.NotFoundException;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.sql.SQLException;
+import java.util.TreeMap;
+
+public class NewsFeedHandler implements HttpHandler {
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        String method = exchange.getRequestMethod();
+        String[] path = exchange.getRequestURI().getPath().split("/");
+        if (!method.equals("GET") || path.length != 3) {
+            exchange.sendResponseHeaders(405, 0);
+            return;
+        }
+
+        try {
+            TreeMap<Post, User> map = NewsFeedController.fetchFeed(path[2]);
+            if (map.isEmpty()) throw new NotFoundException("Empty feed");
+
+            exchange.getResponseHeaders().add("X-Total-Count", String.valueOf(map.size()));
+            exchange.sendResponseHeaders(200, 0);
+
+            OutputStream os = exchange.getResponseBody();
+            MultipartHandler.writeMap(os, map);
+            os.close();
+        } catch (NotFoundException e) {
+            exchange.sendResponseHeaders(404, 0);
+        } catch (SQLException e) {
+            exchange.sendResponseHeaders(500, 0);
+        }
+    }
+}
