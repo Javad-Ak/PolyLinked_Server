@@ -14,28 +14,27 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class NewsFeedController {
-    public static TreeMap<Post, User> fetchFeed(String userId) throws SQLException, NotFoundException {
-        try {
-            List<User> related = new ArrayList<>();
-            related.addAll(FollowAccessor.getFollowings(userId));
-            related.addAll(ConnectAccessor.getConnectionsOf(userId));
+    public static TreeMap<Post, User> fetchFeed(String userId) throws SQLException {
+        List<User> related = new ArrayList<>();
+        related.addAll(FollowAccessor.getFollowings(userId));
+        related.addAll(ConnectAccessor.getConnectionsOf(userId));
 
-            List<User> network = ConnectAccessor.getNetworkOf(userId);
-            network.addAll(FollowAccessor.getNetWork(userId));
+        List<User> network = ConnectAccessor.getNetworkOf(userId);
+        network.addAll(FollowAccessor.getNetWork(userId));
 
-            ArrayList<Post> posts = new ArrayList<>();
-            for (User user : network) posts.addAll(PostAccessor.getPostsLikedBy(user.getUserId()));
-            for (User user : related) posts.addAll(PostAccessor.getPostsOf(user.getUserId()));
+        ArrayList<Post> posts = new ArrayList<>();
+        for (User user : network) posts.addAll(PostAccessor.getPostsLikedBy(user.getUserId()));
+        for (User user : related) posts.addAll(PostAccessor.getPostsOf(user.getUserId()));
 
-            TreeMap<Post, User> feed = new TreeMap<>();
-            for (Post post : posts) {
-                if (post.getPostId().equals(userId)) continue;
+        TreeMap<Post, User> feed = new TreeMap<>();
+        for (Post post : posts) {
+            if (post.getPostId().equals(userId)) continue;
+            try {
                 feed.put(post, UserAccessor.getUserById(post.getUserId()));
+            } catch (NotFoundException ignored) {
             }
-
-            return feed;
-        } catch (Exception e) {
-            throw new NotFoundException("empty feed");
         }
+
+        return feed;
     }
 }

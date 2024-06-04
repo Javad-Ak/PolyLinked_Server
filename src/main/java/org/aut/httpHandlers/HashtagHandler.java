@@ -35,7 +35,6 @@ public class HashtagHandler implements HttpHandler {
                     exchange.sendResponseHeaders(200, 0);
                     OutputStream outputStream = exchange.getResponseBody();
 
-                    System.out.println(posts);
                     MultipartHandler.writeMap(outputStream, posts);
                     outputStream.close();
                 } else {

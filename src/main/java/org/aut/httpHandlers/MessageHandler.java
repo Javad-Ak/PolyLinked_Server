@@ -81,6 +81,7 @@ public class MessageHandler implements HttpHandler {
                         throw new UnauthorizedException("Unauthorized user");
 
                     ArrayList<Message> messages = MessageAccessor.getLastMessagesBetween(senderId, receiverId);
+                    if (messages.isEmpty()) throw new NotFoundException("Messages not found");
 
                     exchange.getResponseHeaders().set("X-Total-Count", "" + messages.size());
                     exchange.sendResponseHeaders(200, 0);

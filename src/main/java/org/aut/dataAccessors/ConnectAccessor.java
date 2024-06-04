@@ -135,24 +135,25 @@ public class ConnectAccessor {
         return connects;
     }
 
-    public synchronized static List<User> getConnectionsOf(String userId) throws SQLException, NotAcceptableException {
+    public synchronized static List<User> getConnectionsOf(String userId) throws SQLException {
         PreparedStatement statement1 = connection.prepareStatement("SELECT acceptor_id FROM connects WHERE applicant_id = ? AND accept_state = ? ORDER BY create_date DESC ");
         statement1.setString(1, userId);
         statement1.setString(2, Connect.AcceptState.ACCEPTED.toString());
-        ArrayList<User> users = new ArrayList<>(getUsersFromIdSet(userId, statement1.executeQuery()));
+        ArrayList<User> users = new ArrayList<>(getUsersFromIdSet(statement1.executeQuery()));
         statement1.close();
 
         PreparedStatement statement2 = connection.prepareStatement("SELECT applicant_id FROM connects WHERE acceptor_id = ? AND accept_state = ? ORDER BY create_date DESC ");
         statement2.setString(1, userId);
         statement2.setString(2, Connect.AcceptState.ACCEPTED.toString());
-        users.addAll(getUsersFromIdSet(userId, statement2.executeQuery()));
+        users.addAll(getUsersFromIdSet(statement2.executeQuery()));
         statement2.close();
 
         return users.stream().distinct().toList();
     }
 
-    public synchronized static List<User> getNetworkOf(String userId) throws SQLException, NotAcceptableException {
+    public synchronized static List<User> getNetworkOf(String userId) throws SQLException {
         ArrayList<User> users = new ArrayList<>();
+
         for (User user : getConnectionsOf(userId)) {
             users.addAll(getConnectionsOf(user.getUserId()));
             for (User user2 : getConnectionsOf(user.getUserId())) {
@@ -162,11 +163,10 @@ public class ConnectAccessor {
                 }
             }
         }
-
         return users.stream().distinct().toList();
     }
 
-    private static ArrayList<User> getUsersFromIdSet(String userId, ResultSet resultSet) throws SQLException {
+    private static ArrayList<User> getUsersFromIdSet(ResultSet resultSet) throws SQLException {
         ArrayList<User> users = new ArrayList<>();
         while (resultSet.next()) {
             try {

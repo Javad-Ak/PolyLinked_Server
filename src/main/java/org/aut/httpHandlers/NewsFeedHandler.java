@@ -2,12 +2,10 @@ package org.aut.httpHandlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.thoughtworks.qdox.model.expression.PostDecrement;
 import org.aut.controllers.NewsFeedController;
 import org.aut.models.Post;
 import org.aut.models.User;
 import org.aut.utils.MultipartHandler;
-import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
 
 import java.io.IOException;

@@ -74,20 +74,20 @@ public class PostAccessor {
         return new Post(jsonObject);
     }
 
-    public synchronized static ArrayList<Post> getPostsWithHashtag() throws SQLException, NotFoundException {
+    public synchronized static ArrayList<Post> getPostsWithHashtag() throws SQLException {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM posts WHERE text like '%#_%';");
         return getPostsFromSet(statement, resultSet);
     }
 
-    public synchronized static ArrayList<Post> getPostsLikedBy(String userId) throws SQLException, NotFoundException {
+    public synchronized static ArrayList<Post> getPostsLikedBy(String userId) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM posts WHERE postId = (SELECT likes.postId FROM likes WHERE likes.userId = ?);");
         statement.setString(1, userId);
         ResultSet resultSet = statement.executeQuery();
         return getPostsFromSet(statement, resultSet);
     }
 
-    public synchronized static ArrayList<Post> getPostsOf(String userId) throws SQLException, NotFoundException {
+    public synchronized static ArrayList<Post> getPostsOf(String userId) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM posts WHERE userId = ?;");
         statement.setString(1, userId);
         ResultSet resultSet = statement.executeQuery();
@@ -105,14 +105,14 @@ public class PostAccessor {
     }
 
     @NotNull
-    private static ArrayList<Post> getPostsFromSet(Statement statement, ResultSet resultSet) throws SQLException, NotFoundException {
+    private static ArrayList<Post> getPostsFromSet(Statement statement, ResultSet resultSet) throws SQLException {
         ArrayList<JSONObject> jsonArray = JsonHandler.getArrayFromResultSet(resultSet);
-        if (jsonArray.isEmpty()) throw new NotFoundException("Posts not found");
+        ArrayList<Post> posts = new ArrayList<>();
+        if (jsonArray.isEmpty()) return posts;
 
         resultSet.close();
         statement.close();
 
-        ArrayList<Post> posts = new ArrayList<>();
         for (JSONObject jsonObject : jsonArray) {
             jsonObject.put("likesCount", LikeAccessor.countPostLikes(jsonObject.getString("postId")));
             jsonObject.put("commentsCount", CommentAccessor.countPostComments(jsonObject.getString("postId")));
