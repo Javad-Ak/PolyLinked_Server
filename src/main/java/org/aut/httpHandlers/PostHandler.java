@@ -54,7 +54,7 @@ public class PostHandler implements HttpHandler {
                 break;
                 case "GET": {
                     String[] path = exchange.getRequestURI().getPath().split("/");
-                    if (path.length < 3) throw new NotAcceptableException("Invalid path");
+                    if (path.length != 3) throw new NotAcceptableException("Invalid path");
 
                     Post post = PostAccessor.getPostById(path[2]);
                     exchange.sendResponseHeaders(200, 0);
@@ -66,7 +66,7 @@ public class PostHandler implements HttpHandler {
                 break;
                 case "DELETE": {
                     String[] path = exchange.getRequestURI().getPath().split("/");
-                    if (path.length < 3) throw new NotAcceptableException("Invalid path");
+                    if (path.length != 3) throw new NotAcceptableException("Invalid path");
 
                     Post post = PostAccessor.getPostById(path[2]);
 

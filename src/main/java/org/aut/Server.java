@@ -26,6 +26,7 @@ public class Server {
             server.createContext("/users/login", new LoginHandler());
             server.createContext("/users/profiles", new ProfileHandler());
             server.createContext("/users/followers", new FollowersHandler());
+            server.createContext("/users/followings" , new FollowingsHandler());
 
             server.createContext("/follows", new FollowHandler());
             server.createContext("/connections", new ConnectHandler());

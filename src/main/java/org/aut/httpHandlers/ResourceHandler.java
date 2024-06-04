@@ -14,7 +14,7 @@ public class ResourceHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         String[] path = exchange.getRequestURI().getPath().split("/");
         String method = exchange.getRequestMethod();
-        if (!(method.equals("GET") || method.equals("HEAD")) || path.length < 4) {
+        if (!(method.equals("GET") || method.equals("HEAD")) || path.length != 4) {
             exchange.sendResponseHeaders(405, 0);
             return;
         }
@@ -34,7 +34,7 @@ public class ResourceHandler implements HttpHandler {
                 exchange.getResponseHeaders().add("Content-Type", "Audio/" + type);
             } else if (MediaAccessor.IMAGE_EXTENSIONS.contains(type)) {
                 exchange.getResponseHeaders().add("Content-Type", "Image/" + type);
-            } else throw new NotFoundException("File corruption");
+            } else throw new NotFoundException("File format not supported");
 
             exchange.sendResponseHeaders(200, length);
             if (method.equals("HEAD")) return;

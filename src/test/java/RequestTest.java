@@ -148,6 +148,30 @@ public class RequestTest {
     }
 
     @Test
+    @DisplayName("---- get followings of someone")
+    public void getFollowings() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/users/followings/" + user1Id))
+                .timeout(Duration.ofSeconds(10))
+                .header("Authorization", jwt)
+                .GET()
+                .build();
+
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() / 100 == 2) {
+            InputStream inputStream = response.body();
+            int count = Integer.parseInt(response.headers().map().get("X-Total-Count").getFirst());
+            List<User> users = MultipartHandler.readObjectArray(inputStream, User.class, count);
+            inputStream.close();
+            System.out.println(users);
+        } else {
+            System.out.println("Server returned HTTP code " + response.statusCode());
+        }
+        client.close();
+    }
+
+    @Test
     @DisplayName("---- Like test")
     public void likeTest() throws Exception {
         // ##### GET
