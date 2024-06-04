@@ -3,8 +3,6 @@ package org.aut.httpHandlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.aut.dataAccessors.EducationAccessor;
-import org.aut.dataAccessors.MediaAccessor;
-import org.aut.dataAccessors.PostAccessor;
 import org.aut.models.Education;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
@@ -13,11 +11,9 @@ import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
 import org.aut.utils.exceptions.UnauthorizedException;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -60,6 +56,7 @@ public class EducationHandler implements HttpHandler {
                     ArrayList<Education> educations = EducationAccessor.getEducationsOf(path[3]);
                     if (educations.isEmpty()) throw new NotFoundException("Not Found");
 
+                    System.out.println(educations);
                     exchange.getResponseHeaders().add("X-Total-Count", Integer.toString(educations.size()));
                     exchange.sendResponseHeaders(200, 0);
 
@@ -72,7 +69,7 @@ public class EducationHandler implements HttpHandler {
                 case "DELETE": {
                     if (path.length != 4) throw new NotAcceptableException("Invalid path");
                     Education education = EducationAccessor.getEducation(path[3]);
-                    if (!education.getEducationId().equals(user.getUserId()))
+                    if (!education.getUserId().equals(user.getUserId()))
                         throw new UnauthorizedException("Unauthorized");
 
                     EducationAccessor.deleteEducation(education.getEducationId());

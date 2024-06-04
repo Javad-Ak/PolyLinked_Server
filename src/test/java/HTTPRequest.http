@@ -1,3 +1,17 @@
+# @name education
+
+DELETE http://localhost:8080/users/educations/edu8416371f-4737-8827 HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNTcyNTk2MzQtNDE0My04MjM3IiwiaWF0IjoxNzE3NTI3MzI5LCJleHAiOjE3MTgxMjczMjl9.KbEUOS-k0OfyK6oLlx4onHwLk6PNnZNfo97cE4iE5fE
+
+###
+
+# @name education
+
+GET http://localhost:8080/users/educations/user57259634-4143-8237 HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNTcyNTk2MzQtNDE0My04MjM3IiwiaWF0IjoxNzE3NTI3MzI5LCJleHAiOjE3MTgxMjczMjl9.KbEUOS-k0OfyK6oLlx4onHwLk6PNnZNfo97cE4iE5fE
+
+###
+
 # @name posts
 
 GET http://localhost:8080/users/posts/post23033026-439f-80b3 HTTP/1.1

@@ -83,7 +83,7 @@ public class EducationAccessor {
         statement.close();
     }
 
-    public synchronized static boolean educationExists(String id) throws SQLException, NotFoundException, NotAcceptableException {
+    public synchronized static boolean educationExists(String id) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM educations WHERE educationId = ?;");
         statement.setString(1, id);
 
@@ -106,7 +106,7 @@ public class EducationAccessor {
         return new Education(obj);
     }
 
-    public synchronized static ArrayList<Education> getEducationsOf(String userId) throws SQLException, NotFoundException, NotAcceptableException {
+    public synchronized static ArrayList<Education> getEducationsOf(String userId) throws SQLException, NotFoundException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM educations WHERE userId = ?;");
         statement.setString(1, userId);
 
@@ -115,7 +115,14 @@ public class EducationAccessor {
         statement.close();
 
         ArrayList<Education> educations = new ArrayList<>();
-        for (JSONObject obj : objects) educations.add(new Education(obj));
+        for (JSONObject obj : objects) {
+            try {
+                System.out.println("***"+obj);
+                educations.add(new Education(obj));
+                System.out.println(educations);
+            } catch (NotAcceptableException ignored) {
+            }
+        }
         return educations;
     }
 }
