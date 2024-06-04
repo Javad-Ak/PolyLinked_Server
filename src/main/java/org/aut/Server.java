@@ -34,6 +34,8 @@ public class Server {
             server.createContext("/likes", new LikeHandler());
             server.createContext("/comments", new CommentHandler());
             server.createContext("/messages", new MessageHandler());
+            server.createContext("/hashtags", new HashtagHandler());
+
 
             server.createContext("/resources", new ResourceHandler());
 
