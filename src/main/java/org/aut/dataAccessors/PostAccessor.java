@@ -119,7 +119,7 @@ public class PostAccessor {
 
             try {
                 posts.add(new Post(jsonObject));
-            } catch (NotAcceptableException ignored) {
+            } catch (Exception ignored) {
             }
         }
 

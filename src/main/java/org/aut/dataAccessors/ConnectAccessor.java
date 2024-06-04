@@ -153,14 +153,11 @@ public class ConnectAccessor {
 
     public synchronized static List<User> getNetworkOf(String userId) throws SQLException {
         ArrayList<User> users = new ArrayList<>();
-
         for (User user : getConnectionsOf(userId)) {
-            users.addAll(getConnectionsOf(user.getUserId()));
+            users.add(user);
             for (User user2 : getConnectionsOf(user.getUserId())) {
+                users.add(user2);
                 users.addAll(getConnectionsOf(user2.getUserId()));
-                for (User user3 : getConnectionsOf(user2.getUserId())) {
-                    users.addAll(getConnectionsOf(user3.getUserId()));
-                }
             }
         }
         return users.stream().distinct().toList();

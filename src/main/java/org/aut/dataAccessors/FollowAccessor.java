@@ -80,8 +80,7 @@ public class FollowAccessor {
         for (Follow follow : follows) {
             try {
                 followings.add(UserAccessor.getUserById(follow.getFollowed_id()));
-            } catch (NotFoundException e) {
-                throw new RuntimeException(e);
+            } catch (Exception ignored) {
             }
         }
         followings.sort(Comparator.comparing(User::getFirstName));
@@ -101,12 +100,10 @@ public class FollowAccessor {
     public synchronized static ArrayList<User> getNetWork(String id) throws SQLException {
         ArrayList<User> users = new ArrayList<>();
         for (User user : getFollowings(id)) {
-            users.addAll(getFollowers(user.getUserId()));
-            for (User user2 : getFollowers(user.getUserId())) {
-                users.addAll(getFollowers(user2.getUserId()));
-                for (User user3 : getFollowers(user2.getUserId())) {
-                    users.addAll(getFollowers(user3.getUserId()));
-                }
+            users.add(user);
+            for (User user2 : getFollowings(user.getUserId())) {
+                users.add(user2);
+                users.addAll(getFollowings(user2.getUserId()));
             }
         }
 
