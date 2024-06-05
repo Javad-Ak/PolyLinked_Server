@@ -44,7 +44,7 @@ public class SearchHandler implements HttpHandler {
                 }
             } else if (method.equals("GET") && path[2].equals("users")) {
                 List<User> users = UserController.searchUsers(input);
-                if (!users.isEmpty()) throw new NotFoundException("Not found");
+                if (users.isEmpty()) throw new NotFoundException("Not found");
 
                 exchange.getResponseHeaders().add("X-Total-Count", String.valueOf(users.size()));
                 exchange.sendResponseHeaders(200, 0);
