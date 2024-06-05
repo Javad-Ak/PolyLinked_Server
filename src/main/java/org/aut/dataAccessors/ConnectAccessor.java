@@ -163,6 +163,19 @@ public class ConnectAccessor {
         return users.stream().distinct().toList();
     }
 
+    public synchronized static boolean userIsInNetworkOf(String requesterId , String userId ) throws SQLException {
+        List <User> users = getNetworkOf(userId);
+        for (User user : users) {
+            if (user.getUserId().equals(requesterId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public synchronized static boolean usersIsConnected(String user1Id , String user2Id) throws SQLException, NotAcceptableException {
+        return getAcceptedConnect(user1Id, user2Id) != null;
+    }
+
     private static ArrayList<User> getUsersFromIdSet(ResultSet resultSet) throws SQLException {
         ArrayList<User> users = new ArrayList<>();
         while (resultSet.next()) {

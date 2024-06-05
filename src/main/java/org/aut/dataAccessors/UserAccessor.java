@@ -3,11 +3,13 @@ package org.aut.dataAccessors;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.*;
+import java.util.ArrayList;
 
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 public class UserAccessor {
@@ -74,6 +76,27 @@ public class UserAccessor {
         statement.close();
     }
 
+    public synchronized static ArrayList<User> getAllUsers() throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users;");
+        return getUserArrayFromSet(statement);
+    }
+
+    @NotNull
+    static ArrayList<User> getUserArrayFromSet(PreparedStatement statement) throws SQLException {
+        ArrayList<JSONObject> array = JsonHandler.getArrayFromResultSet(statement.executeQuery());
+        statement.close();
+
+        ArrayList<User> users = new ArrayList<>();
+        for (JSONObject object : array) {
+            try {
+                users.add(new User(object));
+            } catch (NotAcceptableException ignored) {
+            }
+        }
+        return users;
+    }
+
+    @NotNull
     private static User getUserFromResultSet(String input, PreparedStatement statement) throws SQLException, NotFoundException {
         statement.setString(1, input);
         ResultSet resultSet = statement.executeQuery();

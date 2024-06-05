@@ -1,3 +1,22 @@
+GET http://localhost:8080/search/users/al HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNDEzMDJiMWQtNGUyYy1hZjg5IiwiaWF0IjoxNzE3NTY1Nzc1LCJleHAiOjE3MTgxNjU3NzV9.NsNbWPHcsx1YA4FUxu6-cY18CWuIqOzRAKWswzrk9uA
+
+###
+
+# @name skill
+
+GET http://localhost:8080/users/skills/edu32706abb-4abf-ae52 HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNDEzMDJiMWQtNGUyYy1hZjg5IiwiaWF0IjoxNzE3NTMzMTkzLCJleHAiOjE3MTgxMzMxOTN9.5YGnn3xuQjVUOgHOKOicOw7v4vip65m8JSGn2sNYICY
+
+###
+
+# @name education
+
+GET http://localhost:8080/users/educations/user57259634-4143-8237 HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNTcyNTk2MzQtNDE0My04MjM3IiwiaWF0IjoxNzE3NTI3MzI5LCJleHAiOjE3MTgxMjczMjl9.KbEUOS-k0OfyK6oLlx4onHwLk6PNnZNfo97cE4iE5fE
+
+###
+
 # @name posts
 
 GET http://localhost:8080/users/posts/post23033026-439f-80b3 HTTP/1.1
@@ -14,8 +33,8 @@ Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyODc1MzgzMDMtNGFlZC05MGI4Iiwi
 
 # @name hashtag
 
-GET http://localhost:8080/hashtags/wow HTTP/1.1
-Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMzMwZTAwLTRiNjAtYjYxMSIsImlhdCI6MTcxNzQ5MjE3MiwiZXhwIjoxNzE4MDkyMTcyfQ.8PF5XydPTbCdH89DBJxkyRBLXU7Q2m18nCbmiirpt0I
+GET http://localhost:8080/search/hashtags/wow HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyNDEzMDJiMWQtNGUyYy1hZjg5IiwiaWF0IjoxNzE3NTY1Nzc1LCJleHAiOjE3MTgxNjU3NzV9.NsNbWPHcsx1YA4FUxu6-cY18CWuIqOzRAKWswzrk9uA
 
 ###
 

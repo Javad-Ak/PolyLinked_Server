@@ -1,13 +1,15 @@
 package org.aut.dataAccessors;
 
 import org.aut.models.CallInfo;
+import org.aut.models.Message;
+import org.aut.utils.JsonHandler;
+import org.aut.utils.exceptions.NotAcceptableException;
+import org.aut.utils.exceptions.NotFoundException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class CallInfoAccessor {
     private static final Connection connection = DataBaseAccessor.getConnection();
@@ -73,11 +75,41 @@ public class CallInfoAccessor {
         statement.close();
     }
 
-    public synchronized static void deleteCallInfo(CallInfo callInfo) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("DELETE FROM callInfo WHERE userId = ?;");
-        statement.setString(1, callInfo.getUserId());
+    public synchronized static CallInfo getCallInfoByUserId(String userId) throws SQLException, NotFoundException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM callInfo WHERE userId = ?;");
+        statement.setString(1, userId);
+        ResultSet resultSet = statement.executeQuery();
+        return getCallInfoFromResultSet(resultSet);
+    }
 
+    public synchronized static void deleteCallInfo(String userId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("DELETE FROM callInfo WHERE userId = ?;");
+        statement.setString(1, userId);
         statement.executeUpdate();
         statement.close();
+    }
+
+    public synchronized static boolean callInfoExists(String userId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM callInfo WHERE userId = ?;");
+        statement.setString(1, userId);
+        ResultSet resultSet = statement.executeQuery();
+        return resultSet.next();
+    }
+
+
+    private static CallInfo getCallInfoFromResultSet(ResultSet resultSet) throws SQLException, NotFoundException {
+        JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
+        resultSet.close();
+        if (jsonObject == null) {
+            throw new NotFoundException("CallInfo not Found");
+        } else {
+            CallInfo callInfo;
+            try {
+                callInfo = new CallInfo(jsonObject);
+            } catch (NotAcceptableException e) {
+                throw new NotFoundException("CallInfo not Found");
+            }
+            return callInfo;
+        }
     }
 }

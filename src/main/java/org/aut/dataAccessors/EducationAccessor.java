@@ -1,12 +1,15 @@
 package org.aut.dataAccessors;
 
 import org.aut.models.Education;
+import org.aut.utils.JsonHandler;
+import org.aut.utils.exceptions.NotAcceptableException;
+import org.aut.utils.exceptions.NotFoundException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
 
 public class EducationAccessor {
     private static final Connection connection = DataBaseAccessor.getConnection();
@@ -72,12 +75,52 @@ public class EducationAccessor {
         statement.close();
     }
 
-    public synchronized static void deleteEducation(Education education) throws SQLException {
+    public synchronized static void deleteEducation(String id) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("DELETE FROM educations WHERE educationId = ?;");
-        statement.setString(1, education.getEducationId());
+        statement.setString(1, id);
 
         statement.executeUpdate();
         statement.close();
     }
 
+    public synchronized static boolean educationExists(String id) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM educations WHERE educationId = ?;");
+        statement.setString(1, id);
+
+        ResultSet set = statement.executeQuery();
+        boolean bool = set.next();
+        set.close();
+        statement.close();
+        return bool;
+    }
+
+    public synchronized static Education getEducation(String id) throws SQLException, NotFoundException, NotAcceptableException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM educations WHERE educationId = ?;");
+        statement.setString(1, id);
+
+        ResultSet set = statement.executeQuery();
+        JSONObject obj = JsonHandler.getFromResultSet(set);
+        statement.close();
+
+        if (obj == null || obj.isEmpty()) throw new NotFoundException("Not Found");
+        return new Education(obj);
+    }
+
+    public synchronized static ArrayList<Education> getEducationsOf(String userId) throws SQLException, NotFoundException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM educations WHERE userId = ?;");
+        statement.setString(1, userId);
+
+        ResultSet set = statement.executeQuery();
+        ArrayList<JSONObject> objects = JsonHandler.getArrayFromResultSet(set);
+        statement.close();
+
+        ArrayList<Education> educations = new ArrayList<>();
+        for (JSONObject obj : objects) {
+            try {
+                educations.add(new Education(obj));
+            } catch (NotAcceptableException ignored) {
+            }
+        }
+        return educations;
+    }
 }
