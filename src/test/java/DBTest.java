@@ -13,7 +13,7 @@ import java.sql.SQLException;
 @DisplayName("------ testing DataBase...")
 public class DBTest {
     @Test
-    @DisplayName("---- testing comments table")
+    @DisplayName("---- full test")
     public void fullDBTest() throws Exception {
         DataBaseAccessor.create();
         User user1 = new User("ali@gmail.com", "ali1222345", "Ali", "akbari", "ll");
@@ -78,6 +78,40 @@ public class DBTest {
             ConnectAccessor.addConnect(connect);
             System.out.println("2 follows and a connect added.");
         } catch (SQLException ignored) {
+        }
+
+        Education edu1 = new Education(user1.getUserId(), "art", "ddd", new Date(22222222), new java.util.Date(33333333), 75, "aa", "bbb");
+        Education edu2 = new Education(user1.getUserId(), "math", "ddd", new Date(22222222), new java.util.Date(33333333), 75, "aa", "bbb");
+        Education edu3 = new Education(user2.getUserId(), "game", "ddd", new Date(22222222), new java.util.Date(33333333), 75, "aa", "bbb");
+        try {
+            EducationAccessor.addEducation(edu1);
+            EducationAccessor.addEducation(edu2);
+            EducationAccessor.addEducation(edu3);
+            EducationAccessor.deleteEducation(edu2.getEducationId());
+            System.out.println("3 Educations added and 1 deleted.");
+        } catch (Exception ignored) {
+        }
+
+        Skill skill1 = new Skill(edu1.getUserId(), edu1.getEducationId(), "1");
+        Skill skill2 = new Skill(edu1.getUserId(), edu1.getEducationId(), "2");
+        Skill skill3 = new Skill(edu1.getUserId(), edu1.getEducationId(), "3");
+        try {
+            SkillsAccessor.addSkill(skill1);
+            SkillsAccessor.addSkill(skill2);
+            SkillsAccessor.addSkill(skill3);
+            SkillsAccessor.deleteSkill(skill1.getSkillId());
+            System.out.println("3 Skills added and 1 deleted.");
+        } catch (Exception ignored) {
+        }
+
+        CallInfo callInfo1 = new CallInfo(user1.getUserId(), user1.getEmail(), "222", "333", "444", "555", new Date(555555), CallInfo.PrivacyPolitics.EVERYONE, "tel");
+        CallInfo callInfo12 = new CallInfo(user2.getUserId(), user2.getEmail(), "222", "333", "444", "555", new Date(555555), CallInfo.PrivacyPolitics.EVERYONE, "tel");
+        try {
+            CallInfoAccessor.addCallInfo(callInfo1);
+            CallInfoAccessor.addCallInfo(callInfo12);
+            CallInfoAccessor.deleteCallInfo(callInfo1.getUserId());
+            System.out.println("2 CallInfos added and 1 deleted.");
+        } catch (Exception ignored) {
         }
 
         System.out.println("---- user1 Feed: \n" + NewsFeedController.fetchFeed(user1.getUserId()));

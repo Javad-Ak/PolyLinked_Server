@@ -37,7 +37,7 @@ public class Education implements JsonSerializable {
     public Education(JSONObject jsonObject) throws NotAcceptableException {
         try {
             educationId = jsonObject.getString("educationId");
-            userId = jsonObject.getString("user_id");
+            userId = jsonObject.getString("userId");
             institute = jsonObject.getString("institute");
             field = jsonObject.getString("field");
             start = new Date(jsonObject.getLong("start"));
@@ -53,7 +53,7 @@ public class Education implements JsonSerializable {
     @Override
     public String toString() {
         return "{" +
-                ", educationId:" + educationId +
+                "educationId:" + educationId +
                 ", userId:" + userId +
                 ", institute:" + institute +
                 ", field:" + field +
@@ -69,7 +69,7 @@ public class Education implements JsonSerializable {
     public JSONObject toJson() {
        JSONObject jsonObject = new JSONObject();
        jsonObject.put("educationId", educationId);
-       jsonObject.put("user_id", userId);
+       jsonObject.put("userId", userId);
        jsonObject.put("institute", institute);
        jsonObject.put("field", field);
        jsonObject.put("start", start.getTime());

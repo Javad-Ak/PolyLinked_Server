@@ -66,7 +66,7 @@ public class PostAccessor {
         statement.setString(1, postId);
         ResultSet resultSet = statement.executeQuery();
         JSONObject jsonObject = JsonHandler.getFromResultSet(resultSet);
-        if (jsonObject == null) throw new NotFoundException("Post not found.");
+        if (jsonObject == null || jsonObject.isEmpty()) throw new NotFoundException("Post not found.");
         resultSet.close();
         statement.close();
 

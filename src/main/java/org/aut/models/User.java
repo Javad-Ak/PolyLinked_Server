@@ -22,24 +22,24 @@ public class User implements MediaLinked {
         String id = "user" + new Random().nextInt(99999) + UUID.randomUUID().toString().substring(10, 23);
 
         validateFields(email, password, firstName, lastName, additionalName);
-        this.userId = id;
-        this.email = email;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.additionalName = additionalName;
+        this.userId = id.trim();
+        this.email = email.trim();
+        this.password = password.trim();
+        this.firstName = firstName.trim();
+        this.lastName = lastName.trim();
+        this.additionalName = additionalName.trim();
         createDate = new Date(System.currentTimeMillis());
     }
 
     public User(JSONObject json) throws NotAcceptableException {
         try {
             validateFields(json.getString("email"), json.getString("password"), json.getString("firstName"), json.getString("lastName"), json.getString("additionalName"));
-            userId = json.getString("userId");
-            email = json.getString("email");
-            password = json.getString("password");
-            firstName = json.getString("firstName");
-            lastName = json.getString("lastName");
-            additionalName = json.getString("additionalName");
+            userId = json.getString("userId").trim();
+            email = json.getString("email").trim();
+            password = json.getString("password").trim();
+            firstName = json.getString("firstName").trim();
+            lastName = json.getString("lastName").trim();
+            additionalName = json.getString("additionalName").trim();
             createDate = new Date(json.getLong("createDate"));
         } catch (JSONException e) {
             throw new NotAcceptableException("Wrong jsonObject");
@@ -114,7 +114,7 @@ public class User implements MediaLinked {
     }
 
     private static void validateFields(String email, String password, String firstName, String lastName, String additionalName) throws NotAcceptableException {
-        if ((firstName == null || lastName == null || email == null || password == null) ||
+        if ((firstName == null || lastName == null || email == null || password == null || additionalName == null) ||
                 (!email.matches("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")) ||
                 (!password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,20}$")) ||
                 (!firstName.matches("(?i)^[a-z]{1,20}$")) ||
@@ -123,27 +123,11 @@ public class User implements MediaLinked {
             throw new NotAcceptableException("invalid argument");
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public void setAdditionalName(String additionalName) {
-        this.additionalName = additionalName;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
     }
 }
