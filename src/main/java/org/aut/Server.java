@@ -39,7 +39,8 @@ public class Server {
             server.createContext("/comments", new CommentHandler());
             server.createContext("/messages", new MessageHandler());
             server.createContext("/newsfeed", new NewsFeedHandler());
-            server.createContext("/hashtags", new HashtagHandler());
+            server.createContext("/search/hashtags", new SearchHandler());
+            server.createContext("/search/users", new SearchHandler());
 
             server.createContext("/resources", new ResourceHandler());
 

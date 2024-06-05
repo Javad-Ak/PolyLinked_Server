@@ -6,6 +6,9 @@ import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class UserController {
     private UserController() {
@@ -56,5 +59,18 @@ public class UserController {
     public static boolean authenticate(String email, String password) throws SQLException, NotFoundException {
         User user = UserAccessor.getUserByEmail(email);
         return user.getPassword().equals(password);
+    }
+
+    public static List<User> searchUsers(String input) throws SQLException {
+        ArrayList<User> users = UserAccessor.getAllUsers();
+        users.removeIf(user -> !(user.getFirstName().toLowerCase().contains(input.toLowerCase())
+        || user.getLastName().toLowerCase().contains(input.toLowerCase())
+        || user.getEmail().toLowerCase().contains(input.toLowerCase())
+        || user.getAdditionalName().toLowerCase().contains(input.toLowerCase())
+        || input.toLowerCase().contains(user.getFirstName().toLowerCase())
+        || input.toLowerCase().contains(user.getLastName().toLowerCase())
+        || input.toLowerCase().contains(user.getEmail().toLowerCase())
+        || input.toLowerCase().contains(user.getAdditionalName().toLowerCase())));
+        return users;
     }
 }
