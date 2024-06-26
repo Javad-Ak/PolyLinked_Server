@@ -22,6 +22,14 @@ public class CallInfoController {
         }
     }
 
+    public static void updateCallInfo(CallInfo callInfo) throws SQLException, NotFoundException {
+        if (!CallInfoAccessor.callInfoExists(callInfo.getUserId())) {
+            throw new NotFoundException("CallInfo not found");
+        } else {
+            CallInfoAccessor.updateCallInfo(callInfo);
+        }
+    }
+
     public static void deleteCallInfo(String userId) throws SQLException, NotFoundException {
         if (!CallInfoAccessor.callInfoExists(userId)) {
             throw new NotFoundException("CallInfo not found");
@@ -36,7 +44,7 @@ public class CallInfoController {
         boolean isInNetwork = ConnectAccessor.userIsInNetworkOf(requesterId , userId);
         boolean isConnected = ConnectAccessor.usersIsConnected(userId , requesterId);
 
-      if (privacyLevel.equals(CallInfo.PrivacyPolitics.ONLY_ME.toString()) ||
+      if (privacyLevel.equals(CallInfo.PrivacyPolitics.ONLY_ME.toString()) && !userId.equals(requesterId) ||
       privacyLevel.equals(CallInfo.PrivacyPolitics.MY_CONNECTIONS.toString()) && !isConnected ||
       privacyLevel.equals(CallInfo.PrivacyPolitics.FURTHER_CONNECTIONS.toString()) && !isInNetwork){
           throw new UnauthorizedException("Requester not allowed");
