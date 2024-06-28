@@ -3,19 +3,13 @@ package org.aut.httpHandlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.aut.controllers.CallInfoController;
-import org.aut.dataAccessors.CallInfoAccessor;
-import org.aut.dataAccessors.MediaAccessor;
-import org.aut.dataAccessors.ProfileAccessor;
 import org.aut.models.CallInfo;
-import org.aut.models.Profile;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
-import org.aut.utils.MultipartHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
 import org.aut.utils.exceptions.UnauthorizedException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
@@ -30,15 +24,21 @@ public class CallInfoHandler implements HttpHandler {
             User requester = LoginHandler.getUserByToken(jwt);
 
             switch (method) {
-                case "POST": {
+                case "POST":
+                case "PUT": {
                     JSONObject jsonObject = JsonHandler.getObject(exchange.getRequestBody());
                     CallInfo newCallInfo = new CallInfo(jsonObject);
 
                     if (!requester.getUserId().equals(newCallInfo.getUserId()))
                         throw new UnauthorizedException("User unauthorized");
 
-                    CallInfoController.addCallInfo(newCallInfo);
-                    exchange.sendResponseHeaders(200, 0);
+                    if (method.equals("POST")) {
+                        CallInfoController.addCallInfo(newCallInfo);
+                        exchange.sendResponseHeaders(200, 0);
+                    } else {
+                        CallInfoController.updateCallInfo(newCallInfo);
+                        exchange.sendResponseHeaders(200, 0);
+                    }
                 }
                 break;
 
