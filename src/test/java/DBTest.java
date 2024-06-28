@@ -72,10 +72,12 @@ public class DBTest {
         Follow follow1 = new Follow(user1.getUserId(), user2.getUserId());
         Follow follow2 = new Follow(user2.getUserId(), user3.getUserId());
         Connect connect = new Connect(user1.getUserId(), user2.getUserId(), "Hey there!");
+        Message message = new Message(user1.getUserId(), user2.getUserId(), post.getPostId(), "wow");
         try {
             FollowAccessor.addFollow(follow1);
             FollowAccessor.addFollow(follow2);
             ConnectAccessor.addConnect(connect);
+            MessageAccessor.addMessage(message);
             System.out.println("2 follows and a connect added.");
         } catch (SQLException ignored) {
         }

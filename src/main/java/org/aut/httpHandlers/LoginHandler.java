@@ -31,14 +31,13 @@ public class LoginHandler implements HttpHandler {
                     code = 200;
                     User user = UserAccessor.getUserByEmail(received.getString("email"));
                     response.put("Authorization", JwtHandler.generateToken(user.getUserId()));
+                    response.put("userId", user.getUserId());
                 } else {
                     throw new UnauthorizedException("Invalid credentials");
                 }
             }
-        } catch (UnauthorizedException e) {
+        } catch (UnauthorizedException | NotFoundException e) {
             code = 401;
-        } catch (NotFoundException e) {
-            code = 404;
         } catch (SQLException e) {
             code = 500;
         }

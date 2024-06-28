@@ -23,14 +23,11 @@ public class MessageAccessor {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS messages (" +
                     "id TEXT NOT NULL PRIMARY KEY" +
-                    ", senderId TEXT NOT NULL" +
-                    ", receiverId TEXT NOT NULL" +
+                    ", senderId TEXT NOT NULL REFERENCES users (userId) ON UPDATE CASCADE ON DELETE CASCADE" +
+                    ", receiverId TEXT NOT NULL REFERENCES users (userId) ON UPDATE CASCADE ON DELETE CASCADE" +
+                    ", postId TEXT REFERENCES posts (postId) ON UPDATE CASCADE ON DELETE CASCADE" +
                     ", text TEXT NOT NULL" +
                     ", createDate BIGINT(20)" +
-                    ", FOREIGN KEY (senderId , receiverId)" +
-                    "REFERENCES users (userId , userId)" +
-                    "ON UPDATE CASCADE " +
-                    "ON DELETE CASCADE " +
                     ");");
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
@@ -38,13 +35,14 @@ public class MessageAccessor {
     }
 
     public synchronized static void addMessage(Message message) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO messages (id , senderId , receiverId , text , createDate) " +
-                "VALUES (?, ?, ? , ? ,?)");
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO messages (id , senderId , receiverId, postId , text , createDate) " +
+                "VALUES (?, ?, ?, ?, ?, ?)");
         statement.setString(1, message.getId());
         statement.setString(2, message.getSenderId());
         statement.setString(3, message.getReceiverId());
-        statement.setString(4, message.getText());
-        statement.setLong(5, message.getCreateDate().getTime());
+        statement.setString(4, message.getPostId());
+        statement.setString(5, message.getText());
+        statement.setLong(6, message.getCreateDate().getTime());
         statement.executeUpdate();
         statement.close();
     }
