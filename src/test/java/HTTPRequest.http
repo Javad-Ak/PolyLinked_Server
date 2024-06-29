@@ -27,7 +27,7 @@ Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyODc1MzgzMDMtNGFlZC05MGI4Iiwi
 # @name feed
 
 GET http://localhost:8080/newsfeed HTTP/1.1
-Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyODc1MzgzMDMtNGFlZC05MGI4IiwiaWF0IjoxNzE3NTE2OTEyLCJleHAiOjE3MTgxMTY5MTJ9.t-hDKUlCkWx0a-PRq0uPUpWXdqFBf3EAB_bQjL0qeKU
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyOTkxMDQ4MGQtNGI5YS1hZGE4IiwiaWF0IjoxNzE5NjkzNjEzLCJleHAiOjE3MjAyOTM2MTN9.7owSW3xfMvvpa3xxWYvgiV-d5tmoix9x4PdWoe9DxPA
 
 ###
 

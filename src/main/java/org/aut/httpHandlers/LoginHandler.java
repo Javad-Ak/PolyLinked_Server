@@ -55,12 +55,7 @@ public class LoginHandler implements HttpHandler {
     public static User getUserByToken(String token) throws SQLException ,UnauthorizedException {
         try {
             Claims claims = JwtHandler.verifyToken(token);
-            User user;
-            user = UserAccessor.getUserById(claims.getSubject());
-            if (user == null) {
-                throw new UnauthorizedException("Authentication failed.");
-            }
-            return user;
+            return UserAccessor.getUserById(claims.getSubject());
         } catch (Exception e) {
             throw new UnauthorizedException("Authentication failed.");
         }

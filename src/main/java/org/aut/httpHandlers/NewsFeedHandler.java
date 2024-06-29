@@ -43,5 +43,6 @@ public class NewsFeedHandler implements HttpHandler {
         } catch (UnauthorizedException e) {
             exchange.sendResponseHeaders(401, 0);
         }
+        exchange.close();
     }
 }

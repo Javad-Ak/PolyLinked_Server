@@ -22,8 +22,8 @@ public class DBTest {
         User[] users = {user1, user2, user3};
 
         Post post = new Post(user1.getUserId(), "hey #Woww .");
-        Post post2 = new Post(user1.getUserId(), "#good luck boy");
-        Post post3 = new Post(user1.getUserId(), "good luck #boy");
+        Post post2 = new Post(user2.getUserId(), "#good luck boy");
+        Post post3 = new Post(user3.getUserId(), "good luck #boy");
         for (User user : users) {
             try {
                 UserAccessor.addUser(user);
@@ -36,9 +36,9 @@ public class DBTest {
             PostAccessor.addPost(post3);
         } catch (NotAcceptableException ignored) {
         }
-        Like like1 = new Like(post.getPostId(), user1.getUserId());
+        Like like1 = new Like(post2.getPostId(), user1.getUserId());
         Like like2 = new Like(post.getPostId(), user2.getUserId());
-        Like like3 = new Like(post.getPostId(), user3.getUserId());
+        Like like3 = new Like(post2.getPostId(), user3.getUserId());
         try {
             LikeAccessor.addLike(like1);
             LikeAccessor.addLike(like2);

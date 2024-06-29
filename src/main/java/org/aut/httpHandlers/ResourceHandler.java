@@ -69,5 +69,6 @@ public class ResourceHandler implements HttpHandler {
         } catch (SQLException e) {
             exchange.sendResponseHeaders(500, 0);
         }
+        exchange.close();
     }
 }
