@@ -3,9 +3,15 @@ package org.aut.httpHandlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.aut.dataAccessors.MediaAccessor;
+import org.aut.models.Follow;
+import org.aut.models.User;
+import org.aut.utils.JsonHandler;
 import org.aut.utils.exceptions.NotFoundException;
+import org.aut.utils.exceptions.UnauthorizedException;
+import org.json.JSONObject;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.util.Arrays;
 
 public class ResourceHandler implements HttpHandler {
@@ -20,6 +26,9 @@ public class ResourceHandler implements HttpHandler {
         }
 
         try {
+            String jwt = exchange.getRequestHeaders().getFirst("Authorization");
+            LoginHandler.getUserByToken(jwt);
+
             File file = MediaAccessor.getMedia(path[3], MediaAccessor.MediaPath.valueOf(path[2].toUpperCase()));
             if (file == null) throw new NotFoundException("Media not found");
 
@@ -55,6 +64,10 @@ public class ResourceHandler implements HttpHandler {
             }
         } catch (NotFoundException e) {
             exchange.sendResponseHeaders(404, 0);
+        } catch (UnauthorizedException e) {
+            exchange.sendResponseHeaders(401, 0);
+        } catch (SQLException e) {
+            exchange.sendResponseHeaders(500, 0);
         }
     }
 }
