@@ -20,6 +20,7 @@ public class NewsFeedHandler implements HttpHandler {
         String method = exchange.getRequestMethod();
         if (!method.equals("GET")) {
             exchange.sendResponseHeaders(405, 0);
+            exchange.close();
             return;
         }
 

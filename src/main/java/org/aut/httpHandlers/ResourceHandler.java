@@ -21,20 +21,17 @@ public class ResourceHandler implements HttpHandler {
         String[] path = exchange.getRequestURI().getPath().split("/");
         String method = exchange.getRequestMethod();
         if (!(method.equals("GET") || method.equals("HEAD")) || path.length != 4) {
-            exchange.sendResponseHeaders(405, 0);
+            exchange.sendResponseHeaders(405, -1);
+            exchange.close();
             return;
         }
 
         try {
-            String jwt = exchange.getRequestHeaders().getFirst("Authorization");
-            LoginHandler.getUserByToken(jwt);
-
             File file = MediaAccessor.getMedia(path[3], MediaAccessor.MediaPath.valueOf(path[2].toUpperCase()));
-            if (file == null) throw new NotFoundException("Media not found");
-
+            if (file == null || file.length() < 1 || !file.isFile()) throw new NotFoundException("Media not found");
 
             int length = (int) file.length();
-            String type = file.getName().substring(file.getName().lastIndexOf(".") + 1);
+            String type = file.getName().substring(file.getName().lastIndexOf(".") + 1).toLowerCase();
             if (type.trim().isEmpty()) throw new NotFoundException("File corruption");
 
             if (MediaAccessor.VIDEO_EXTENSIONS.contains(type)) {
@@ -45,9 +42,13 @@ public class ResourceHandler implements HttpHandler {
                 exchange.getResponseHeaders().add("Content-Type", "Image/" + type);
             } else throw new NotFoundException("File format not supported");
 
-            exchange.sendResponseHeaders(200, length);
-            if (method.equals("HEAD")) return;
+            if (method.equals("HEAD")) {
+                exchange.sendResponseHeaders(200, -1);
+                exchange.close();
+                return;
+            }
 
+            exchange.sendResponseHeaders(200, length);
             try (OutputStream outputStream = exchange.getResponseBody();
                  FileInputStream inputStream = new FileInputStream(file)) {
 
@@ -64,10 +65,6 @@ public class ResourceHandler implements HttpHandler {
             }
         } catch (NotFoundException e) {
             exchange.sendResponseHeaders(404, 0);
-        } catch (UnauthorizedException e) {
-            exchange.sendResponseHeaders(401, 0);
-        } catch (SQLException e) {
-            exchange.sendResponseHeaders(500, 0);
         }
         exchange.close();
     }

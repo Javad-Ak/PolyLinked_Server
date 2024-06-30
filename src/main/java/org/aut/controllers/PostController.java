@@ -17,6 +17,7 @@ public class PostController {
         ArrayList<Comment> comments = CommentAccessor.getCommentsOfPost(postId);
         for (Comment comment : comments) {
             try {
+                if (map.containsKey(comment)) continue;
                 User user = UserAccessor.getUserById(comment.getUserId());
                 map.put(comment, user);
             } catch (NotFoundException ignored) {

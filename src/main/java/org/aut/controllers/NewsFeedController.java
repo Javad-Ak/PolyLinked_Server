@@ -26,11 +26,12 @@ public class NewsFeedController {
         for (User user : connectNetwork) posts.addAll(PostAccessor.getPostsLikedBy(user.getUserId()));
         for (User user : followNetwork) posts.addAll(PostAccessor.getPostsLikedBy(user.getUserId()));
         for (User user : related) posts.addAll(PostAccessor.getPostsOf(user.getUserId()));
+        posts.addAll(PostAccessor.getPostsOf(userId));
 
         TreeMap<Post, User> feed = new TreeMap<>();
         for (Post post : posts) {
-            if (post.getPostId().equals(userId)) continue;
             try {
+                if (feed.containsKey(post)) continue;
                 feed.put(post, UserAccessor.getUserById(post.getUserId()));
             } catch (NotFoundException ignored) {
             }
