@@ -27,10 +27,6 @@ public class PostHandler implements HttpHandler {
         String method = exchange.getRequestMethod();
         String jwt = exchange.getRequestHeaders().getFirst("Authorization");
         String[] path = exchange.getRequestURI().getPath().split("/");
-        if (path[1].equals("users") && !method.equals("GET")) {
-            exchange.sendResponseHeaders(405, 0);
-            return;
-        }
 
         try {
             User user = LoginHandler.getUserByToken(jwt);
