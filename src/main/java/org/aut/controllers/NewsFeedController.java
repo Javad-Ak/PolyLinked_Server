@@ -29,14 +29,12 @@ public class NewsFeedController {
         posts.addAll(PostAccessor.getPostsOf(userId));
 
         TreeMap<Post, User> feed = new TreeMap<>();
-        for (Post post : posts) {
+        for (Post post : posts.stream().distinct().toList()) {
             try {
-                if (feed.containsKey(post)) continue;
-                feed.put(post, UserAccessor.getUserById(post.getUserId()));
+                feed.putIfAbsent(post, UserAccessor.getUserById(post.getUserId()));
             } catch (NotFoundException ignored) {
             }
         }
-
         return feed;
     }
 }

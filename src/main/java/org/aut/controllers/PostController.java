@@ -15,11 +15,10 @@ public class PostController {
     public static TreeMap<Comment, User> getCommentsOfPost(String postId) throws SQLException {
         TreeMap<Comment, User> map = new TreeMap<>();
         ArrayList<Comment> comments = CommentAccessor.getCommentsOfPost(postId);
-        for (Comment comment : comments) {
+        for (Comment comment : comments.stream().distinct().toList()) {
             try {
-                if (map.containsKey(comment)) continue;
                 User user = UserAccessor.getUserById(comment.getUserId());
-                map.put(comment, user);
+                map.putIfAbsent(comment, user);
             } catch (NotFoundException ignored) {
             }
         }
