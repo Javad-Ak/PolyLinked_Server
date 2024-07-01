@@ -20,8 +20,7 @@ public class ResourceHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         String[] path = exchange.getRequestURI().getPath().split("/");
         String method = exchange.getRequestMethod();
-        if (!(method.equals("GET") || method.equals("HEAD")) || path.length != 4) {
-            exchange.sendResponseHeaders(405, -1);
+        if (path.length != 4) {
             exchange.close();
             return;
         }
@@ -42,29 +41,33 @@ public class ResourceHandler implements HttpHandler {
                 exchange.getResponseHeaders().add("Content-Type", "Image/" + type);
             } else throw new NotFoundException("File format not supported");
 
-            if (method.equals("HEAD")) {
-                exchange.sendResponseHeaders(200, -1);
-                exchange.close();
-                return;
-            }
+            switch (method) {
+                case "HEAD":
+                    exchange.sendResponseHeaders(200, -1);
+                    break;
+                case "GET":
+                    exchange.sendResponseHeaders(200, length);
+                    try (OutputStream outputStream = exchange.getResponseBody();
+                         FileInputStream inputStream = new FileInputStream(file)) {
 
-            exchange.sendResponseHeaders(200, length);
-            try (OutputStream outputStream = exchange.getResponseBody();
-                 FileInputStream inputStream = new FileInputStream(file)) {
+                        int totalWrite = 0;
+                        byte[] buffer = new byte[1000000];
+                        while (totalWrite < length) {
+                            int read = inputStream.read(buffer);
+                            if (read == -1) break;
 
-                int totalWrite = 0;
-                byte[] buffer = new byte[1000000];
-                while (totalWrite < length) {
-                    int read = inputStream.read(buffer);
-                    if (read == -1) break;
-
-                    outputStream.write(buffer, 0, read);
-                    totalWrite += read;
-                }
-                outputStream.flush();
+                            outputStream.write(buffer, 0, read);
+                            totalWrite += read;
+                        }
+                        outputStream.flush();
+                    }
+                    break;
+                default:
+                    exchange.sendResponseHeaders(405, -1);
+                    break;
             }
         } catch (NotFoundException e) {
-            exchange.sendResponseHeaders(404, 0);
+            exchange.sendResponseHeaders(404, -1);
         }
         exchange.close();
     }
