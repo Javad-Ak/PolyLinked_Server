@@ -3,16 +3,8 @@ package org.aut.httpHandlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.aut.dataAccessors.MediaAccessor;
-import org.aut.models.Follow;
-import org.aut.models.User;
-import org.aut.utils.JsonHandler;
 import org.aut.utils.exceptions.NotFoundException;
-import org.aut.utils.exceptions.UnauthorizedException;
-import org.json.JSONObject;
-
 import java.io.*;
-import java.sql.SQLException;
-import java.util.Arrays;
 
 public class ResourceHandler implements HttpHandler {
 
