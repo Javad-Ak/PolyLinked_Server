@@ -32,6 +32,7 @@ public class LoginHandler implements HttpHandler {
                     User user = UserAccessor.getUserByEmail(received.getString("email"));
                     response.put("Authorization", JwtHandler.generateToken(user.getUserId()));
                     response.put("userId", user.getUserId());
+                    response.put("fullName", user.getFirstName() + " " + user.getLastName());
                 } else {
                     throw new UnauthorizedException("Invalid credentials");
                 }
@@ -52,7 +53,7 @@ public class LoginHandler implements HttpHandler {
         exchange.close();
     }
 
-    public static User getUserByToken(String token) throws SQLException ,UnauthorizedException {
+    public static User getUserByToken(String token) throws SQLException, UnauthorizedException {
         try {
             Claims claims = JwtHandler.verifyToken(token);
             return UserAccessor.getUserById(claims.getSubject());

@@ -57,11 +57,11 @@ public class UserHandler implements HttpHandler {
                     break;
                 }
                 case "GET": {
-                    String [] splitPath = exchange.getRequestURI().getPath().split("/");
-                    if(splitPath.length != 3){
+                    String[] splitPath = exchange.getRequestURI().getPath().split("/");
+                    if (splitPath.length != 3) {
                         throw new NotAcceptableException("Invalid path");
                     }
-                    String path =splitPath[2];
+                    String path = splitPath[2];
                     User seekedUser = UserAccessor.getUserById(path);
 
                     exchange.sendResponseHeaders(200, 0);
