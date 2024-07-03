@@ -2,10 +2,13 @@ package org.aut.controllers;
 
 import org.aut.dataAccessors.*;
 import org.aut.models.Comment;
+import org.aut.models.Post;
 import org.aut.models.User;
 import org.aut.utils.exceptions.NotFoundException;
 
 import java.io.File;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,5 +26,28 @@ public class PostController {
             }
         }
         return map;
+    }
+
+    public static ArrayList<Post> getPostsOf(String userId) throws SQLException {
+        ArrayList<Post> posts = PostAccessor.getPostsOfUser(userId);
+        return fillPosts(posts);
+    }
+
+    public static ArrayList<Post> getPostsLikedBy(String userId) throws SQLException {
+        ArrayList<Post> posts = PostAccessor.getPostsLikedByUser(userId);
+        return fillPosts(posts);
+    }
+
+    public static ArrayList<Post> getPostsWithHashtag() throws SQLException {
+        ArrayList<Post> posts = PostAccessor.getPostsWithHashtags();
+        return fillPosts(posts);
+    }
+
+    public static ArrayList<Post> fillPosts (ArrayList<Post> posts) throws SQLException {
+        for (Post post : posts) {
+            post.setLikesCount(LikeAccessor.countPostLikes(post.getPostId()));
+            post.setCommentsCount(CommentAccessor.countPostComments(post.getPostId()));
+        }
+        return posts;
     }
 }

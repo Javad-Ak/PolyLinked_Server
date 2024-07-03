@@ -24,12 +24,12 @@ public class LikeHandler implements HttpHandler {
         String method = exchange.getRequestMethod();
         String jwt = exchange.getRequestHeaders().getFirst("Authorization");
 
+
         try {
             User user = LoginHandler.getUserByToken(jwt);
             switch (method) {
                 case "POST": {
                     InputStream inputStream = exchange.getRequestBody();
-
                     Like like = new Like(JsonHandler.getObject(inputStream));
                     if (!like.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
@@ -57,15 +57,26 @@ public class LikeHandler implements HttpHandler {
                 }
                 break;
                 case "DELETE": {
-                    String[] path = exchange.getRequestURI().getPath().split("/");
-                    if (path.length < 3 || path[2].split("&").length < 2)
-                        throw new NotAcceptableException("Invalid path");
-
-                    Like like = LikeAccessor.getLike(path[2].split("&")[0], path[2].split("&")[1]);
+                    InputStream inputStream = exchange.getRequestBody();
+                    Like like = new Like(JsonHandler.getObject(inputStream));
                     if (!like.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
                     LikeAccessor.deleteLike(like.getPostId(), like.getUserId());
                     exchange.sendResponseHeaders(200, 0);
+                }
+                case "HEAD": {
+                    String[] path = exchange.getRequestURI().getPath().split("/");
+                    if (path.length != 3) throw new NotAcceptableException("Invalid path");
+                    String postId = path[2];
+                    String exists = "false";
+                    for (User obj : LikeAccessor.getLikersOfPost(postId)) {
+                        if (obj.getUserId().equals(user.getUserId())) {
+                            exists = "true";
+                            break;
+                        }
+                    }
+                    exchange.getResponseHeaders().add("Exists", exists);
+                    exchange.sendResponseHeaders(200, -1);
                 }
                 break;
                 default:

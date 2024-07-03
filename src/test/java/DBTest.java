@@ -16,9 +16,9 @@ public class DBTest {
     @DisplayName("---- full test")
     public void fullDBTest() throws Exception {
         DataBaseAccessor.create();
-        User user1 = new User("ali@gmail.com", "ali1222345", "Ali", "akbari", "ll");
-        User user2 = new User("javad@gmail.com", "ali1222345", "Ali", "akbari", "ll");
-        User user3 = new User("kasra@gmail.com", "ali1222345", "Ali", "akbari", "ll");
+        User user1 = new User("kasra@gmail.com", "kasra123456", "Kasra", "Rezai", "D");
+        User user2 = new User("javad@gmail.com", "javad123456", "Javad", "Akbari", "H");
+        User user3 = new User("ali@gmail.com", "ali1222345", "Ali", "Athari", "K");
         User[] users = {user1, user2, user3};
 
         Post post = new Post(user1.getUserId(), "hey #Woww .");

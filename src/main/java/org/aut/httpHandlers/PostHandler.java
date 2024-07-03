@@ -2,6 +2,7 @@ package org.aut.httpHandlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.aut.controllers.PostController;
 import org.aut.dataAccessors.MediaAccessor;
 import org.aut.dataAccessors.PostAccessor;
 import org.aut.models.Post;
@@ -63,7 +64,7 @@ public class PostHandler implements HttpHandler {
 
                         outputStream.close();
                     } else if (path.length == 4) {
-                        ArrayList<Post> posts = PostAccessor.getPostsOf(user.getUserId());
+                        ArrayList<Post> posts = PostController.getPostsOf(user.getUserId());
                         if (posts.isEmpty()) throw new NotFoundException("Not found");
 
                         exchange.getResponseHeaders().add("X-Total-Count", Integer.toString(posts.size()));

@@ -23,10 +23,10 @@ public class NewsFeedController {
         List<User> followNetwork = FollowAccessor.getNetWork(userId);
 
         ArrayList<Post> posts = new ArrayList<>();
-        for (User user : connectNetwork) posts.addAll(PostAccessor.getPostsLikedBy(user.getUserId()));
-        for (User user : followNetwork) posts.addAll(PostAccessor.getPostsLikedBy(user.getUserId()));
-        for (User user : related) posts.addAll(PostAccessor.getPostsOf(user.getUserId()));
-        posts.addAll(PostAccessor.getPostsOf(userId));
+        for (User user : connectNetwork) posts.addAll(PostController.getPostsLikedBy(user.getUserId()));
+        for (User user : followNetwork) posts.addAll(PostController.getPostsLikedBy(user.getUserId()));
+        for (User user : related) posts.addAll(PostController.getPostsOf(user.getUserId()));
+        posts.addAll(PostController.getPostsOf(userId));
 
         TreeMap<Post, User> feed = new TreeMap<>();
         for (Post post : posts.stream().distinct().toList()) {

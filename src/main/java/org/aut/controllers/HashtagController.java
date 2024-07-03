@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public class HashtagController {
     public static TreeMap<Post, User> hashtagDetector(String input) throws SQLException, NotFoundException {
         TreeMap<Post, User> map = new TreeMap<>();
-        ArrayList<Post> posts = PostAccessor.getPostsWithHashtag();
+        ArrayList<Post> posts = PostController.getPostsWithHashtag();
         for (Post post : posts) {
             if (hashtagExists(post.getText(), input)) map.put(post, UserAccessor.getUserById(post.getUserId()));
         }

@@ -3,6 +3,7 @@ package org.aut.httpHandlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.aut.dataAccessors.MediaAccessor;
+import org.aut.utils.MultipartHandler;
 import org.aut.utils.exceptions.NotFoundException;
 import java.io.*;
 
@@ -20,7 +21,6 @@ public class ResourceHandler implements HttpHandler {
         try {
             File file = MediaAccessor.getMedia(path[3], MediaAccessor.MediaPath.valueOf(path[2].toUpperCase()));
             if (file == null || file.length() < 1 || !file.isFile()) throw new NotFoundException("Media not found");
-            System.out.println(file.getName());
 
             int length = (int) file.length();
             String type = file.getName().substring(file.getName().lastIndexOf(".") + 1).toLowerCase();
@@ -43,16 +43,7 @@ public class ResourceHandler implements HttpHandler {
                     try (OutputStream outputStream = exchange.getResponseBody();
                          FileInputStream inputStream = new FileInputStream(file)) {
 
-                        int totalWrite = 0;
-                        byte[] buffer = new byte[1000000];
-                        while (totalWrite < length) {
-                            int read = inputStream.read(buffer);
-                            if (read == -1) break;
-
-                            outputStream.write(buffer, 0, read);
-                            totalWrite += read;
-                        }
-                        outputStream.flush();
+                        MultipartHandler.linkStreams(inputStream, outputStream, length);
                     }
                     break;
                 default:

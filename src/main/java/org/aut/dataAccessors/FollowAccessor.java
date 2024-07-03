@@ -47,7 +47,7 @@ public class FollowAccessor {
 
     public synchronized static void deleteFollow(Follow follow) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("DELETE FROM follows WHERE follower_id = ? AND followed_id = ?");
-        statement.setString(1, follow.getFollowed_id());
+        statement.setString(1, follow.getFollower_id());
         statement.setString(2, follow.getFollowed_id());
         statement.executeUpdate();
         statement.close();
