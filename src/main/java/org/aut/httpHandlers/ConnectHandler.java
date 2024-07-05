@@ -3,6 +3,8 @@ package org.aut.httpHandlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.aut.controllers.ConnectController;
+import org.aut.dataAccessors.ConnectAccessor;
+import org.aut.dataAccessors.FollowAccessor;
 import org.aut.models.Connect;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
@@ -52,6 +54,27 @@ public class ConnectHandler implements HttpHandler {
                         code = 401;
                     }
                     break;
+
+                case "HEAD": {
+                    String[] path = exchange.getRequestURI().getPath().split("/");
+                    if (path.length != 3) throw new NotAcceptableException("Invalid path");
+                    String userId = path[2];
+                    String exists = "false";
+                    for (Connect obj : ConnectAccessor.getWaitingConnectsOf(userId)) {
+                        if (obj.getApplicant_id().equals(user.getUserId())) {
+                            exists = "waiting";
+                            break;
+                        }
+                    }
+                    for (User obj : ConnectAccessor.getConnectionsOf(userId)) {
+                        if (obj.getUserId().equals(user.getUserId())) {
+                            exists = "true";
+                            break;
+                        }
+                    }
+                    exchange.getResponseHeaders().add("Exists", exists);
+                    exchange.sendResponseHeaders(200, -1);
+                }
 
             }
         } catch (UnauthorizedException e) {
