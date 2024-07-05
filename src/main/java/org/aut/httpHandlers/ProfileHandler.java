@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpHandler;
 import org.aut.dataAccessors.MediaAccessor;
 import org.aut.dataAccessors.ProfileAccessor;
 import org.aut.models.Profile;
+import org.aut.models.Skill;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.MultipartHandler;
@@ -33,24 +34,13 @@ public class ProfileHandler implements HttpHandler {
                 case "POST":
                 case "PUT": {
                     InputStream inputStream = exchange.getRequestBody();
-
-                    Profile profile = MultipartHandler.readObject(inputStream, Profile.class);
-                    if (!profile.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
-
-                    if (method.equals("POST")) ProfileAccessor.addProfile(profile);
-                    else ProfileAccessor.updateProfile(profile);
-
-                    File oldPic = MediaAccessor.getMedia(profile.getUserId(), MediaAccessor.MediaPath.PROFILES);
-                    File newPic = MultipartHandler.readToFile(inputStream, MediaAccessor.MediaPath.PROFILES.value(), profile.getUserId());
-                    if (newPic != null && oldPic != null) {
-                        Files.delete(oldPic.toPath());
+                    Profile profile = new Profile(JsonHandler.getObject(inputStream));
+                    try {
+                        ProfileAccessor.addProfile(profile);
+                    } catch (SQLException e) {
+                        ProfileAccessor.updateProfile(profile);
                     }
 
-                    File oldBG = MediaAccessor.getMedia("bg" + profile.getUserId(), MediaAccessor.MediaPath.BACKGROUNDS);
-                    File newBG = MultipartHandler.readToFile(inputStream, MediaAccessor.MediaPath.BACKGROUNDS.value(), profile.getUserId());
-                    if (oldBG != null && newBG != null) {
-                        Files.delete(oldBG.toPath());
-                    }
                     inputStream.close();
                     exchange.sendResponseHeaders(200, 0);
                 }

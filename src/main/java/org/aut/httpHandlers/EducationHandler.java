@@ -3,6 +3,7 @@ package org.aut.httpHandlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.aut.dataAccessors.EducationAccessor;
+import org.aut.dataAccessors.ProfileAccessor;
 import org.aut.models.Education;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
@@ -35,14 +36,9 @@ public class EducationHandler implements HttpHandler {
                     Education edu = new Education(JsonHandler.getObject(inputStream));
                     if (!edu.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
-
-                    if (method.equals("POST")) {
-                        if (EducationAccessor.educationExists(edu.getEducationId()))
-                            throw new NotAcceptableException("Not Acceptable");
+                    try {
                         EducationAccessor.addEducation(edu);
-                    } else {
-                        if (!EducationAccessor.educationExists(edu.getEducationId()))
-                            throw new NotAcceptableException("Not Acceptable");
+                    } catch (SQLException e) {
                         EducationAccessor.updateEducation(edu);
                     }
 

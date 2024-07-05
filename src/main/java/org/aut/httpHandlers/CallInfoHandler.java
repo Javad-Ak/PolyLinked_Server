@@ -3,6 +3,7 @@ package org.aut.httpHandlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.aut.controllers.CallInfoController;
+import org.aut.dataAccessors.EducationAccessor;
 import org.aut.models.CallInfo;
 import org.aut.models.User;
 import org.aut.utils.JsonHandler;
@@ -32,13 +33,12 @@ public class CallInfoHandler implements HttpHandler {
                     if (!requester.getUserId().equals(newCallInfo.getUserId()))
                         throw new UnauthorizedException("User unauthorized");
 
-                    if (method.equals("POST")) {
+                    try {
                         CallInfoController.addCallInfo(newCallInfo);
-                        exchange.sendResponseHeaders(200, 0);
-                    } else {
+                    } catch (SQLException e) {
                         CallInfoController.updateCallInfo(newCallInfo);
-                        exchange.sendResponseHeaders(200, 0);
                     }
+                    exchange.sendResponseHeaders(200, 0);
                 }
                 break;
 
