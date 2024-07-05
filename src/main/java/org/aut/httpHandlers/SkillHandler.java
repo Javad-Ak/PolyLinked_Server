@@ -52,7 +52,7 @@ public class SkillHandler implements HttpHandler {
                 case "GET": {
                     if (path.length != 4) throw new NotAcceptableException("Invalid path");
 
-                    ArrayList<Skill> skills = SkillsAccessor.getSkillsOfEducation(path[3]);
+                    ArrayList<Skill> skills = SkillsAccessor.getSkillsOfUser(path[3]);
                     if (!skills.isEmpty()) {
                         exchange.getResponseHeaders().add("X-Total-Count", Integer.toString(skills.size()));
                         exchange.sendResponseHeaders(200, 0);

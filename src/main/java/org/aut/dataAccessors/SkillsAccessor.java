@@ -5,6 +5,7 @@ import org.aut.models.Skill;
 import org.aut.utils.JsonHandler;
 import org.aut.utils.exceptions.NotAcceptableException;
 import org.aut.utils.exceptions.NotFoundException;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -90,7 +91,17 @@ public class SkillsAccessor {
 
     public synchronized static ArrayList<Skill> getSkillsOfEducation(String eduId) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM skills WHERE educationId = ?;");
-        statement.setString(1, eduId);
+        return getSkills(eduId, statement);
+    }
+
+    public synchronized static ArrayList<Skill> getSkillsOfUser(String userId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM skills WHERE userId = ?;");
+        return getSkills(userId, statement);
+    }
+
+    @NotNull
+    static ArrayList<Skill> getSkills(String userId, PreparedStatement statement) throws SQLException {
+        statement.setString(1, userId);
 
         ResultSet set = statement.executeQuery();
         ArrayList<JSONObject> objects = JsonHandler.getArrayFromResultSet(set);

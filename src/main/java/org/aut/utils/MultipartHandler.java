@@ -59,7 +59,7 @@ public class MultipartHandler {
         if (!type[1].equals("file")) throw new NotAcceptableException("Invalid Content-Type");
 
         File file = new File(dir + "/" + fileName + "." + type[0]);
-        FileOutputStream outputStream = new FileOutputStream(file);
+        FileOutputStream outputStream = new FileOutputStream(file, false);
         int remained = length;
         byte[] buffer = new byte[1000000];
         while (remained > 0) {

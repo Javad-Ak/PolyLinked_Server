@@ -29,7 +29,6 @@ public class Server {
             server.createContext("/users/skills", new SkillHandler());
             server.createContext("/users/followers", new FollowersHandler());
             server.createContext("/users/followings" , new FollowingsHandler());
-            server.createContext("/users/posts", new PostHandler());
             server.createContext("/users/callInfo" , new CallInfoHandler());
 
             server.createContext("/follows", new FollowHandler());
