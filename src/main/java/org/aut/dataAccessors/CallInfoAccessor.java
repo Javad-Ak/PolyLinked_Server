@@ -20,19 +20,15 @@ public class CallInfoAccessor {
     static void createUserTable() throws IOException {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS callInfo (" +
-                    "userId TEXT NOT NULL" +
-                    ", email TEXT PRIMARY KEY NOT NULL" +
+                    "userId TEXT PRIMARY KEY NOT NULL REFERENCES users(userId) ON DELETE CASCADE ON UPDATE CASCADE" +
+                    ", emailAddress TEXT NOT NULL REFERENCES users(email) ON DELETE CASCADE ON UPDATE CASCADE" +
                     ", mobileNumber TEXT" +
                     ", homeNumber TEXT" +
                     ", workNumber TEXT" +
-                    ", Address TEXT" +
+                    ", address TEXT" +
                     ", birthDay BIGINT" +
                     ", privacyPolitics TEXT" +
                     ", socialMedia TEXT" +
-                    ", FOREIGN KEY (userId, email)" +
-                    " REFERENCES users (userId, email)" +
-                    " ON UPDATE CASCADE" +
-                    " ON DELETE CASCADE" +
                     ");");
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
@@ -40,7 +36,7 @@ public class CallInfoAccessor {
     }
 
     public synchronized static void addCallInfo(CallInfo callInfo) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO callInfo(userId, email, mobileNumber, homeNumber, workNumber, Address, birthDay, privacyPolitics, socialMedia) " +
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO callInfo(userId, emailAddress, mobileNumber, homeNumber, workNumber, Address, birthDay, privacyPolitics, socialMedia) " +
                 "VALUES (?,?,?,?,?,?,?,?,?);");
 
         statement.setString(1, callInfo.getUserId());
@@ -58,8 +54,7 @@ public class CallInfoAccessor {
     }
 
     public synchronized static void updateCallInfo(CallInfo callInfo) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("UPDATE callInfo SET email=?, mobileNumber=?, homeNumber=?, workNumber=?, Address=?, birthDay=?, privacyPolitics=?, socialMedia=? WHERE userId=?;");
-
+        PreparedStatement statement = connection.prepareStatement("UPDATE callInfo SET emailAddress=?, mobileNumber=?, homeNumber=?, workNumber=?, address=?, birthDay=?, privacyPolitics=?, socialMedia=? WHERE userId=?;");
 
         statement.setString(1, callInfo.getEmail());
         statement.setString(2, callInfo.getMobileNumber());

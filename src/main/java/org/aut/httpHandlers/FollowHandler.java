@@ -46,7 +46,6 @@ public class FollowHandler implements HttpHandler {
                         throw new NotFoundException("not found");
                     } else {
                         FollowController.deleteFollow(follow);
-                        System.out.println("Hey");
                         exchange.sendResponseHeaders(200, 0);
                     }
                 }

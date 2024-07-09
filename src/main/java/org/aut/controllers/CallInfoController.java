@@ -38,18 +38,20 @@ public class CallInfoController {
         }
     }
 
-    public static CallInfo getCallInfo(String userId , String requesterId) throws SQLException, NotFoundException , NotAcceptableException , UnauthorizedException {
-        CallInfo callInfo = CallInfoAccessor.getCallInfoByUserId(userId);
-        String privacyLevel = callInfo.getPrivacyPolitics();
-        boolean isInNetwork = ConnectAccessor.userIsInNetworkOf(requesterId , userId);
-        boolean isConnected = ConnectAccessor.usersIsConnected(userId , requesterId);
+    public static CallInfo getCallInfo(String userId, String requesterId) throws SQLException, NotFoundException, NotAcceptableException, UnauthorizedException {
+        CallInfo callInfo =  CallInfoAccessor.getCallInfoByUserId(userId);;
 
-      if (privacyLevel.equals(CallInfo.PrivacyPolitics.ONLY_ME.toString()) && !userId.equals(requesterId) ||
-      privacyLevel.equals(CallInfo.PrivacyPolitics.MY_CONNECTIONS.toString()) && !isConnected ||
-      privacyLevel.equals(CallInfo.PrivacyPolitics.FURTHER_CONNECTIONS.toString()) && !isInNetwork){
-          throw new UnauthorizedException("Requester not allowed");
-      } else {
-          return callInfo;
-      }
+        String privacyLevel = callInfo.getPrivacyPolitics();
+        boolean isInNetwork = ConnectAccessor.userIsInNetworkOf(requesterId, userId);
+        boolean isConnected = ConnectAccessor.usersIsConnected(userId, requesterId);
+        if (userId.equals(requesterId)) return callInfo;
+
+        if (privacyLevel.equals(CallInfo.PrivacyPolitics.ONLY_ME.toString()) ||
+                privacyLevel.equals(CallInfo.PrivacyPolitics.MY_CONNECTIONS.toString()) && !isConnected ||
+                privacyLevel.equals(CallInfo.PrivacyPolitics.FURTHER_CONNECTIONS.toString()) && !isInNetwork) {
+            throw new UnauthorizedException("Requester not allowed");
+        } else {
+            return callInfo;
+        }
     }
 }

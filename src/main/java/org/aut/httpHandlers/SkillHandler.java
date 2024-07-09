@@ -2,6 +2,7 @@ package org.aut.httpHandlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.aut.dataAccessors.EducationAccessor;
 import org.aut.dataAccessors.ProfileAccessor;
 import org.aut.dataAccessors.SkillsAccessor;
 import org.aut.models.Skill;
@@ -36,9 +37,10 @@ public class SkillHandler implements HttpHandler {
                     if (!skill.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
                     try {
-                        SkillsAccessor.addSkill(skill);
-                    } catch (SQLException e) {
+                        SkillsAccessor.getSkill(skill.getSkillId());
                         SkillsAccessor.updateSkill(skill);
+                    } catch (Exception e) {
+                        SkillsAccessor.addSkill(skill);
                     }
 
                     inputStream.close();

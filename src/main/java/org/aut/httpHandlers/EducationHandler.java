@@ -37,9 +37,10 @@ public class EducationHandler implements HttpHandler {
                     if (!edu.getUserId().equals(user.getUserId())) throw new UnauthorizedException("Unauthorized");
 
                     try {
-                        EducationAccessor.addEducation(edu);
-                    } catch (SQLException e) {
+                        EducationAccessor.getEducation(edu.getEducationId());
                         EducationAccessor.updateEducation(edu);
+                    } catch (Exception e) {
+                        EducationAccessor.addEducation(edu);
                     }
 
                     inputStream.close();

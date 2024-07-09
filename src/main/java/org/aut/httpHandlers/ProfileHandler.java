@@ -35,10 +35,12 @@ public class ProfileHandler implements HttpHandler {
                 case "PUT": {
                     InputStream inputStream = exchange.getRequestBody();
                     Profile profile = new Profile(JsonHandler.getObject(inputStream));
+
                     try {
-                        ProfileAccessor.addProfile(profile);
-                    } catch (SQLException e) {
+                        ProfileAccessor.getProfile(profile.getUserId());
                         ProfileAccessor.updateProfile(profile);
+                    } catch (Exception e) {
+                        ProfileAccessor.addProfile(profile);
                     }
 
                     inputStream.close();
