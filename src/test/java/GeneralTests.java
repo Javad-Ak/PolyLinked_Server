@@ -2,8 +2,8 @@ import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.aut.utils.JwtHandler.generateToken;
-import static org.aut.utils.JwtHandler.verifyToken;
+import static org.aut.polylinked_server.utils.JwtHandler.generateToken;
+import static org.aut.polylinked_server.utils.JwtHandler.verifyToken;
 
 @DisplayName("------ testing general features...")
 public class GeneralTests {

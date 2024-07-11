@@ -1,10 +1,10 @@
-import org.aut.models.Message;
-import org.aut.models.Post;
-import org.aut.models.Profile;
-import org.aut.models.*;
-import org.aut.utils.MultipartHandler;
-import org.aut.dataAccessors.UserAccessor;
-import org.aut.utils.exceptions.NotFoundException;
+import org.aut.polylinked_server.models.Message;
+import org.aut.polylinked_server.models.Post;
+import org.aut.polylinked_server.models.Profile;
+import org.aut.polylinked_server.models.*;
+import org.aut.polylinked_server.utils.MultipartHandler;
+import org.aut.polylinked_server.dataAccessors.UserAccessor;
+import org.aut.polylinked_server.utils.exceptions.NotFoundException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.aut.utils.JsonHandler;
+import org.aut.polylinked_server.utils.JsonHandler;
 
 @DisplayName("------ Testing requests...")
 public class RequestTest {

@@ -1,8 +1,8 @@
-import org.aut.controllers.*;
-import org.aut.dataAccessors.*;
-import org.aut.models.*;
-import org.aut.utils.exceptions.NotAcceptableException;
-import org.aut.utils.exceptions.NotFoundException;
+import org.aut.polylinked_server.controllers.*;
+import org.aut.polylinked_server.dataAccessors.*;
+import org.aut.polylinked_server.models.*;
+import org.aut.polylinked_server.utils.exceptions.NotAcceptableException;
+import org.aut.polylinked_server.utils.exceptions.NotFoundException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
